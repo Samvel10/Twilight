@@ -4,6 +4,7 @@
 #include "TwFx.h"
 #include "AralezWorld.h"
 #include "AralezActors.h"
+#include "TwFlash.h"
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -155,7 +156,12 @@ void AAralezSpirit::InHowl()
 	HowlCd = 12.f;
 	const FVector P = GetActorLocation();
 	TwFx::Sound(GetWorld(), TEXT("sfx_aralez_howl"), P, bBot ? 0.4f : 1.f);
-	TwFx::Burst(GetWorld(), TwFx::EFx::Nova, P, 2.f);
+	// a soft blue shock-wave instead of a blinding explosion (the camera is very close in the cave)
+	{
+		FActorSpawnParameters Sp;
+		Sp.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		if (ATwFlash* F = GetWorld()->SpawnActor<ATwFlash>(P, FRotator::ZeroRotator, Sp)) F->Init(FLinearColor(0.25f, 0.7f, 1.f) * 0.35f, bBot ? 10.f : 16.f, 0.5f);
+	}
 	for (TActorIterator<AShadowWraith> It(GetWorld()); It; ++It)
 		if (FVector::Dist(It->GetActorLocation(), P) < 2600.f) It->Repel(P);
 	for (TActorIterator<ASoulLight> It(GetWorld()); It; ++It)

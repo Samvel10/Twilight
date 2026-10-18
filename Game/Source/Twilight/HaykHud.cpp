@@ -222,6 +222,21 @@ void SHaykHud::PaintDuel(const FGeometry& Geo, FSlateWindowElementList& Out, int
 	// ---- aiming: crosshair, power, special
 	if (St == EHaykState::Aim && GM->IsHumanTurn())
 	{
+		// mark the opponent: he is far away across the valley
+		if (AHaykArcher* Foe = GM->IsBelTurn() ? GM->GetHayk() : GM->GetBel())
+		{
+			FVector2D Scr;
+			if (PC->ProjectWorldLocationToScreen(Foe->GetHeadTarget() + FVector(0, 0, 60.f), Scr, true))
+			{
+				Scr /= FMath::Max(Geo.GetAccumulatedLayoutTransform().GetScale(), 0.01f);
+				const float T = PC->GetWorld()->GetRealTimeSeconds();
+				const float Bob = FMath::Sin(T * 4.f) * 4.f * S;
+				const FLinearColor Mc = Foe->IsBel() ? Blood : Gold;
+				const FVector2D P(Scr.X, Scr.Y - 18.f * S + Bob);
+				Lines(Out, L + 6, Geo, { FVector2f(P + FVector2D(-11, -14) * S), FVector2f(P), FVector2f(P + FVector2D(11, -14) * S) }, Mc, 3.f * S);
+				Text(Out, L + 6, Geo, P + FVector2D(0, -44 * S), Foe->IsBel() ? LOCTEXT("BelMark", "ԲԵԼ") : LOCTEXT("HaykMark", "ՀԱՅԿ"), TwAssets::Font(15 * S, false, true), Mc, 0.5f);
+			}
+		}
 		const FLinearColor Cc(1, 1, 1, 0.8f);
 		const float G = 8 * S, Ln = 8 * S;
 		Lines(Out, L + 5, Geo, { FVector2f(C + FVector2D(-G - Ln, 0)), FVector2f(C + FVector2D(-G, 0)) }, Cc, 2 * S);
