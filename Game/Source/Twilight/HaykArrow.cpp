@@ -229,7 +229,7 @@ void AHaykArrow::Resolve(const FHitResult& Hit)
 		TwFx::Burst(GetWorld(), TwFx::EFx::Smoke, Impact, 0.6f);
 		TwFx::Sound(GetWorld(), TEXT("sfx_arrow_hit_ground"), Impact, 0.9f);
 	}
-	if (bSpecial) TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, Impact, 1.2f);
+	if (bSpecial && Result != EArrowResult::HitArcher) TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, Impact, 1.2f); // the archer spawns its own
 	Light->SetIntensity(Light->Intensity * 0.3f);
 	SetLifeSpan(25.f);
 }

@@ -118,7 +118,11 @@ void AShadowWraith::BeginPlay()
 		Dark->SetVectorParameterValue(TEXT("VeinColor"), FLinearColor(0.6f, 0.02f, 0.06f));
 		Dark->SetScalarParameterValue(TEXT("VeinIntensity"), 0.12f);
 		Dark->SetScalarParameterValue(TEXT("Metallic"), 0.f);
-		Dark->SetScalarParameterValue(TEXT("Roughness"), 1.f); Dark->SetScalarParameterValue(TEXT("RimIntensity"), 0.2f); Dark->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(0.06f, 0.f, 0.1f));
+		Dark->SetScalarParameterValue(TEXT("Roughness"), 1.f);
+		// a black shape with a crimson rim reads as a ghost; the lit scale pattern read as a checkered cone
+		Dark->SetVectorParameterValue(TEXT("SkinColor2"), FLinearColor(0.01f, 0.005f, 0.012f));
+		Dark->SetScalarParameterValue(TEXT("ScaleTiling"), 0.6f);
+		Dark->SetScalarParameterValue(TEXT("RimIntensity"), 0.35f); Dark->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(0.3f, 0.01f, 0.03f)); // cave exposure is +2.2: keep it dark crimson, not pink
 	}
 	// a hooded robe trailing into smoke, with a small head carrying the burning eyes
 	Body->SetStaticMesh(TwAssets::Sphere());
@@ -136,7 +140,7 @@ void AShadowWraith::BeginPlay()
 		Robe->RegisterComponent();
 	}
 	UMaterialInstanceDynamic* Eye = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
-	if (Eye) { Eye->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.08f, 0.04f)); Eye->SetScalarParameterValue(TEXT("GlowMode"), 1.f); Eye->SetScalarParameterValue(TEXT("Intensity"), 30.f); }
+	if (Eye) { Eye->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.08f, 0.04f)); Eye->SetScalarParameterValue(TEXT("GlowMode"), 1.f); Eye->SetScalarParameterValue(TEXT("Intensity"), 9.f); }
 	for (int32 s = -1; s <= 1; s += 2)
 	{
 		UStaticMeshComponent* E = NewObject<UStaticMeshComponent>(this);
@@ -162,6 +166,26 @@ void AShadowWraith::BeginPlay()
 		W->RegisterComponent();
 		Wisps.Add(W);
 	}
+	// soft crimson aura so the shadow is seen against the dark rock, and a bigger body
+	if (UMaterialInstanceDynamic* AuraM = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this))
+	{
+		AuraM->SetVectorParameterValue(TEXT("Color"), FLinearColor(0.4f, 0.f, 0.03f));
+		AuraM->SetScalarParameterValue(TEXT("GlowMode"), 1.f);
+		AuraM->SetScalarParameterValue(TEXT("Intensity"), 0.3f);
+		AuraM->SetScalarParameterValue(TEXT("Falloff"), 2.f);
+		UStaticMeshComponent* Aura = NewObject<UStaticMeshComponent>(this);
+		Aura->SetStaticMesh(TwAssets::Sphere());
+		Aura->SetupAttachment(Body);
+		Aura->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Aura->SetCastShadow(false);
+		Aura->SetRelativeLocation(FVector(0.f, 0.f, -80.f));
+		Aura->SetRelativeScale3D(FVector(2.2f, 2.2f, 3.4f));
+		Aura->SetMaterial(0, AuraM);
+		Aura->RegisterComponent();
+	}
+	EyeLight->SetIntensity(600.f);
+	EyeLight->SetAttenuationRadius(500.f);
+	SetActorScale3D(FVector(1.4f));
 }
 
 void AShadowWraith::Repel(const FVector& From)
@@ -173,6 +197,13 @@ void AShadowWraith::Repel(const FVector& From)
 
 void AShadowWraith::Tick(float Dt)
 {
+	// a shade flying through the lens fills the screen with a flat red cone: hide it for that instant
+	if (APlayerController* LPC = GetWorld()->GetFirstPlayerController())
+		if (LPC->PlayerCameraManager)
+		{
+			const bool bNear = FVector::DistSquared(GetActorLocation(), LPC->PlayerCameraManager->GetCameraLocation()) < FMath::Square(420.f);
+			if (Body->IsVisible() == bNear) Body->SetVisibility(!bNear, true);
+		}
 	Super::Tick(Dt);
 	Age += Dt;
 	Cooldown = FMath::Max(0.f, Cooldown - Dt);

@@ -211,6 +211,13 @@ void AAralezSpirit::ThinkBot(float Dt)
 			const FVector Away = GetActorLocation() - It->GetActorLocation();
 			if (Away.Size() < 1300.f) BotGoal += Away.GetSafeNormal() * 1500.f;
 		}
+		// personal space: rivals keep off the player (and so off the lens right behind them)
+		if (APlayerController* LPC = GetWorld()->GetFirstPlayerController())
+			if (APawn* PP = LPC->GetPawn())
+			{
+				const FVector Away = GetActorLocation() - PP->GetActorLocation();
+				if (Away.Size() < 1000.f) BotGoal += Away.GetSafeNormal() * 1400.f;
+			}
 		if (DashCd <= 0.f && FMath::FRand() < 0.05f * Skill) InDash();
 	}
 }
@@ -250,12 +257,26 @@ void AAralezSpirit::Move(float Dt)
 		// same frame as AAralezWorld::BuildTunnel; the floor is flatter (closer) than the walls
 		const FVector RightV = FVector::CrossProduct(FVector::UpVector, Tan).GetSafeNormal();
 		const FVector UpV = FVector::CrossProduct(Tan, RightV).GetSafeNormal();
-		const float Frac = FVector::DotProduct(Dir, UpV) < -0.35f ? 0.60f : 0.76f;
-		const float Lim = AAralezWorld::TunnelRadius(PathT) * Frac;
+		// the real (noisy) wall at this angle, minus body + wing span: a flat fraction of the mean radius let the
+		// spirit sink into the narrow spots
+		float Ang = FMath::Atan2(FVector::DotProduct(Dir, UpV), FVector::DotProduct(Dir, RightV));
+		if (Ang < 0.f) Ang += 2.f * PI;
+		const float Lim = FMath::Max(400.f, AAralezWorld::WallRadius(PathT, Ang) - 260.f);
 		if (D > Lim)
 		{
 			P -= Dir * (D - Lim);
 			Vel -= Dir * FMath::Max(0.f, FVector::DotProduct(Vel, Dir));
+		}
+		// skim over the underground river, never dive under its surface
+		if (PathT > AAralezWorld::RiverT0 && PathT < AAralezWorld::RiverT1)
+		{
+			const float MinUp = -AAralezWorld::RiverDepth * AAralezWorld::TunnelRadius(PathT) + 140.f;
+			const float CurUp = FVector::DotProduct(P - C, UpV);
+			if (CurUp < MinUp)
+			{
+				P += UpV * (MinUp - CurUp);
+				Vel -= UpV * FMath::Min(0.f, FVector::DotProduct(Vel, UpV));
+			}
 		}
 	}
 	if (PathT <= 0.001f && FVector::DotProduct(Vel, Tan) < 0.f) Vel -= Tan * FVector::DotProduct(Vel, Tan);
@@ -300,12 +321,13 @@ void AAralezSpirit::Animate(float Dt)
 	for (int32 i = 0; i < SpiritTrail; ++i)
 	{
 		const float A = Now - TrailBirth[i];
-		if (A < 0.f || A > 1.4f) continue;
+		const float Life = bBot ? 0.6f : 1.2f; // rival trails short and thin: long ones read as laser beams across the frame
+		if (A < 0.f || A > Life) continue;
 		FTransform T;
 		Trail->GetInstanceTransform(i, T, true);
 		// segments crossing right in front of the lens read as a flat band: thin them out there
-		const float CamK = FMath::SmoothStep(60.f, 450.f, (float)FVector::Dist(T.GetLocation(), CamLoc));
-		const float TW = 0.06f * (1.f - A / 1.4f) * CamK + 0.001f;
+		const float CamK = FMath::SmoothStep(150.f, 1200.f, (float)FVector::Dist(T.GetLocation(), CamLoc));
+		const float TW = (bBot ? 0.03f : 0.055f) * FMath::Square(1.f - A / Life) * CamK + 0.001f;
 		T.SetScale3D(FVector(TW, TW, TrailLen[i]));
 		Trail->UpdateInstanceTransform(i, T, true, false, true);
 	}
@@ -320,7 +342,7 @@ void AAralezSpirit::Tick(float Dt)
 	{
 		bool bNearLens = false;
 		if (APlayerController* LPC = GetWorld()->GetFirstPlayerController())
-			if (LPC->PlayerCameraManager) bNearLens = FVector::DistSquared(GetActorLocation(), LPC->PlayerCameraManager->GetCameraLocation()) < FMath::Square(320.f);
+			if (LPC->PlayerCameraManager) bNearLens = FVector::DistSquared(GetActorLocation(), LPC->PlayerCameraManager->GetCameraLocation()) < FMath::Square(450.f);
 		if (BodyRoot->IsVisible() == bNearLens) BodyRoot->SetVisibility(!bNearLens, true);
 	}
 	DashCd = FMath::Max(0.f, DashCd - Dt);
@@ -342,5 +364,17 @@ void AAralezSpirit::Tick(float Dt)
 	if (!bBot)
 	{
 		Camera->SetFieldOfView(FMath::FInterpTo(Camera->FieldOfView, DashTime > 0.f ? 104.f : 90.f, Dt, 5.f));
+		// keep the lens inside the cave: pull the boom in when the camera nears the rock
+		const FVector CL = Camera->GetComponentLocation();
+		const float CT = AAralezWorld::NearestT(CL, PathT);
+		FVector O = CL - AAralezWorld::PathPoint(CT);
+		const FVector Tn = AAralezWorld::PathTangent(CT);
+		O -= Tn * FVector::DotProduct(O, Tn);
+		const FVector Rv = FVector::CrossProduct(FVector::UpVector, Tn).GetSafeNormal();
+		const FVector Uv = FVector::CrossProduct(Tn, Rv);
+		float CA = FMath::Atan2(FVector::DotProduct(O, Uv), FVector::DotProduct(O, Rv));
+		if (CA < 0.f) CA += 2.f * PI;
+		const bool bTight = O.Size() > AAralezWorld::WallRadius(CT, CA) - 180.f;
+		Boom->TargetArmLength = FMath::FInterpTo(Boom->TargetArmLength, bTight ? 260.f : 520.f, Dt, 4.f);
 	}
 }

@@ -85,14 +85,14 @@ void AVishap::Build()
 		SkinMat->SetVectorParameterValue(TEXT("SkinColor"), Skin);
 		SkinMat->SetVectorParameterValue(TEXT("VeinColor"), Vein);
 		// wet obsidian scales with a few thick lava veins; cool rim separates them from the golden hero
-		SkinMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBoss ? 4.f : 3.f);
+		SkinMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBoss ? 3.5f : 2.6f);
 		SkinMat->SetScalarParameterValue(TEXT("VeinTiling"), 1.6f);
-		SkinMat->SetScalarParameterValue(TEXT("VeinSharpness"), 28.f);
+		SkinMat->SetScalarParameterValue(TEXT("VeinSharpness"), 45.f); // dark obsidian with a few veins, not lava speckle like the hero
 		SkinMat->SetScalarParameterValue(TEXT("ScaleTiling"), 4.f);
 		SkinMat->SetScalarParameterValue(TEXT("Roughness"), 0.22f);
 		SkinMat->SetScalarParameterValue(TEXT("Metallic"), 0.5f);
-		SkinMat->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(0.45f, 0.2f, 1.f));
-		SkinMat->SetScalarParameterValue(TEXT("RimIntensity"), 0.25f);
+		SkinMat->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(0.3f, 0.5f, 1.f)); // cool rim: separates them from the gold hero without turning them silver
+		SkinMat->SetScalarParameterValue(TEXT("RimIntensity"), 0.45f);
 		SkinMat->SetVectorParameterValue(TEXT("SkinColor2"), Skin * 2.2f);
 	}
 	BoneMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_VishapSkin")), this);
@@ -194,10 +194,10 @@ void AVishap::Build()
 		UStaticMeshComponent* Horn = MakePart(ConeMesh, H, BoneMat, false);
 		Horn->SetRelativeLocation(FVector(10.f, 26.f * s, 38.f));
 		Horn->SetRelativeRotation(FRotator(-110.f, 0.f, 18.f * s));
-		Horn->SetRelativeScale3D(FVector(0.22f, 0.22f, bBoss ? 1.5f : 1.1f));
+		Horn->SetRelativeScale3D(FVector(0.24f, 0.24f, bBoss ? 2.3f : 1.6f));
 		UStaticMeshComponent* Eye = MakePart(SphereMesh, H, EyeMat, false);
 		Eye->SetRelativeLocation(FVector(88.f, 20.f * s, 20.f));
-		Eye->SetRelativeScale3D(FVector(0.17f, 0.12f, 0.1f));
+		Eye->SetRelativeScale3D(FVector(0.3f, 0.2f, 0.16f)); // readable head: big glowing eyes
 		// brow spikes
 		UStaticMeshComponent* Brow = MakePart(ConeMesh, H, BoneMat, false);
 		Brow->SetRelativeLocation(FVector(70.f, 22.f * s, 30.f));
@@ -608,6 +608,11 @@ void AVishap::Tick(float Dt)
 void AVishap::UpdateBody(float Dt)
 {
 	const float Lag = FVector::Dist(HeadPos, Trail[0]);
+	// segments the camera passes through would fill the screen with a flat red tube: hide them for that instant
+	FVector CamLoc(1e9f);
+	if (APlayerController* CPC = GetWorld()->GetFirstPlayerController())
+		if (CPC->PlayerCameraManager) CamLoc = CPC->PlayerCameraManager->GetCameraLocation();
+	const bool bHideNear = State != EVishapState::Dying;
 	for (int32 i = 0; i < Segments.Num(); ++i)
 	{
 		FVector Tan;
@@ -620,6 +625,11 @@ void AVishap::UpdateBody(float Dt)
 		P += Side * Wave;
 		const FRotator Rot = FRotationMatrix::MakeFromXZ(Tan, FVector::UpVector).Rotator();
 		Segments[i]->SetWorldLocationAndRotation(P, Rot);
+		if (bHideNear)
+		{
+			const bool bNear = FVector::DistSquared(P, CamLoc) < FMath::Square(SegRadius[i] * 1.8f + (bBoss ? 600.f : 250.f));
+			if (Segments[i]->IsVisible() == bNear) Segments[i]->SetVisibility(!bNear, true);
+		}
 	}
 	if (State == EVishapState::Dying && BreathCone) BreathCone->SetVisibility(false);
 	// breath cone follows the mouth
@@ -639,7 +649,7 @@ void AVishap::UpdateBody(float Dt)
 			// soft: the cone reads as heat haze; also fade it when the camera is inside or right next to it
 			float CamK = 1.f;
 			if (APlayerController* PCc = GetWorld()->GetFirstPlayerController())
-				if (PCc->PlayerCameraManager) CamK = FMath::Clamp((float)FVector::Dist(PCc->PlayerCameraManager->GetCameraLocation(), Mouth) / (Range * 0.8f), 0.15f, 1.f);
+				if (PCc->PlayerCameraManager) CamK = FMath::Clamp((float)FVector::Dist(PCc->PlayerCameraManager->GetCameraLocation(), Mouth) / (Range * 0.8f), 0.05f, 1.f);
 			if (BreathMat) BreathMat->SetScalarParameterValue(TEXT("Intensity"), (bFire ? 0.45f + FMath::FRandRange(-0.08f, 0.08f) : 0.12f) * CamK);
 		}
 	}

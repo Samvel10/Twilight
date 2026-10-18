@@ -329,7 +329,9 @@ float AHaykArcher::ApplyHit(EArcherZone Zone, bool bSpecial, const FVector& Wher
 	if (bSpecial) D *= 1.8f;
 	Health = FMath::Max(0.f, Health - D);
 	HurtFlash = 1.f;
-	TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, Where, bSpecial ? 1.6f : 1.25f);
+	// a full fireball hid the stuck arrow and the hit reaction: sparks for normal hits, fire for the big ones
+	if (bSpecial || Health <= 0.f) TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, Where, 1.6f);
+	else TwFx::Burst(GetWorld(), TwFx::EFx::Sparks, Where, 1.0f);
 	TwFx::LightFlash(GetWorld(), Where, FLinearColor(1.f, 0.45f, 0.1f), 30000.f, 1600.f, 0.35f);
 	TwFx::Sound(GetWorld(), TEXT("sfx_vishap_hit"), Where, 1.f, bBel ? 0.7f : 1.1f);
 	if (Health <= 0.f)

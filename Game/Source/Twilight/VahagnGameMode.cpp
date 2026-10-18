@@ -147,12 +147,12 @@ void AVahagnGameMode::BeginWave(int32 Index)
 		for (int32 i = 0; i < 4; ++i) SpawnVishap(false, 0, 7500.f, Base + i * 90.f);
 		break;
 	case 2:
-		Announce(LOCTEXT("W2", "Ալիք 2"), LOCTEXT("W2s", "Կարմիր վիշապը ավելի արագ է"));
+		Announce(LOCTEXT("W2", "Ալիք 2"), LOCTEXT("W2s", "Կարմիր վիշապն ավելի արագ է"));
 		for (int32 i = 0; i < 4; ++i) SpawnVishap(false, 0, 8000.f, Base + i * 72.f);
 		SpawnVishap(false, 1, 9000.f, Base + 288.f);
 		break;
 	case 3:
-		Announce(LOCTEXT("W3", "Ալիք 3"), LOCTEXT("W3s", "Ծովը եռում է"));
+		Announce(LOCTEXT("W3", "Ալիք 3"), LOCTEXT("W3s", "Ծովն եռում է"));
 		for (int32 i = 0; i < 4; ++i) SpawnVishap(false, 0, 8000.f, Base + i * 60.f);
 		SpawnVishap(false, 1, 9000.f, Base + 240.f);
 		SpawnVishap(false, 1, 9000.f, Base + 288.f);
@@ -227,7 +227,7 @@ void AVahagnGameMode::EndMatch(bool bVictory)
 		Score += FMath::RoundToInt(TimeLeft) * 10;
 		if (AVahagnCharacter* H = Hero()) Score += FMath::RoundToInt(H->GetHealth()) * 15;
 		TwFx::Sound2D(GetWorld(), TEXT("sfx_victory"), 1.f);
-		if (World) World->PlayMusic(TEXT("music_menu"));
+		if (World) { World->PlayMusic(TEXT("music_menu")); World->SetStorm(false); } // the vishap is slain: the storm clears, the purple sunset returns
 	}
 	else
 	{

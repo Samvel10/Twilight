@@ -67,8 +67,9 @@ AVahagnCharacter::AVahagnCharacter()
 	Boom->SocketOffset = FVector(0, 85.f, 110.f);
 	Boom->bUsePawnControlRotation = true;
 	Boom->bEnableCameraLag = true;
-	Boom->CameraLagSpeed = 9.f;
-	Boom->CameraLagMaxDistance = 320.f;
+	// tight follow: a loose lag let the hero drift to the screen edges under the HUD
+	Boom->CameraLagSpeed = 14.f;
+	Boom->CameraLagMaxDistance = 120.f;
 	Boom->bDoCollisionTest = true;
 	Boom->ProbeSize = 16.f;
 
@@ -120,7 +121,7 @@ void AVahagnCharacter::BeginPlay()
 	AnimNova = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_ChargedAttack.MM_ChargedAttack"));
 	AnimHit = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Front_Lgt_01.MM_HitReact_Front_Lgt_01"));
 	AnimDeath = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Death/MM_Death_Front_01.MM_Death_Front_01"));
-	if (Poser) Poser->SetLoop(AnimFly, 0.01f, 0.22f);
+	if (Poser) { Poser->SetLoop(AnimFly, 0.01f, 0.35f); Poser->SetOneShotMask(TEXT("spine_01")); } // casts move the arms, the legs keep flying
 
 	// Molten fire body
 	BodyMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_FireBody")), this);
@@ -240,7 +241,7 @@ void AVahagnCharacter::Tick(float Dt)
 		if (BirthStage == 1 && A > 0.22f) { BirthStage = 2; TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, Reed, 2.5f); TwFx::LightFlash(GetWorld(), Reed, FLinearColor(1.f, 0.4f, 0.1f), 120000.f, 6000.f, 1.f); }
 		if (BirthStage == 2 && A > 0.36f) { BirthStage = 3; GetMesh()->SetVisibility(true, true); TwFx::Burst(GetWorld(), TwFx::EFx::BigExplosion, Reed, 4.f); TwFx::Burst(GetWorld(), TwFx::EFx::Splash, FVector(Reed.X, Reed.Y, 10.f), 5.f); TwFx::Sound2D(GetWorld(), TEXT("sfx_special_nova"), 1.f, 0.8f); }
 		Boom->TargetOffset = FMath::VInterpTo(Boom->TargetOffset, A > 0.6f ? FVector::ZeroVector : FVector(0, 0, 650.f), Dt, 1.5f);
-		if (BirthLeft <= 0.f) { BirthLeft = 0.f; GetMesh()->SetVisibility(true, true); Boom->TargetOffset = FVector::ZeroVector; if (Poser) Poser->SetLoop(AnimFly, 0.5f, 0.22f); bFlyPose = false; }
+		if (BirthLeft <= 0.f) { BirthLeft = 0.f; GetMesh()->SetVisibility(true, true); Boom->TargetOffset = FVector::ZeroVector; if (Poser) Poser->SetLoop(AnimFly, 0.5f, 0.35f); bFlyPose = false; }
 		UpdateVisuals(Dt);
 		return;
 	}
@@ -385,7 +386,8 @@ void AVahagnCharacter::UpdateVisuals(float Dt)
 	TargetPitch += Climb * 35.f * FMath::Min(FwdK, 1.f);
 	if (bDead) TargetPitch = 0.f;
 	float TargetRoll = FMath::Clamp(YawRate * 0.10f, -40.f, 40.f) + MoveInput.X * 18.f;
-	if (bFireHeld || bChargeHeld) { TargetPitch *= 0.55f; } // upright-ish while casting so shots read clearly
+	if (bFireHeld || bChargeHeld) { TargetPitch *= 0.85f; } // a little more upright while casting
+	if (!bDead) TargetPitch = FMath::Min(TargetPitch, -20.f); // always a flier: legs trail, never "standing on the sea"
 	VisualPitch = FMath::FInterpTo(VisualPitch, TargetPitch, Dt, 5.f);
 	VisualRoll = FMath::FInterpTo(VisualRoll, TargetRoll, Dt, 5.f);
 
@@ -404,7 +406,7 @@ void AVahagnCharacter::UpdateVisuals(float Dt)
 		if (bWantFly != bFlyPose)
 		{
 			bFlyPose = bWantFly;
-			Poser->SetLoop(AnimFly, 0.35f, bFlyPose ? 0.55f : 0.22f);
+			Poser->SetLoop(AnimFly, 0.35f, bFlyPose ? 0.55f : 0.35f);
 		}
 	}
 
@@ -497,7 +499,7 @@ void AVahagnCharacter::FireOnce()
 	FireCooldown = 0.15f;
 	const FVector Muzzle = MuzzleLocation(bRightHand);
 	SpawnFireball(Muzzle, AimPoint, 0.f, false);
-	if (Poser) Poser->PlayOneShot(bRightHand ? AnimCastA : AnimCastB, 2.0f, 0.05f, 0.18f, 0.55f);
+	if (Poser) Poser->PlayOneShot(bRightHand ? AnimCastA : AnimCastB, 2.0f, 0.05f, 0.18f, 0.6f);
 	TwFx::Burst(GetWorld(), TwFx::EFx::MuzzleFlash, Muzzle, 0.5f);
 	TwFx::Sound(GetWorld(), TEXT("sfx_fireball_cast"), Muzzle, 0.55f, FMath::FRandRange(0.92f, 1.08f));
 	bRightHand = !bRightHand;
@@ -521,9 +523,10 @@ void AVahagnCharacter::InNova()
 	Nova = 0.f;
 	const FVector C = GetActorLocation();
 	if (Poser) Poser->PlayOneShot(AnimNova, 1.3f, 0.05f, 0.3f, 1.f);
-	TwFx::Burst(GetWorld(), TwFx::EFx::Nova, C, 6.f);
-	TwFx::Burst(GetWorld(), TwFx::EFx::BigExplosion, C, 4.f);
-	TwFx::LightFlash(GetWorld(), C, FLinearColor(1.f, 0.6f, 0.2f), 300000.f, 9000.f, 0.9f);
+	// the burst sits on the hero (the camera is only ~6 m away): keep it small and put the big fire on the targets
+	TwFx::Burst(GetWorld(), TwFx::EFx::Nova, C, 3.f);
+	TwFx::LightFlash(GetWorld(), C, FLinearColor(1.f, 0.6f, 0.2f), 120000.f, 9000.f, 0.9f);
+	int32 TargetBursts = 0;
 	TwFx::Sound2D(GetWorld(), TEXT("sfx_special_nova"), 1.f);
 	AddShake(1.f);
 	for (TActorIterator<AVishap> It(GetWorld()); It; ++It)
@@ -536,6 +539,7 @@ void AVahagnCharacter::InNova()
 			const float Dmg = (V->IsBoss() ? 18.f : 14.f) * (1.f - 0.5f * D / 5200.f);
 			V->ApplyHit(Dmg, C, this, true);
 			V->Knockback(C, 4000.f);
+			if (TargetBursts++ < 6) TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, V->GetHeadLocation(), V->IsBoss() ? 3.f : 1.8f);
 		}
 	}
 	// a short, dramatic slow-motion beat

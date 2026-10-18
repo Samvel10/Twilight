@@ -72,6 +72,7 @@ FTwPoseSnapshot UTwPoseAnimInstance::GetSnapshot() const
 	S.Current = Current;
 	S.Previous = Previous;
 	S.OneShot = OneShot;
+	S.OneShotMaskRoot = OneShotMaskRoot;
 	return S;
 }
 
@@ -114,11 +115,48 @@ bool FTwPoseProxy::Evaluate(FPoseContext& Output)
 
 	if (Snap.OneShot.Seq && Snap.OneShot.Weight > 0.001f)
 	{
-		FPoseContext Shot(this);
+		// additive clips (e.g. the Rifle hit-reacts) hold deltas, not a pose: blending them as a pose collapses the skeleton
+		const bool bAdditive = Snap.OneShot.Seq->IsValidAdditive();
+		FPoseContext Shot(this, bAdditive);
 		TwSample(Snap.OneShot, Shot);
-		FAnimationPoseData OutData(Output);
-		const FAnimationPoseData ShotData(Shot);
-		FAnimationRuntime::BlendTwoPosesTogetherInPlace(OutData, ShotData, 1.f - Snap.OneShot.Weight);
+		if (bAdditive)
+		{
+			FAnimationPoseData OutData(Output);
+			const FAnimationPoseData ShotData(Shot);
+			FAnimationRuntime::AccumulateAdditivePose(OutData, ShotData, Snap.OneShot.Weight, Snap.OneShot.Seq->GetAdditiveAnimType());
+			Output.Pose.NormalizeRotations();
+		}
+		else if (Snap.OneShotMaskRoot.IsNone())
+		{
+			FAnimationPoseData OutData(Output);
+			const FAnimationPoseData ShotData(Shot);
+			FAnimationRuntime::BlendTwoPosesTogetherInPlace(OutData, ShotData, 1.f - Snap.OneShot.Weight);
+		}
+		else
+		{
+			// masked overlay: only the subtree under the mask root takes the action (legs keep flying)
+			const FBoneContainer& BC = Output.Pose.GetBoneContainer();
+			const int32 N = Output.Pose.GetNumBones();
+			if (MaskFor != Snap.OneShotMaskRoot || MaskWeights.Num() != N)
+			{
+				MaskFor = Snap.OneShotMaskRoot;
+				MaskWeights.Init(0.f, N);
+				const FReferenceSkeleton& Ref = BC.GetReferenceSkeleton();
+				for (FCompactPoseBoneIndex I : Output.Pose.ForEachBoneIndex())
+				{
+					for (FCompactPoseBoneIndex P = I; P.GetInt() != INDEX_NONE; P = BC.GetParentBoneIndex(P))
+					{
+						const int32 MeshIdx = BC.MakeMeshPoseIndex(P).GetInt();
+						if (MeshIdx != INDEX_NONE && Ref.GetBoneName(MeshIdx) == MaskFor) { MaskWeights[I.GetInt()] = 1.f; break; }
+					}
+				}
+			}
+			for (FCompactPoseBoneIndex I : Output.Pose.ForEachBoneIndex())
+			{
+				const float W = MaskWeights[I.GetInt()] * Snap.OneShot.Weight;
+				if (W > 0.f) Output.Pose[I].BlendWith(Shot.Pose[I], W);
+			}
+		}
 	}
 	return true;
 }

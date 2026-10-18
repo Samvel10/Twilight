@@ -23,6 +23,7 @@ struct FTwPoseSnapshot
 	FTwPoseLayer Current;   // loop being blended in
 	FTwPoseLayer Previous;  // loop being blended out
 	FTwPoseLayer OneShot;   // action overlay (cast/hit)
+	FName OneShotMaskRoot;  // NAME_None = full body, else only this bone and its children
 };
 
 struct FTwPoseProxy : public FAnimInstanceProxy
@@ -34,6 +35,10 @@ struct FTwPoseProxy : public FAnimInstanceProxy
 	virtual bool Evaluate(FPoseContext& Output) override;
 
 	FTwPoseSnapshot Snap;
+private:
+	// per compact-bone weight of the one-shot mask (cached for MaskFor / bone count)
+	TArray<float> MaskWeights;
+	FName MaskFor;
 };
 
 /**
@@ -50,6 +55,8 @@ public:
 	/** Play an action once over the base loop. */
 	void PlayOneShot(UAnimSequence* Seq, float Rate = 1.f, float BlendIn = 0.08f, float BlendOut = 0.2f, float MaxWeight = 1.f);
 	bool IsOneShotPlaying() const { return OneShot.Seq != nullptr; }
+	/** Restrict one-shots to a bone subtree (e.g. "spine_01" = upper body), NAME_None = full body. */
+	void SetOneShotMask(FName Root) { OneShotMaskRoot = Root; }
 
 	FTwPoseSnapshot GetSnapshot() const;
 
@@ -62,4 +69,5 @@ private:
 	FTwPoseLayer Current, Previous, OneShot;
 	float BlendDuration = 0.25f, BlendElapsed = 0.f;
 	float OneShotIn = 0.08f, OneShotOut = 0.2f, OneShotMax = 1.f;
+	FName OneShotMaskRoot;
 };

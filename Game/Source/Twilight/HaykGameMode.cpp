@@ -159,7 +159,7 @@ void AHaykGameMode::StartDuel(bool bInVsBot)
 	StateTime = 0.f;
 	if (World) World->PlayMusic(TEXT("music_hayk"));
 	TwFx::Sound2D(GetWorld(), TEXT("sfx_war_drums_loop"), 0.5f);
-	Announce(LOCTEXT("Intro", "Հայոց ձոր"), LOCTEXT("IntroSub", "Հայկը կանգնեց Բելի դեմ։ Մեկ նետ կարող է որոշել ազգի ճակատագիրը։"));
+	Announce(bNight ? LOCTEXT("IntroN", "Մասիսի ստորոտ") : LOCTEXT("Intro", "Հայոց ձոր"), LOCTEXT("IntroSub", "Հայկը կանգնեց Բելի դեմ։ Մեկ նետ կարող է որոշել ազգի ճակատագիրը։"));
 	if (AHaykPlayerController* PC = Cast<AHaykPlayerController>(UGameplayStatics::GetPlayerController(this, 0))) PC->OnDuelStarted();
 }
 
@@ -192,6 +192,7 @@ void AHaykGameMode::BeginTurn()
 {
 	bBelTurn = !bBelTurn;
 	++Turn;
+	bCamCut = true;
 	State = EHaykState::Aim;
 	StateTime = 0.f;
 	TurnLeft = 25.f;
@@ -489,7 +490,18 @@ void AHaykGameMode::Tick(float Dt)
 				(bByBel ? StreakBel : StreakHayk) = 0;
 				if (bByBel) ++BotMisses;
 				const float MissBy = Target() ? FVector::Dist(A->GetImpactPoint(), Target()->GetChestTarget()) / 100.f : 0.f;
-				Announce(A->GetResult() == EArrowResult::HitShield ? LOCTEXT("Shield", "Վահանին") : LOCTEXT("Miss", "Վրիպեց"), FText::Format(LOCTEXT("MissBy", "{0} մ կողքով"), FText::AsNumber(FMath::RoundToInt(MissBy))));
+				// say which way it missed, so the next shot can be corrected: long, short or to the side
+				FText How = LOCTEXT("MissBy", "{0} մ կողքով");
+				if (Target() && Shooter())
+				{
+					const FVector Tc = Target()->GetChestTarget();
+					const FVector Sd = (Tc - Shooter()->GetActorLocation()).GetSafeNormal2D();
+					const FVector Off = A->GetImpactPoint() - Tc;
+					const float Along = FVector::DotProduct(Off, Sd);
+					const float Side = FMath::Abs(FVector::CrossProduct(Sd, Off).Z);
+					if (FMath::Abs(Along) > 1.2f * Side) How = Along > 0.f ? LOCTEXT("MissLong", "{0} մ-ով անցավ") : LOCTEXT("MissShort", "{0} մ-ով չհասավ");
+				}
+				Announce(A->GetResult() == EArrowResult::HitShield ? LOCTEXT("Shield", "Վահանին") : LOCTEXT("Miss", "Վրիպեց"), FText::Format(How, FText::AsNumber(FMath::Max(1, FMath::RoundToInt(MissBy)))));
 			}
 		}
 		break;
@@ -540,9 +552,14 @@ void AHaykGameMode::UpdateCamera(float Dt)
 		break;
 	}
 	case EHaykState::Aim:
-		if (AHaykArcher* S = Shooter()) OverShoulder(S, 300.f, 80.f, 175.f, WantPos, WantRot);
+		if (AHaykArcher* S = Shooter())
+		{
+			// Bel: wider and lower so the giant reads as huge and his back does not fill the frame
+			const bool bB = S->IsBel();
+			OverShoulder(S, bB ? 420.f : 300.f, bB ? 150.f : 80.f, bB ? 130.f : 175.f, WantPos, WantRot);
+		}
 		Speed = 6.f;
-		WantFov = 52.f;
+		WantFov = 52.f - 18.f * FMath::Clamp(Power, 0.f, 1.f); // archer's focus: the target grows as the bow bends
 		break;
 	case EHaykState::Flight:
 		if (AHaykArrow* A = Arrow.Get())
@@ -565,19 +582,24 @@ void AHaykGameMode::UpdateCamera(float Dt)
 				const bool bKill = A->GetHitArcher() && A->GetHitArcher()->IsDead();
 				const float Orb = bKill ? Orbit * 0.4f : 0.f;
 				const FVector From = FRotator(0.f, (bBelTurn ? 30.f : 150.f) + FMath::RadiansToDegrees(Orb), 0.f).Vector();
-				WantPos = P + From * (bKill ? 620.f : 520.f) + FVector(0, 0, 140.f);
-				WantRot = (P - WantPos).Rotation();
+				// frame the whole body: the stuck arrow and the stagger must be visible, not just the impact point
+				AHaykArcher* Ht = A->GetHitArcher();
+				const float Sc = Ht ? Ht->GetScale() : 1.f;
+				const FVector Body = Ht ? Ht->GetActorLocation() + FVector(0, 0, 110.f * Sc) : P;
+				WantPos = P + From * (bKill ? 820.f : 640.f) * Sc + FVector(0, 0, 150.f * Sc);
+				// stay above the valley floor: from below the hill crest the target vanished behind it
+				WantPos.Z = FMath::Max(WantPos.Z, AHaykWorld::TerrainZ(WantPos.X, WantPos.Y) + 280.f);
+				WantRot = (Body - WantPos).Rotation();
 				Speed = 5.f;
-			}
-			else if (FMath::Abs(P.X) > AHaykWorld::BelX + 400.f)
-			{
-				WantPos = CamPos; WantRot = (P - CamPos).Rotation(); Speed = 3.f; // flew into the army: just look
 			}
 			else if (AHaykArcher* T = Target())
 			{
 				// frame the miss together with the target so the player sees how far off it was
-				const FVector Mid = (P + T->GetChestTarget()) * 0.5f;
-				const FVector Dir = (T->GetChestTarget() - P).GetSafeNormal2D();
+				// (long shots into the army are pulled in: target and the direction of the miss stay in one frame)
+				const FVector Tc = T->GetChestTarget();
+				const FVector Pc = Tc + (P - Tc).GetClampedToMaxSize(1600.f);
+				const FVector Mid = (Pc + Tc) * 0.5f;
+				const FVector Dir = (Tc - Pc).GetSafeNormal2D();
 				WantPos = Mid - Dir * 700.f + FVector::CrossProduct(FVector::UpVector, Dir) * 450.f + FVector(0, 0, 260.f);
 				WantPos.Z = FMath::Max(WantPos.Z, AHaykWorld::TerrainZ(WantPos.X, WantPos.Y) + 300.f);
 				WantRot = (Mid - WantPos).Rotation();
@@ -600,8 +622,9 @@ void AHaykGameMode::UpdateCamera(float Dt)
 		break;
 	}
 	}
-	if (CamPos.IsNearlyZero()) { CamPos = WantPos; CamRot = WantRot; }
-	CamFov = FMath::FInterpTo(CamFov, WantFov, Dt, 3.f);
+	// a new turn is a hard cut (with the banner), not a 180-degree whip pan through the valley
+	if (bCamCut || CamPos.IsNearlyZero()) { CamPos = WantPos; CamRot = WantRot; CamFov = WantFov; bCamCut = false; }
+	CamFov = FMath::FInterpTo(CamFov, WantFov, Dt, State == EHaykState::Aim ? 6.f : 3.f);
 	Cam->GetCameraComponent()->SetFieldOfView(CamFov);
 	CamPos = FMath::VInterpTo(CamPos, WantPos, Dt, Speed);
 	CamRot = FMath::RInterpTo(CamRot, WantRot, Dt, Speed);

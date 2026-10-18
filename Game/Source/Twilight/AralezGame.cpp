@@ -17,6 +17,7 @@
 #include "Engine/GameViewportClient.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
+#include "Fonts/FontMeasure.h"
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -174,7 +175,7 @@ void AAralezGameMode::FinishCinematic()
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.35f);
 	FTimerHandle H;
 	TWeakObjectPtr<AAralezGameMode> Self(this);
-	GetWorldTimerManager().SetTimer(H, FTimerDelegate::CreateLambda([Self]() { if (Self.IsValid()) { UGameplayStatics::SetGlobalTimeDilation(Self->GetWorld(), 1.f); Self->EndRace(); } }), 0.6f, false);
+	GetWorldTimerManager().SetTimer(H, FTimerDelegate::CreateLambda([Self]() { if (Self.IsValid()) { UGameplayStatics::SetGlobalTimeDilation(Self->GetWorld(), 1.f); Self->EndRace(); } }), 1.3f, false); // ~3.7 s real at 0.35 dilation: the light column is seen before the panel
 }
 
 void AAralezGameMode::EndRace()
@@ -222,7 +223,7 @@ void AAralezGameMode::TickEndCamera(float Dt)
 	const FVector Right = FVector::CrossProduct(FVector::UpVector, Fwd).GetSafeNormal();
 	const float Sway = FMath::Sin(EndCamAge * 0.25f);
 	const FVector Loc = AAralezWorld::PathPoint(T) + FVector(0, 0, 700.f) + Right * (900.f * Sway);
-	EndCam->SetActorLocationAndRotation(Loc, (World->GetGate() - Loc).Rotation());
+	EndCam->SetActorLocationAndRotation(Loc, (World->GetGate() - FVector(0, 0, 900.f) - Loc).Rotation()); // gate in the upper third, above the score list
 }
 
 void AAralezGameMode::Tick(float Dt)
@@ -255,7 +256,7 @@ void AAralezGameMode::Tick(float Dt)
 			if (Z != Zone)
 			{
 				Zone = Z;
-				if (Z == 1) Announce(LOCTEXT("Z1", "Ստորերկրյա գետ"), LOCTEXT("Z1s", "Ջրերի խորքում ստվերները ավելի շատ են"));
+				if (Z == 1) Announce(LOCTEXT("Z1", "Ստորերկրյա գետ"), LOCTEXT("Z1s", "Ջրերի խորքում ստվերներն ավելի շատ են"));
 				if (Z == 2) Announce(LOCTEXT("Z2", "Անդունդ"), LOCTEXT("Z2s", "Դարպասը մոտ է. Արան սպասում է"));
 			}
 		}
@@ -270,7 +271,7 @@ void AAralezGameMode::Tick(float Dt)
 				FinishBonus.Add(S, Bonus[FMath::Clamp(Finished, 0, 3)]);
 				++Finished;
 				S->SetControlEnabled(false);
-				if (S == PlayerSpirit) Announce(FText::Format(LOCTEXT("Fin", "Դարպաս՝ {0}-րդ"), FText::AsNumber(Finished)), FText::Format(LOCTEXT("FinB", "+{0} բոնուս"), FText::AsNumber(Bonus[FMath::Clamp(Finished - 1, 0, 3)])));
+				if (S == PlayerSpirit) Announce(Finished == 1 ? LOCTEXT("Fin1", "Դարպաս՝ 1-ին") : FText::Format(LOCTEXT("Fin", "Դարպաս՝ {0}-րդ"), FText::AsNumber(Finished)), FText::Format(LOCTEXT("FinB", "+{0} բոնուս"), FText::AsNumber(Bonus[FMath::Clamp(Finished - 1, 0, 3)])));
 			}
 		}
 		if (!bFinishing && PlayerSpirit && PlayerSpirit->IsFinished()) FinishCinematic();
@@ -439,7 +440,7 @@ void SAralezHud::Construct(const FArguments& Args)
 					const int32 R = GM->RankOf(GM->GetPlayerSpirit());
 					if (R == 1) return LOCTEXT("Win", "ԱՐԱՆ ՎԵՐԱԴԱՐՁԱՎ");
 					if (R <= 3 && GM->GetPlayerSpirit() && GM->GetPlayerSpirit()->GetLights() > 0)
-						return FText::Format(LOCTEXT("Place", "ԴՈՒ՝ {0} ՏԵՂ"), FText::FromString(FString::Printf(TEXT("%d-րդ"), R)));
+						return FText::Format(LOCTEXT("Place", "ԴՈՒ՝ {0} ՏԵՂ"), FText::FromString(R == 1 ? FString(TEXT("1-ԻՆ")) : FString::Printf(TEXT("%d-ՐԴ"), R)));
 					return LOCTEXT("Lose", "ՍՏՎԵՐՆԵՐԸ ՀԱՂԹԵՑԻՆ");
 				})
 				.ColorAndOpacity_Lambda([Mode]()
@@ -460,7 +461,7 @@ void SAralezHud::Construct(const FArguments& Args)
 					R.Sort([GM](const AAralezSpirit& A, const AAralezSpirit& B) { return GM->RankOf(&A) < GM->RankOf(&B); });
 					FString S;
 					for (int32 i = 0; i < R.Num(); ++i)
-						S += FString::Printf(TEXT("%s%d. %s — %d\n"), R[i] == GM->GetPlayerSpirit() ? TEXT("► ") : TEXT(""), i + 1, *R[i]->GetRacerName().ToString(), GM->ScoreOf(R[i]));
+						S += FString::Printf(TEXT("%s%d. %s — %d\n"), R[i] == GM->GetPlayerSpirit() ? TEXT("» ") : TEXT(""), i + 1, *R[i]->GetRacerName().ToString(), GM->ScoreOf(R[i]));
 					return FText::FromString(S);
 				})
 			]
@@ -533,9 +534,11 @@ int32 SAralezHud::OnPaint(const FPaintArgs& Args, const FGeometry& Geo, const FS
 		if (GM->GetAnnouncement(At, As, Age))
 		{
 			const float A = FMath::Clamp(Age / 0.2f, 0.f, 1.f) * FMath::Clamp((3.f - Age) / 0.5f, 0.f, 1.f);
-			Box(Out, L + 7, Geo, FVector2D(0, C.Y - 300 * S), FVector2D(Size.X, 150 * S), FLinearColor(0, 0, 0, 0.35f * A));
-			Text(Out, L + 8, Geo, FVector2D(C.X, C.Y - 280 * S), At, TwAssets::Font(52 * S, true, true), FLinearColor(0.75f, 0.95f, 1.f, A), 0.5f);
-			if (!As.IsEmpty()) Text(Out, L + 8, Geo, FVector2D(C.X, C.Y - 205 * S), As, TwAssets::Font(21 * S, false, false), FLinearColor(Cream.R, Cream.G, Cream.B, A * 0.9f), 0.5f);
+			const FSlateFontInfo TF = TwAssets::Font(52 * S, true, true);
+			const float TitleH = FSlateApplication::Get().GetRenderer()->GetFontMeasureService()->Measure(At, TF).Y;
+			Box(Out, L + 7, Geo, FVector2D(0, C.Y - 300 * S), FVector2D(Size.X, TitleH + 70 * S), FLinearColor(0, 0, 0, 0.35f * A));
+			Text(Out, L + 8, Geo, FVector2D(C.X, C.Y - 288 * S), At, TF, FLinearColor(0.75f, 0.95f, 1.f, A), 0.5f);
+			if (!As.IsEmpty()) Text(Out, L + 8, Geo, FVector2D(C.X, C.Y - 288 * S + TitleH + 2 * S), As, TwAssets::Font(22 * S, false, false), FLinearColor(Cream.R, Cream.G, Cream.B, A * 0.9f), 0.5f);
 		}
 	}
 	return SCompoundWidget::OnPaint(Args, Geo, Cull, Out, L + 40, Style, bParentEnabled);

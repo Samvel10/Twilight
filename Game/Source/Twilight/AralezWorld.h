@@ -28,6 +28,8 @@ public:
 	/** Wall distance from the axis at path T and angle A (same noise as the mesh). */
 	static float WallRadius(float T, float A);
 	static constexpr float PathLength = 160000.f; // approx. cm
+	/** Underground river (zone 1): water surface height below the path axis, as a fraction of the tunnel radius. */
+	static constexpr float RiverT0 = 0.37f, RiverT1 = 0.69f, RiverDepth = 0.56f;
 
 	FVector GetGate() const { return PathPoint(1.f); }
 
@@ -40,6 +42,7 @@ private:
 	void BuildTunnel();
 	void BuildCrystals();
 	void BuildGate();
+	void BuildRiver();
 
 	UPROPERTY() TArray<TObjectPtr<UInstancedStaticMeshComponent>> CrystalSets;
 	UPROPERTY() TObjectPtr<UStaticMeshComponent> GateCore;

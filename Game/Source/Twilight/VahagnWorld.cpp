@@ -238,7 +238,7 @@ void AVahagnWorld::BuildVishapakar(const FVector& Base, float Yaw, float Scale)
 	UMaterialInstanceDynamic* Stone = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Rock")), this);
 	if (Stone) Stone->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.5f, 0.42f, 0.45f));
 	UMaterialInstanceDynamic* Glyph = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
-	if (Glyph) { Glyph->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.4f, 0.1f)); Glyph->SetScalarParameterValue(TEXT("GlowMode"), 1.f); Glyph->SetScalarParameterValue(TEXT("Intensity"), 12.f); }
+	if (Glyph) { Glyph->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.4f, 0.1f)); Glyph->SetScalarParameterValue(TEXT("GlowMode"), 1.f); Glyph->SetScalarParameterValue(TEXT("Intensity"), 7.f); }
 
 	auto Part = [&](const FVector& Rel, const FVector& Scl, UMaterialInterface* M)
 	{
@@ -254,15 +254,18 @@ void AVahagnWorld::BuildVishapakar(const FVector& Base, float Yaw, float Scale)
 		C->SetCastShadow(M != Glyph);
 		if (M) C->SetMaterial(0, M);
 	};
-	// tall stele (cube is 100 cm): 4 m wide, 2 m deep, 18 m tall, slightly tapered by a cap
-	Part(FVector(0, 0, 900), FVector(4.f, 1.8f, 18.f), Stone);
-	Part(FVector(0, 0, 1850), FVector(3.4f, 1.6f, 1.2f), Stone);
-	// glowing carved vishap-head and wavy body lines on the face
-	Part(FVector(95, 0, 1500), FVector(0.1f, 2.4f, 0.25f), Glyph);
-	Part(FVector(95, 0, 1300), FVector(0.1f, 1.6f, 0.2f), Glyph);
-	Part(FVector(95, 0, 1000), FVector(0.1f, 2.0f, 0.2f), Glyph);
-	Part(FVector(95, 0, 700), FVector(0.1f, 1.2f, 0.2f), Glyph);
-	Part(FVector(95, 0, 1150), FVector(0.1f, 0.2f, 6.0f), Glyph);
+	// tall stele (cube is 100 cm): 1.8 m deep (X), 4 m wide (Y), 18 m tall, slightly tapered by a cap
+	Part(FVector(0, 0, 900), FVector(1.8f, 4.f, 18.f), Stone);
+	Part(FVector(0, 0, 1850), FVector(1.6f, 3.4f, 1.2f), Stone);
+	// glowing carved vishap-head and wavy body lines, standing proud of both faces (face at X = +-90)
+	for (const float Fx : { 100.f, -100.f })
+	{
+		Part(FVector(Fx, 0, 1500), FVector(0.1f, 2.4f, 0.25f), Glyph);
+		Part(FVector(Fx, 0, 1300), FVector(0.1f, 1.6f, 0.2f), Glyph);
+		Part(FVector(Fx, 0, 1000), FVector(0.1f, 2.0f, 0.2f), Glyph);
+		Part(FVector(Fx, 0, 700), FVector(0.1f, 1.2f, 0.2f), Glyph);
+		Part(FVector(Fx, 0, 1150), FVector(0.1f, 0.2f, 6.0f), Glyph);
+	}
 
 	UPointLightComponent* L = NewObject<UPointLightComponent>(this);
 	L->SetupAttachment(RootComponent);

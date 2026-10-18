@@ -94,6 +94,57 @@ void AAralezWorld::BuildLevel()
 	BuildTunnel();
 	BuildCrystals();
 	BuildGate();
+	BuildRiver();
+}
+
+void AAralezWorld::BuildRiver()
+{
+	// a dark teal water strip along the floor of the underground-river zone (edges run into the rock walls)
+	UProceduralMeshComponent* PM = NewObject<UProceduralMeshComponent>(this);
+	PM->SetupAttachment(RootComponent);
+	PM->RegisterComponent();
+	PM->SetWorldTransform(FTransform::Identity);
+	TArray<FVector> V; TArray<int32> Tr; TArray<FVector> N; TArray<FVector2D> UV; TArray<FLinearColor> C; TArray<FProcMeshTangent> Tg;
+	const int32 Rings = 160, Across = 8;
+	for (int32 r = 0; r <= Rings; ++r)
+	{
+		const float T = FMath::Lerp(RiverT0, RiverT1, r / float(Rings));
+		const FVector P = PathPoint(T);
+		const FVector Fwd = PathTangent(T);
+		const FVector Right = FVector::CrossProduct(FVector::UpVector, Fwd).GetSafeNormal();
+		const FVector Up = FVector::CrossProduct(Fwd, Right).GetSafeNormal();
+		const float Rad = TunnelRadius(T);
+		for (int32 k = 0; k <= Across; ++k)
+		{
+			V.Add(P - Up * (RiverDepth * Rad) + Right * ((k / float(Across) - 0.5f) * 1.9f * Rad));
+			N.Add(Up);
+			UV.Add(FVector2D(k / float(Across), T * 60.f));
+			C.Add(FLinearColor::White);
+			Tg.Add(FProcMeshTangent(Fwd, false));
+		}
+	}
+	const int32 Row = Across + 1;
+	for (int32 r = 0; r < Rings; ++r)
+		for (int32 k = 0; k < Across; ++k)
+		{
+			const int32 a = r * Row + k, b = a + 1, c = a + Row, d = c + 1;
+			Tr.Append({ a, b, c, b, d, c }); // same winding as the tunnel floor: faces up, seen from inside
+		}
+	PM->CreateMeshSection_LinearColor(0, V, Tr, N, UV, C, Tg, false);
+	PM->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	PM->SetCastShadow(false);
+	if (UMaterialInstanceDynamic* W = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Water_Purple")), this))
+	{
+		W->SetVectorParameterValue(TEXT("DeepColor"), FLinearColor(0.0f, 0.012f, 0.018f));
+		W->SetVectorParameterValue(TEXT("HorizonColor"), FLinearColor(0.01f, 0.11f, 0.13f));
+		W->SetVectorParameterValue(TEXT("CrestColor"), FLinearColor(0.08f, 0.35f, 0.32f));
+		W->SetVectorParameterValue(TEXT("SkyReflectColor"), FLinearColor(0.04f, 0.26f, 0.28f));
+		W->SetScalarParameterValue(TEXT("SunGlintIntensity"), 0.f);
+		W->SetScalarParameterValue(TEXT("WaveHeight"), 0.f);
+		W->SetScalarParameterValue(TEXT("NormalTile"), 900.f);
+		W->SetScalarParameterValue(TEXT("RippleSpeed"), 0.5f); // flowing
+		PM->SetMaterial(0, W);
+	}
 }
 
 void AAralezWorld::BuildTunnel()

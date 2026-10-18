@@ -14,6 +14,8 @@
 #include "Widgets/Text/STextBlock.h"
 #include "Styling/CoreStyle.h"
 #include "Kismet/GameplayStatics.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Fonts/FontMeasure.h"
 #include "Camera/PlayerCameraManager.h"
 
 #define LOCTEXT_NAMESPACE "HaykHud"
@@ -123,7 +125,7 @@ void SHaykHud::Construct(const FArguments& Args)
 				{
 					const AHaykGameMode* GM = O.IsValid() ? O->Mode() : nullptr;
 					if (!GM) return FText::GetEmpty();
-					const FText Line = GM->DidHaykWin() ? LOCTEXT("WinL", "Եռաթև նետը խոցեց Բելի կուրծքը։ Հայկի ժառանգները ազատ են։") : LOCTEXT("LoseL", "Բելը այս անգամ ավելի դիպուկ էր… Կրկին փորձիր։");
+					const FText Line = GM->DidHaykWin() ? LOCTEXT("WinL", "Եռաթև նետը խոցեց Բելի կուրծքը։ Հայկի ժառանգներն ազատ են։") : LOCTEXT("LoseL", "Բելն այս անգամ ավելի դիպուկ էր… Կրկին փորձի՛ր։");
 					return FText::Format(LOCTEXT("Stats", "{0}\nՀայկ՝ {1} դիպուկ ({2} գլխին)   ·   Բել՝ {3} դիպուկ ({4} գլխին)   ·   Հերթեր՝ {5}"), Line,
 						FText::AsNumber(GM->GetHits(false)), FText::AsNumber(GM->GetHeadshots(false)), FText::AsNumber(GM->GetHits(true)), FText::AsNumber(GM->GetHeadshots(true)), FText::AsNumber(GM->GetTurn()));
 				})
@@ -219,8 +221,8 @@ void SHaykHud::PaintDuel(const FGeometry& Geo, FSlateWindowElementList& Out, int
 		Text(Out, L + 5, Geo, FVector2D(C.X, 176 * S), FText::Format(LOCTEXT("Wind", "ՔԱՄԻ {0} մ/վ"), FText::AsNumber(FMath::RoundToInt(Ws))), TwAssets::Font(14 * S, false, true), FLinearColor(0.8f, 0.92f, 1.f, 0.9f), 0.5f);
 	}
 
-	// ---- aiming: crosshair, power, special
-	if (St == EHaykState::Aim && GM->IsHumanTurn())
+	// ---- the opponent marker, on both turns (on Bel's turn it shows where Hayk stands)
+	if (St == EHaykState::Aim)
 	{
 		// mark the opponent: he is far away across the valley
 		if (AHaykArcher* Foe = GM->IsBelTurn() ? GM->GetHayk() : GM->GetBel())
@@ -237,6 +239,11 @@ void SHaykHud::PaintDuel(const FGeometry& Geo, FSlateWindowElementList& Out, int
 				Text(Out, L + 6, Geo, P + FVector2D(0, -44 * S), Foe->IsBel() ? LOCTEXT("BelMark", "ԲԵԼ") : LOCTEXT("HaykMark", "ՀԱՅԿ"), TwAssets::Font(15 * S, false, true), Mc, 0.5f);
 			}
 		}
+	}
+
+	// ---- aiming: crosshair, power, special
+	if (St == EHaykState::Aim && GM->IsHumanTurn())
+	{
 		const FLinearColor Cc(1, 1, 1, 0.8f);
 		const float G = 8 * S, Ln = 8 * S;
 		Lines(Out, L + 5, Geo, { FVector2f(C + FVector2D(-G - Ln, 0)), FVector2f(C + FVector2D(-G, 0)) }, Cc, 2 * S);
@@ -266,9 +273,14 @@ void SHaykHud::PaintDuel(const FGeometry& Geo, FSlateWindowElementList& Out, int
 	if (GM->GetAnnouncement(At, As, Age))
 	{
 		const float A = FMath::Clamp(Age / 0.2f, 0.f, 1.f) * FMath::Clamp((2.8f - Age) / 0.5f, 0.f, 1.f);
-		const float Y = C.Y - 250 * S;
-		Text(Out, L + 8, Geo, FVector2D(C.X, Y), At, TwAssets::Font(54 * S, true, true), FLinearColor(Gold.R, Gold.G, Gold.B, A), 0.5f);
-		if (!As.IsEmpty()) Text(Out, L + 8, Geo, FVector2D(C.X, Y + 78 * S), As, TwAssets::Font(22 * S, false, false), FLinearColor(Cream.R, Cream.G, Cream.B, A * 0.9f), 0.5f);
+		// lower third: the upper middle of the frame is where the target stands
+		const float Y = C.Y + 120 * S;
+		const FSlateFontInfo TF = TwAssets::Font(54 * S, true, true);
+		Text(Out, L + 8, Geo, FVector2D(C.X, Y), At, TF, FLinearColor(Gold.R, Gold.G, Gold.B, A), 0.5f);
+		const float TitleH = FSlateApplication::Get().GetRenderer()->GetFontMeasureService()->Measure(At, TF).Y;
+		const bool bDmg = As.ToString().StartsWith(TEXT("-"));
+		const FLinearColor SubC = bDmg ? FLinearColor(Blood.R, Blood.G, Blood.B, A) : FLinearColor(Cream.R, Cream.G, Cream.B, A * 0.9f);
+		if (!As.IsEmpty()) Text(Out, L + 8, Geo, FVector2D(C.X, Y + TitleH + 2 * S), As, TwAssets::Font((bDmg ? 34 : 24) * S, true, false), SubC, 0.5f);
 	}
 }
 

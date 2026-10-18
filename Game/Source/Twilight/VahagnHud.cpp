@@ -341,6 +341,7 @@ void SVahagnHud::PaintGameplay(const FGeometry& Geo, FSlateWindowElementList& Ou
 	const EVahagnMatch MS = GM->GetMatchState();
 
 	// ---- off-screen / on-screen vishap markers
+	TArray<FVector2D> ArrowsDrawn;
 	for (TActorIterator<AVishap> It(PC->GetWorld()); It; ++It)
 	{
 		AVishap* V = *It;
@@ -375,9 +376,18 @@ void SVahagnHud::PaintGameplay(const FGeometry& Geo, FSlateWindowElementList& Ou
 			}
 			if (Dir.IsNearlyZero()) Dir = FVector2D(0, 1);
 			Dir.Normalize();
-			const float Mx = C.X - 70 * S, My = C.Y - 70 * S;
-			const float K = FMath::Min(Mx / FMath::Max(FMath::Abs(Dir.X), 1e-3f), My / FMath::Max(FMath::Abs(Dir.Y), 1e-3f));
+			// on an ellipse inside the HUD frame: clear of the timer/wave line at the top and the corner panels
+			const float Rx = C.X - 90 * S, Ry = C.Y - 130 * S;
+			const float K = 1.f / FMath::Sqrt(FMath::Square(Dir.X / Rx) + FMath::Square(Dir.Y / Ry));
 			const FVector2D P = C + Dir * K;
+			// one arrow per direction: piles of overlapping arrows read as noise (the boss always gets its own)
+			if (!V->IsBoss())
+			{
+				bool bDup = false;
+				for (const FVector2D& Q : ArrowsDrawn) if (FVector2D::DistSquared(Q, P) < FMath::Square(34.f * S)) { bDup = true; break; }
+				if (bDup) continue;
+			}
+			ArrowsDrawn.Add(P);
 			const FVector2D N(-Dir.Y, Dir.X);
 			const float Sz = (V->IsBoss() ? 30.f : 18.f) * S;
 			TArray<FVector2f> Tri = { FVector2f(P + Dir * Sz), FVector2f(P - Dir * Sz * 0.5f + N * Sz * 0.7f), FVector2f(P - Dir * Sz * 0.5f - N * Sz * 0.7f), FVector2f(P + Dir * Sz) };
@@ -452,6 +462,20 @@ void SVahagnHud::PaintGameplay(const FGeometry& Geo, FSlateWindowElementList& Ou
 		const float Pulse = bReady ? 0.75f + 0.25f * FMath::Sin(Now * 7.f) : 1.f;
 		Text(Out, L + 6, Geo, NP + FVector2D(0, -24 * S), bReady ? LOCTEXT("NovaReady", "ԱՐԵՎԻ ՊՈՌԹԿՈՒՄԸ ՊԱՏՐԱՍՏ Է · Q") : LOCTEXT("Nova", "ԱՐԵՎԻ ՊՈՌԹԿՈՒՄ"), TwAssets::Font(13 * S, false, true), bReady ? Gold * Pulse : FLinearColor(1, 1, 1, 0.7f));
 		Bar(Out, L + 6, Geo, NP, FVector2D(260 * S, 8 * S), H->GetNova() / 100.f, FLinearColor(1.f, 0.7f, 0.15f) * Pulse, FLinearColor(1.f, 0.95f, 0.6f, 0.9f));
+		// the moment it fills: a short prompt and a pulsing ring at the crosshair, where the player is looking
+		static double NovaReadySince = -1.0;
+		if (!bReady) NovaReadySince = -1.0;
+		else if (NovaReadySince < 0.0) NovaReadySince = Now;
+		const float RA = bReady ? (float)(Now - NovaReadySince) : 99.f;
+		if (RA < 4.f)
+		{
+			const float Fade = FMath::Clamp((4.f - RA) / 0.8f, 0.f, 1.f);
+			Text(Out, L + 7, Geo, FVector2D(C.X, C.Y + 64 * S), LOCTEXT("NovaPrompt", "Q · ԱՐԵՎԻ ՊՈՌԹԿՈՒՄ"), TwAssets::Font(20 * S, true, true), FLinearColor(Gold.R, Gold.G, Gold.B, Fade * Pulse), 0.5f);
+			TArray<FVector2f> Ring;
+			const float R = (30.f + 8.f * FMath::Sin(Now * 7.f)) * S;
+			for (int32 k = 0; k <= 32; ++k) { const float An = 2.f * PI * k / 32.f; Ring.Add(FVector2f(C + FVector2D(FMath::Cos(An), FMath::Sin(An)) * R)); }
+			Lines(Out, L + 7, Geo, Ring, FLinearColor(Gold.R, Gold.G, Gold.B, 0.8f * Fade), 2.5f * S);
+		}
 	}
 
 	// ---- intro countdown
@@ -468,8 +492,11 @@ void SVahagnHud::PaintGameplay(const FGeometry& Geo, FSlateWindowElementList& Ou
 		const float A = FMath::Clamp(Age / 0.25f, 0.f, 1.f) * FMath::Clamp((3.2f - Age) / 0.6f, 0.f, 1.f);
 		const float Y = C.Y - 300 * S + (1.f - FMath::Clamp(Age / 0.25f, 0.f, 1.f)) * 20 * S;
 		const float TitleSize = At.ToString().Len() > 26 ? 30.f : 56.f; // long quotes must fit the screen
-		Text(Out, L + 8, Geo, FVector2D(C.X, Y), At, TwAssets::Font(TitleSize * S, true, true), FLinearColor(Gold.R, Gold.G, Gold.B, A), 0.5f);
-		if (!As.IsEmpty()) Text(Out, L + 8, Geo, FVector2D(C.X, Y + 80 * S), As, TwAssets::Font(22 * S, false, false), FLinearColor(Cream.R, Cream.G, Cream.B, A * 0.9f), 0.5f);
+		const FSlateFontInfo TF = TwAssets::Font(TitleSize * S, true, true);
+		Text(Out, L + 8, Geo, FVector2D(C.X, Y), At, TF, FLinearColor(Gold.R, Gold.G, Gold.B, A), 0.5f);
+		// subtitle right under the measured title (Armenian serif lines are taller than the font size)
+		const float TitleH = FSlateApplication::Get().GetRenderer()->GetFontMeasureService()->Measure(At, TF).Y;
+		if (!As.IsEmpty()) Text(Out, L + 8, Geo, FVector2D(C.X, Y + TitleH + 4 * S), As, TwAssets::Font(22 * S, false, false), FLinearColor(Cream.R, Cream.G, Cream.B, A * 0.9f), 0.5f);
 	}
 
 	// ---- controls hint for the first seconds

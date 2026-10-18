@@ -126,6 +126,7 @@ private:
 	FRotator CamRot = FRotator::ZeroRotator;
 	float Orbit = 0.f;
 	float CamFov = 72.f;
+	bool bCamCut = false;
 
 	FText AnnTitle, AnnSub;
 	float AnnTime = -100.f;
