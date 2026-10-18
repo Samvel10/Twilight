@@ -555,21 +555,27 @@ def build_water(water_n, noise_tex=None):
         hsum = s if hsum is None else g.add(hsum, s)
     g.out("MP_WORLD_POSITION_OFFSET", g.append(g.c2(0.0, 0.0), g.mul(hsum, amp)))
 
-    # --- Normal: 8 analytic directional ripples (exact cosine slopes), phases domain-warped by
-    # low-frequency Perlin noise so no texture cell / tile pattern can repeat. The engine
-    # T_Water_N cells read as a polka-dot grid (and as dotted sun glints) when seen from altitude.
+    # --- Normal: 8 analytic directional ripples (exact cosine slopes) with a smooth analytic
+    # domain warp, no textures at all. The engine T_Water_N cells read as a polka-dot grid
+    # (and as dotted sun glints) when seen from altitude.
     base_l = g.scalar("NormalTile", 900.0, "Surface")          # longest ripple wavelength (cm)
     xyb = g.div(xy, base_l)
     rspd = g.scalar("RippleSpeed", 0.16, "Surface")
+    # smooth analytic domain warp (three long, non-commensurate sines). The StarterContent Perlin
+    # texture is blobby: its spots shifted the ripple phase into a visible dot lattice from altitude.
+    wa = g.scalar("WarpAmount", 1.0, "Surface")
     warp = None
-    if noise_tex is not None:
-        wobj = g.tex_param_obj("WarpNoise", noise_tex)
-        warp = g.sample(wobj, noise_tex, g.panner(g.mul(xyb, 0.37), 0.004, -0.003), out="R")
-        warp = g.mul(warp, g.scalar("WarpAmount", 1.6, "Surface"))
+    for (wx, wy), ph0, amp_w, spd_w in [((0.31, 0.17), 0.0, 0.5, 0.010), ((-0.13, 0.29), 1.3, 0.5, -0.008),
+                                        ((0.39, -0.46), 2.1, 0.35, 0.013)]:
+        sw = g.mul(g.sine(g.add(g.dot(xyb, g.c2(wx, wy)), g.add(g.mul(t, spd_w), ph0))), amp_w)
+        warp = sw if warp is None else g.add(warp, sw)
+    warp = g.mul(warp, wa)
+    # long ripples get the strongest warp and no single pair dominates: two strong crossing
+    # sines read as a regular dot lattice from altitude
     ripples = [  # (angle deg, wavelength factor, slope weight, phase offset, warp gain)
-        (12, 1.00, 0.22, 0.13, 0.6), (77, 0.71, 0.18, 0.61, 0.9), (141, 0.53, 0.15, 0.27, 1.2),
-        (203, 0.39, 0.13, 0.88, 1.5), (251, 0.29, 0.11, 0.44, 1.8), (318, 0.21, 0.09, 0.07, 2.1),
-        (33, 0.155, 0.07, 0.73, 2.4), (169, 0.11, 0.05, 0.35, 2.7)]
+        (12, 1.00, 0.15, 0.13, 2.6), (77, 0.71, 0.14, 0.61, 2.3), (141, 0.53, 0.14, 0.27, 2.0),
+        (203, 0.39, 0.13, 0.88, 1.7), (251, 0.29, 0.12, 0.44, 1.4), (318, 0.21, 0.12, 0.07, 1.1),
+        (33, 0.155, 0.10, 0.73, 0.9), (169, 0.11, 0.10, 0.35, 0.7)]
     grad = None
     for ang, m, w, off, wk in ripples:
         a = math.radians(ang)

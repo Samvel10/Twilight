@@ -63,7 +63,7 @@ void AVahagnWorld::BuildSea()
 	if (UStaticMesh* PlaneMesh = TwAssets::Plane()) Sea->SetStaticMesh(PlaneMesh);
 	Sea->SetMobility(EComponentMobility::Movable);
 	Sea->SetWorldLocation(FVector(0, 0, 0));
-	Sea->SetWorldScale3D(FVector(5000.f, 5000.f, 1.f)); // 5 km
+	Sea->SetWorldScale3D(FVector(40000.f, 40000.f, 1.f)); // 40 km: the plane edge must never show, even from altitude
 	Sea->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Sea->SetCastShadow(false);
 	UMaterialInstanceDynamic* M = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Water_Purple")), this);

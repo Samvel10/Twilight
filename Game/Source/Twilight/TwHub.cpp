@@ -8,6 +8,8 @@
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Engine/GameViewportClient.h"
 #include "Engine/Engine.h"
@@ -65,6 +67,18 @@ ATwHubController::ATwHubController() { bShowMouseCursor = true; bAutoManageActiv
 void ATwHubController::BeginPlay()
 {
 	Super::BeginPlay();
+	// Shipping builds ignore a map on the command line (UE_ALLOW_MAP_OVERRIDE_IN_SHIPPING is off):
+	// "-TwMap=L_Vahagn" jumps straight into a chapter, once per process (returning to the menu stays here)
+	static bool bMapOverrideDone = false;
+	FString StartMap;
+	if (!bMapOverrideDone && FParse::Value(FCommandLine::Get(), TEXT("TwMap="), StartMap) && !StartMap.IsEmpty() && StartMap != TEXT("L_Menu"))
+	{
+		bMapOverrideDone = true;
+		if (!StartMap.StartsWith(TEXT("/"))) StartMap = TEXT("/Game/Twilight/Maps/") + StartMap;
+		UGameplayStatics::OpenLevel(this, FName(*StartMap));
+		return;
+	}
+	bMapOverrideDone = true;
 	if (GEngine && GEngine->GameViewport && IsLocalController())
 	{
 		Ui = SNew(STwHubWidget).Owner(this);
@@ -190,7 +204,7 @@ void STwHubWidget::Construct(const FArguments& Args)
 				[
 					SNew(SHorizontalBox)
 					+ SHorizontalBox::Slot().AutoWidth().Padding(14, 0)[ Card(LOCTEXT("C1", "ԳԼՈՒԽ I"), LOCTEXT("V", "ՎԱՀԱԳՆ"), LOCTEXT("VG", "Թռիչքային էքշն · 8 րոպե"), LOCTEXT("VT", "Ծիրանի ծովի եղեգից ծնված կրակե պատանին թռչում է ծովի ու լեռների վրայով և կռվում վիշապների դեմ։ Երեք ալիք և Մեծ վիշապը։"), TEXT("/Game/Twilight/Maps/L_Vahagn"), true) ]
-					+ SHorizontalBox::Slot().AutoWidth().Padding(14, 0)[ Card(LOCTEXT("C2", "ԳԼՈՒԽ II"), LOCTEXT("H", "ՀԱՅԿ"), LOCTEXT("HG", "Աղեղի մենամարտ · 1–2 խաղացող"), LOCTEXT("HT", "Հայոց ձորի ճակատամարտ. Հայկը Բելի դեմ։ Քամի, վահաններ և ուղղորդվող եռաթև նետ՝ ռոբոտի կամ ընկերոջ դեմ։"), TEXT("/Game/Twilight/Maps/L_Hayk"), true) ]
+					+ SHorizontalBox::Slot().AutoWidth().Padding(14, 0)[ Card(LOCTEXT("C2", "ԳԼՈՒԽ II"), LOCTEXT("H", "ՀԱՅԿ"), LOCTEXT("HG", "Մենամարտ · 1–2 խաղացող"), LOCTEXT("HT", "Հայոց ձորի ճակատամարտ. Հայկը Բելի դեմ։ Քամի, վահաններ և ուղղորդվող եռաթև նետ՝ ռոբոտի կամ ընկերոջ դեմ։"), TEXT("/Game/Twilight/Maps/L_Hayk"), true) ]
 					+ SHorizontalBox::Slot().AutoWidth().Padding(14, 0)[ Card(LOCTEXT("C3", "ԳԼՈՒԽ III"), LOCTEXT("A", "ԱՐԱԼԵԶ"), LOCTEXT("AG", "Մրցավազք դեպի խորքեր"), LOCTEXT("AT", "Լուսե Արալեզը իջնում է ստորերկրյա աշխարհ, որ հավաքի Արա Գեղեցիկի հոգու լույսերը և վերադարձնի նրան կյանքի։"), TEXT("/Game/Twilight/Maps/L_Aralez"), true) ]
 				]
 				+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center).Padding(0, 30, 0, 0)
