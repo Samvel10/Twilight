@@ -19,3 +19,4 @@ Game/Binaries/
 Game/Saved/
 __pycache__/
 docs/capture/
+Build/

@@ -269,8 +269,11 @@ namespace
 		FSlateDrawElement::MakeBox(Out, Layer, Geo.ToPaintGeometry(FVector2f(Size), FSlateLayoutTransform(FVector2f(Pos))), White(), ESlateDrawEffect::None, C);
 	}
 
-	void Text(FSlateWindowElementList& Out, int32 Layer, const FGeometry& Geo, const FVector2D& Pos, const FText& T, const FSlateFontInfo& F, const FLinearColor& C, float Align = 0.f, bool bShadow = true)
+	void Text(FSlateWindowElementList& Out, int32 Layer, const FGeometry& Geo, const FVector2D& Pos, const FText& T, const FSlateFontInfo& InF, const FLinearColor& C, float Align = 0.f, bool bShadow = true)
 	{
+		FSlateFontInfo F = InF;
+		F.OutlineSettings.OutlineSize = FMath::Max(1, FMath::RoundToInt(F.Size / 18.f));
+		F.OutlineSettings.OutlineColor = FLinearColor(0.06f, 0.01f, 0.02f, 0.8f * C.A);
 		const TSharedRef<FSlateFontMeasure> M = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
 		const FVector2D Sz = M->Measure(T, F);
 		const FVector2D P(Pos.X - Sz.X * Align, Pos.Y);

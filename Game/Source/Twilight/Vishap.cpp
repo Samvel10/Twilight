@@ -20,7 +20,7 @@
 namespace
 {
 	const FLinearColor SkinNormal(0.035f, 0.028f, 0.05f);
-	const FLinearColor SkinElite(0.12f, 0.02f, 0.02f);
+	const FLinearColor SkinElite(0.25f, 0.01f, 0.01f);
 	const FLinearColor SkinBoss(0.02f, 0.03f, 0.035f);
 	const FLinearColor VeinNormal(1.f, 0.14f, 0.03f);
 	const FLinearColor VeinBoss(1.f, 0.06f, 0.02f);
@@ -77,14 +77,20 @@ void AVishap::Build()
 
 	SkinMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_VishapSkin")), this);
 	const FLinearColor Skin = bBoss ? SkinBoss : (Tier ? SkinElite : SkinNormal);
-	const FLinearColor Vein = bBoss ? VeinBoss : VeinNormal;
+	const FLinearColor Vein = bBoss ? VeinBoss : (Tier ? FLinearColor(1.f, 0.03f, 0.02f) : VeinNormal);
 	if (SkinMat)
 	{
 		SkinMat->SetVectorParameterValue(TEXT("SkinColor"), Skin);
 		SkinMat->SetVectorParameterValue(TEXT("VeinColor"), Vein);
-		SkinMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBoss ? 2.6f : 1.8f);
-		SkinMat->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(1.f, 0.22f, 0.05f));
-		SkinMat->SetScalarParameterValue(TEXT("RimIntensity"), 0.7f);
+		// wet obsidian scales with a few thick lava veins; cool rim separates them from the golden hero
+		SkinMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBoss ? 4.f : 3.f);
+		SkinMat->SetScalarParameterValue(TEXT("VeinTiling"), 1.6f);
+		SkinMat->SetScalarParameterValue(TEXT("VeinSharpness"), 28.f);
+		SkinMat->SetScalarParameterValue(TEXT("ScaleTiling"), 4.f);
+		SkinMat->SetScalarParameterValue(TEXT("Roughness"), 0.22f);
+		SkinMat->SetScalarParameterValue(TEXT("Metallic"), 0.5f);
+		SkinMat->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(0.45f, 0.2f, 1.f));
+		SkinMat->SetScalarParameterValue(TEXT("RimIntensity"), 0.25f);
 		SkinMat->SetVectorParameterValue(TEXT("SkinColor2"), Skin * 2.2f);
 	}
 	BoneMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_VishapSkin")), this);
@@ -140,7 +146,7 @@ void AVishap::Build()
 		SegRadius[i] = R;
 		UStaticMeshComponent* S = MakePart(SphereMesh, nullptr, SkinMat, true);
 		S->SetAbsolute(true, true, true);
-		S->SetWorldScale3D(FVector(R / 50.f * 1.25f, R / 50.f, R / 50.f * 0.92f));
+		S->SetWorldScale3D(FVector(R / 50.f * 1.7f, R / 50.f, R / 50.f * 0.92f));
 		Segments.Add(S);
 
 		// dorsal spikes, longer near the head
@@ -167,7 +173,7 @@ void AVishap::Build()
 
 	SegDist.SetNum(NumSeg);
 	SegDist[0] = 0.f;
-	for (int32 i = 1; i < NumSeg; ++i) SegDist[i] = SegDist[i - 1] + (SegRadius[i - 1] + SegRadius[i]) * 0.62f;
+	for (int32 i = 1; i < NumSeg; ++i) SegDist[i] = SegDist[i - 1] + (SegRadius[i - 1] + SegRadius[i]) * 0.5f;
 
 	// head: skull, snout, jaw, horns, eyes (attached to segment 0)
 	USceneComponent* H = Segments[0];
@@ -196,6 +202,13 @@ void AVishap::Build()
 		Brow->SetRelativeRotation(FRotator(-75.f, 0.f, 25.f * s));
 		Brow->SetRelativeScale3D(FVector(0.12f, 0.12f, 0.45f));
 	}
+
+	// visible fire-breath cone: the player must see what hurts him
+	BreathMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
+	if (BreathMat) { BreathMat->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.38f, 0.08f)); BreathMat->SetScalarParameterValue(TEXT("GlowMode"), 1.f); BreathMat->SetScalarParameterValue(TEXT("Intensity"), 3.f); }
+	BreathCone = MakePart(ConeMesh, nullptr, BreathMat, false);
+	BreathCone->SetAbsolute(true, true, true);
+	BreathCone->SetVisibility(false);
 
 	EyeLight = NewObject<UPointLightComponent>(this);
 	EyeLight->SetupAttachment(H);
@@ -283,7 +296,7 @@ void AVishap::BeginState(EVishapState S)
 		break;
 	case EVishapState::Spit: StateDur = bBoss ? 1.2f : 0.6f; SpitsLeft = bBoss ? 3 : 1; break;
 	case EVishapState::Retreat: StateDur = FMath::FRandRange(1.2f, 2.2f); break;
-	case EVishapState::Dying: StateDur = 3.f; break;
+	case EVishapState::Dying: StateDur = bBoss ? 2.6f : 1.8f; break;
 	}
 	if (S != EVishapState::Breath)
 	{
@@ -466,7 +479,7 @@ void AVishap::DoBreathTick()
 	if (BreathFxTick <= 0.f)
 	{
 		BreathFxTick = 0.3f;
-		TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, M + Fwd * FMath::FRandRange(0.3f, 0.9f) * Range * 0.8f, bBoss ? 1.6f : 1.25f);
+		TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, M + Fwd * FMath::FRandRange(0.3f, 0.9f) * Range * 0.8f, bBoss ? 1.3f : 1.f);
 	}
 }
 
@@ -543,9 +556,10 @@ void AVishap::StartDying(AVahagnCharacter* Killer)
 	for (int32 i = 0; i < Segments.Num(); ++i)
 	{
 		Segments[i]->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		DebrisVel[i] = HeadVel * 0.35f + FMath::VRand() * FMath::FRandRange(200.f, 900.f) + FVector(0, 0, FMath::FRandRange(0.f, 700.f));
+		DebrisVel[i] = HeadVel * 0.25f + FMath::VRand() * 150.f;
 	}
 	if (Skull) Skull->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if (BreathCone) BreathCone->SetVisibility(false);
 	TwFx::Burst(GetWorld(), TwFx::EFx::VishapDeath, HeadPos, bBoss ? 6.f : 2.5f);
 	TwFx::LightFlash(GetWorld(), HeadPos, FLinearColor(1.f, 0.4f, 0.1f), bBoss ? 400000.f : 80000.f, bBoss ? 12000.f : 4000.f, bBoss ? 1.5f : 0.6f);
 	TwFx::Sound(GetWorld(), TEXT("sfx_vishap_death"), HeadPos, 1.f, bBoss ? 0.7f : 1.f);
@@ -605,6 +619,24 @@ void AVishap::UpdateBody(float Dt)
 		const FRotator Rot = FRotationMatrix::MakeFromXZ(Tan, FVector::UpVector).Rotator();
 		Segments[i]->SetWorldLocationAndRotation(P, Rot);
 	}
+	if (State == EVishapState::Dying && BreathCone) BreathCone->SetVisibility(false);
+	// breath cone follows the mouth
+	if (BreathCone)
+	{
+		const bool bWind = State == EVishapState::BreathWindup, bFire = State == EVishapState::Breath;
+		BreathCone->SetVisibility(bWind || bFire);
+		if (bWind || bFire)
+		{
+			const float Range = (bBoss ? 5200.f : 3300.f) * (bFire ? 1.f : 0.35f + 0.65f * FMath::Clamp(StateTime / FMath::Max(StateDur, 0.01f), 0.f, 1.f));
+			const float Cone = FMath::DegreesToRadians(bBoss ? 20.f : 15.f);
+			const float Jit = bFire ? FMath::FRandRange(0.9f, 1.1f) : 0.3f;
+			const FVector Fwd = Segments[0]->GetForwardVector();
+			const FVector Mouth = MouthLocation();
+			const float Rad = FMath::Tan(Cone) * Range * Jit;
+			BreathCone->SetWorldTransform(FTransform(FRotationMatrix::MakeFromZ(-Fwd).Rotator(), Mouth + Fwd * Range * 0.5f, FVector(Rad / 50.f, Rad / 50.f, Range / 100.f)));
+			if (BreathMat) BreathMat->SetScalarParameterValue(TEXT("Intensity"), bFire ? 3.f + FMath::FRandRange(-0.5f, 0.5f) : 0.8f);
+		}
+	}
 	if (Jaw)
 	{
 		Jaw->SetRelativeRotation(FRotator(-JawOpen * 32.f, 0.f, 0.f));
@@ -636,13 +668,14 @@ void AVishap::UpdateDying(float Dt)
 	}
 	// chain explosions down the body
 	const float PopInterval = bBoss ? 0.05f : 0.06f;
+	if (SkinMat) SkinMat->SetScalarParameterValue(TEXT("VeinIntensity"), (bBoss ? 4.f : 3.f) + DyingTime * 10.f); // burning from inside
 	while (NextPop < Segments.Num() && DyingTime > NextPop * PopInterval)
 	{
-		if (NextPop % 2 == 0)
-		{
-			const FVector P = Segments[NextPop]->GetComponentLocation();
-			TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, P, (bBoss ? 2.2f : 1.f) * (1.f - 0.5f * NextPop / float(Segments.Num())));
-		}
+		// head-to-tail chain: every segment bursts and vanishes, nothing is left floating
+		const FVector P = Segments[NextPop]->GetComponentLocation();
+		const float K = (bBoss ? 2.2f : 1.15f) * (1.f - 0.5f * NextPop / float(Segments.Num()));
+		TwFx::Burst(GetWorld(), NextPop % 2 == 0 ? TwFx::EFx::FireballImpact : TwFx::EFx::Sparks, P, NextPop % 2 == 0 ? K : 0.6f);
+		Segments[NextPop]->SetVisibility(false, true);
 		++NextPop;
 	}
 	if (DyingTime > StateDur) Destroy();

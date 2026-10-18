@@ -79,8 +79,8 @@ void AAralezGameMode::RestartPlayer(AController* NewPlayer)
 		Racers.Add(A);
 		return A;
 	};
-	PlayerSpirit = Spawn(FVector::ZeroVector, false, FLinearColor(0.55f, 0.9f, 1.f), LOCTEXT("You", "Դու"), 1);
-	for (int32 i = 0; i < 3; ++i) Spawn(Right * (i - 1) * 350.f + FVector(0, 0, 250.f), true, Rivals[i].Col, FText::FromString(Rivals[i].Name), i);
+	PlayerSpirit = Spawn(FVector::ZeroVector, false, FLinearColor(0.3f, 0.75f, 1.f), LOCTEXT("You", "Դու"), 1);
+	for (int32 i = 0; i < 3; ++i) Spawn(Fwd * (700.f + 300.f * i) + Right * ((i == 0 ? -1.f : (i == 1 ? 1.f : 0.f)) * 650.f) + FVector(0, 0, -80.f), true, Rivals[i].Col, FText::FromString(Rivals[i].Name), i);
 	if (PlayerSpirit && NewPlayer)
 	{
 		NewPlayer->Possess(PlayerSpirit);
@@ -158,16 +158,34 @@ int32 AAralezGameMode::RankOf(const AAralezSpirit* S) const
 	return Rank;
 }
 
+void AAralezGameMode::FinishCinematic()
+{
+	// the gate opens for the player whatever the place: light column, slow motion, then results
+	bFinishing = true;
+	if (World)
+	{
+		const FVector G = World->GetGate();
+		TwFx::Sound2D(GetWorld(), TEXT("sfx_gate_open"), 1.f);
+		for (int32 i = 0; i < 8; ++i) TwFx::Burst(GetWorld(), TwFx::EFx::Nova, G + FVector(0, 0, i * 900.f), 3.f);
+		TwFx::LightFlash(GetWorld(), G, FLinearColor(1.f, 0.85f, 0.55f), 600000.f, 20000.f, 4.f);
+	}
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.35f);
+	FTimerHandle H;
+	TWeakObjectPtr<AAralezGameMode> Self(this);
+	GetWorldTimerManager().SetTimer(H, FTimerDelegate::CreateLambda([Self]() { if (Self.IsValid()) { UGameplayStatics::SetGlobalTimeDilation(Self->GetWorld(), 1.f); Self->EndRace(); } }), 0.6f, false);
+}
+
 void AAralezGameMode::EndRace()
 {
 	if (State == EAralezState::End) return;
 	for (AAralezSpirit* S : Racers) FrozenScore.Add(S, ScoreOf(S));
+	AnnTime = -100.f;
 	State = EAralezState::End;
 	for (AAralezSpirit* S : Racers) S->SetControlEnabled(false);
 	const bool bWin = DidPlayerWin();
 	if (World) World->PlayMusic(TEXT("music_menu"));
 	TwFx::Sound2D(GetWorld(), bWin ? TEXT("sfx_victory") : TEXT("sfx_defeat"), 1.f);
-	if (bWin && World)
+	if (World && !bFinishing && bWin)
 	{
 		// Ara returns: a pillar of light from the gate
 		const FVector G = World->GetGate();
@@ -225,7 +243,8 @@ void AAralezGameMode::Tick(float Dt)
 				if (S == PlayerSpirit) Announce(FText::Format(LOCTEXT("Fin", "Դարպաս՝ {0}-րդ"), FText::AsNumber(Finished)), FText::Format(LOCTEXT("FinB", "+{0} բոնուս"), FText::AsNumber(Bonus[FMath::Clamp(Finished - 1, 0, 3)])));
 			}
 		}
-		if (TimeLeft <= 0.f || (PlayerSpirit && PlayerSpirit->IsFinished()) || Finished >= Racers.Num()) EndRace();
+		if (!bFinishing && PlayerSpirit && PlayerSpirit->IsFinished()) FinishCinematic();
+		else if (!bFinishing && (TimeLeft <= 0.f || Finished >= Racers.Num())) EndRace();
 		break;
 	}
 	default: break;
@@ -382,9 +401,23 @@ void SAralezHud::Construct(const FArguments& Args)
 			SNew(SVerticalBox)
 			+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)
 			[
-				SNew(STextBlock).Font(TwAssets::Font(80.f, true, true))
-				.Text_Lambda([Mode]() { AAralezGameMode* GM = Mode(); return GM && GM->DidPlayerWin() ? LOCTEXT("Win", "ԱՐԱՆ ՎԵՐԱԴԱՐՁԱՎ") : LOCTEXT("Lose", "ՍՏՎԵՐՆԵՐԸ ՀԱՂԹԵՑԻՆ"); })
-				.ColorAndOpacity_Lambda([Mode]() { AAralezGameMode* GM = Mode(); return FSlateColor(GM && GM->DidPlayerWin() ? Gold : Blood); })
+				SNew(STextBlock).Font(TwAssets::Font(64.f, true, true))
+				.Text_Lambda([Mode]()
+				{
+					AAralezGameMode* GM = Mode();
+					if (!GM) return FText::GetEmpty();
+					const int32 R = GM->RankOf(GM->GetPlayerSpirit());
+					if (R == 1) return LOCTEXT("Win", "ԱՐԱՆ ՎԵՐԱԴԱՐՁԱՎ");
+					if (R <= 3 && GM->GetPlayerSpirit() && GM->GetPlayerSpirit()->GetLights() > 0)
+						return FText::Format(LOCTEXT("Place", "ԴՈՒ՝ {0} ՏԵՂ"), FText::FromString(FString::Printf(TEXT("%d-րդ"), R)));
+					return LOCTEXT("Lose", "ՍՏՎԵՐՆԵՐԸ ՀԱՂԹԵՑԻՆ");
+				})
+				.ColorAndOpacity_Lambda([Mode]()
+				{
+					AAralezGameMode* GM = Mode();
+					const int32 R = GM ? GM->RankOf(GM->GetPlayerSpirit()) : 4;
+					return FSlateColor(R == 1 ? Gold : (R <= 3 ? Ember : Blood));
+				})
 			]
 			+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center).Padding(0, 10, 0, 24)
 			[
@@ -397,7 +430,7 @@ void SAralezHud::Construct(const FArguments& Args)
 					R.Sort([GM](const AAralezSpirit& A, const AAralezSpirit& B) { return GM->RankOf(&A) < GM->RankOf(&B); });
 					FString S;
 					for (int32 i = 0; i < R.Num(); ++i)
-						S += FString::Printf(TEXT("%d. %s — %d\n"), i + 1, *R[i]->GetRacerName().ToString(), GM->ScoreOf(R[i]));
+						S += FString::Printf(TEXT("%s%d. %s — %d\n"), R[i] == GM->GetPlayerSpirit() ? TEXT("► ") : TEXT(""), i + 1, *R[i]->GetRacerName().ToString(), GM->ScoreOf(R[i]));
 					return FText::FromString(S);
 				})
 			]
@@ -422,7 +455,7 @@ int32 SAralezHud::OnPaint(const FPaintArgs& Args, const FGeometry& Geo, const FS
 {
 	AAralezController* PC = Owner.Get();
 	AAralezGameMode* GM = PC ? PC->Mode() : nullptr;
-	if (GM && PC->GetScreen() != EAralezScreen::Menu && GM->GetState() != EAralezState::Menu)
+	if (GM && PC->GetScreen() != EAralezScreen::Menu && PC->GetScreen() != EAralezScreen::End && GM->GetState() != EAralezState::Menu)
 	{
 		const FVector2D Size = FVector2D(Geo.GetLocalSize());
 		const float S = Size.Y / 1080.f;
@@ -453,12 +486,24 @@ int32 SAralezHud::OnPaint(const FPaintArgs& Args, const FGeometry& Geo, const FS
 			Text(Out, L + 4, Geo, FVector2D(Size.X - 48 * S, Size.Y - 120 * S), FText::Format(LOCTEXT("Mine", "Արայի լույսեր՝ {0}"), FText::AsNumber(Me->GetLights())), TwAssets::Font(28 * S, true, true), Gold, 1.f);
 			if (Me->GetStun() > 0.f) Text(Out, L + 6, Geo, FVector2D(C.X, C.Y + 120 * S), LOCTEXT("Stun", "Ստվերը խլեց լույսերդ"), TwAssets::Font(24 * S, false, true), Blood, 0.5f);
 		}
+		// red pulse when a shadow is close
+		if (Me)
+		{
+			float Near = TNumericLimits<float>::Max();
+			for (TActorIterator<AShadowWraith> It(PC->GetWorld()); It; ++It) Near = FMath::Min(Near, FVector::Dist(It->GetActorLocation(), Me->GetActorLocation()));
+			if (Near < 1800.f)
+			{
+				const float Now = PC->GetWorld()->GetRealTimeSeconds();
+				EdgeGlow(Out, L + 3, Geo, Size, FLinearColor(Blood.R, Blood.G, Blood.B, 0.35f * (1.f - Near / 1800.f) * (0.6f + 0.4f * FMath::Sin(Now * 10.f))), 180 * S);
+			}
+		}
 		if (GM->GetState() == EAralezState::Intro)
-			Text(Out, L + 8, Geo, FVector2D(C.X, C.Y - 160 * S), FText::AsNumber(FMath::Max(1, FMath::CeilToInt(GM->GetIntroLeft()))), TwAssets::Font(110 * S, true, true), Gold, 0.5f);
+			Text(Out, L + 8, Geo, FVector2D(C.X, C.Y + 40 * S), FText::AsNumber(FMath::Max(1, FMath::CeilToInt(GM->GetIntroLeft()))), TwAssets::Font(110 * S, true, true), Gold, 0.5f);
 		FText At, As; float Age = 0.f;
 		if (GM->GetAnnouncement(At, As, Age))
 		{
 			const float A = FMath::Clamp(Age / 0.2f, 0.f, 1.f) * FMath::Clamp((3.f - Age) / 0.5f, 0.f, 1.f);
+			Box(Out, L + 7, Geo, FVector2D(0, C.Y - 300 * S), FVector2D(Size.X, 150 * S), FLinearColor(0, 0, 0, 0.35f * A));
 			Text(Out, L + 8, Geo, FVector2D(C.X, C.Y - 280 * S), At, TwAssets::Font(52 * S, true, true), FLinearColor(0.75f, 0.95f, 1.f, A), 0.5f);
 			if (!As.IsEmpty()) Text(Out, L + 8, Geo, FVector2D(C.X, C.Y - 205 * S), As, TwAssets::Font(21 * S, false, false), FLinearColor(Cream.R, Cream.G, Cream.B, A * 0.9f), 0.5f);
 		}

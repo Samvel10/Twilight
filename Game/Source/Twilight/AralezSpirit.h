@@ -91,4 +91,6 @@ private:
 	float TrailTimer = 0.f;
 	int32 TrailNext = 0;
 	TArray<float> TrailBirth;
+	TArray<float> TrailLen;
+	FVector PrevTrail = FVector::ZeroVector;
 };

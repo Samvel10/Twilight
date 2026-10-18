@@ -45,7 +45,7 @@ void AHaykPreview::Show(const TArray<FVector>& Points)
 	TArray<FTransform> T;
 	for (int32 i = 0; i < Points.Num(); ++i)
 	{
-		const float S = FMath::Lerp(0.07f, 0.025f, i / float(FMath::Max(1, Points.Num() - 1)));
+		const float S = FMath::Lerp(0.04f, 0.015f, i / float(FMath::Max(1, Points.Num() - 1)));
 		T.Add(FTransform(FRotator::ZeroRotator, Points[i], FVector(S)));
 	}
 	if (Dots->GetInstanceCount() != T.Num())
@@ -146,7 +146,7 @@ bool AHaykGameMode::GetAnnouncement(FText& Title, FText& Sub, float& Age) const
 void AHaykGameMode::StartDuel(bool bInVsBot)
 {
 	bVsBot = bInVsBot;
-	const float BelHp = bVsBot ? (Difficulty == 0 ? 110.f : (Difficulty == 2 ? 160.f : 140.f)) : 100.f;
+	const float BelHp = bVsBot ? (Difficulty == 0 ? 130.f : (Difficulty == 2 ? 180.f : 160.f)) : 100.f;
 	if (Hayk) Hayk->Setup(false, 100.f);
 	if (Bel) Bel->Setup(true, BelHp);
 	Turn = 0;
@@ -211,7 +211,7 @@ void AHaykGameMode::BeginTurn()
 		if (!bBelTurn) Bel->SetAim(BaseYawFor(Bel), 5.f); else Hayk->SetAim(BaseYawFor(Hayk), 5.f);
 	}
 	const FText Who = bBelTurn ? (bVsBot ? LOCTEXT("BelTurn", "Բելի հերթն է") : LOCTEXT("P2Turn", "Խաղացող 2 · Բել")) : (bVsBot ? LOCTEXT("YourTurn", "Քո հերթն է") : LOCTEXT("P1Turn", "Խաղացող 1 · Հայկ"));
-	Announce(Who, FText::Format(LOCTEXT("WindSub", "Քամի՝ {0} մ/վ"), FText::AsNumber(FMath::RoundToInt(Wind.Size()))));
+	Announce(Who, FText::GetEmpty());
 }
 
 void AHaykGameMode::AimDelta(const FVector2D& D)
@@ -386,7 +386,7 @@ void AHaykGameMode::UpdatePreview()
 	{
 		V += FVector(0, 0, -AHaykArrow::Gravity) * Dt;
 		P += V * Dt;
-		if (i % 2 == 0) Pts.Add(P);
+		if (i % 2 == 0 && i > 4) Pts.Add(P);
 	}
 	Preview->Show(Pts);
 }
@@ -477,20 +477,26 @@ void AHaykGameMode::Tick(float Dt)
 				if (Streak % 2 == 0) Spec = FMath::Min(2, Spec + 1);
 				if (bByBel) BotMisses = 0;
 				TwFx::Sound2D(GetWorld(), TEXT("sfx_crowd_cheer"), 0.55f, bByBel ? 0.85f : 1.f);
-				Announce(A->WasHeadshot() ? LOCTEXT("Head", "Գլխին") : LOCTEXT("Hit", "Դիպուկ է"), FText::Format(LOCTEXT("Dmg", "-{0}"), FText::AsNumber(FMath::RoundToInt(A->GetDamageDealt()))));
+				if (A->GetHitArcher()->IsDead())
+				{
+					UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.12f);
+					Announce(A->GetHitArcher()->IsBel() ? LOCTEXT("BelFell", "Բելն ընկավ") : LOCTEXT("HaykFell", "Հայկն ընկավ"), A->GetHitArcher()->IsBel() ? LOCTEXT("BelFellSub", "Եռաթև նետը խոցեց բռնակալի կուրծքը") : LOCTEXT("HaykFellSub", "Բաբելոնը հաղթեց… այս անգամ"));
+				}
+				else Announce(A->WasHeadshot() ? LOCTEXT("Head", "Գլխին") : LOCTEXT("Hit", "Դիպուկ է"), FText::Format(LOCTEXT("Dmg", "-{0}"), FText::AsNumber(FMath::RoundToInt(A->GetDamageDealt()))));
 			}
 			else
 			{
 				(bByBel ? StreakBel : StreakHayk) = 0;
 				if (bByBel) ++BotMisses;
-				Announce(A->GetResult() == EArrowResult::HitShield ? LOCTEXT("Shield", "Վահանին") : LOCTEXT("Miss", "Վրիպեց"), FText::GetEmpty());
+				const float MissBy = Target() ? FVector::Dist(A->GetImpactPoint(), Target()->GetChestTarget()) / 100.f : 0.f;
+				Announce(A->GetResult() == EArrowResult::HitShield ? LOCTEXT("Shield", "Վահանին") : LOCTEXT("Miss", "Վրիպեց"), FText::Format(LOCTEXT("MissBy", "{0} մ կողքով"), FText::AsNumber(FMath::RoundToInt(MissBy))));
 			}
 		}
 		break;
 	}
 	case EHaykState::Impact:
 		// StateTime is game time (dilated); use real time for the pause length
-		if (GetWorld()->GetRealTimeSeconds() - (AnnTime) > 1.8f) FinishImpact();
+		if (GetWorld()->GetRealTimeSeconds() - (AnnTime) > (((Hayk && Hayk->IsDead()) || (Bel && Bel->IsDead())) ? 3.4f : 1.8f)) FinishImpact();
 		break;
 	default: break;
 	}
@@ -509,7 +515,7 @@ void AHaykGameMode::UpdateCamera(float Dt)
 	auto OverShoulder = [](AHaykArcher* S, float Back, float Side, float Up, FVector& OutPos, FRotator& OutRot)
 	{
 		const FRotator Aim(0.f, S->GetAimYaw(), 0.f);
-		const float Sc = S->IsBel() ? 1.45f : 1.f;
+		const float Sc = S->GetScale();
 		OutPos = S->GetActorLocation() + Aim.RotateVector(FVector(-Back * Sc, Side * Sc, Up * Sc));
 		OutRot = FRotator(S->GetAimPitch() * 0.45f - 6.f, S->GetAimYaw(), 0.f);
 	};
@@ -553,10 +559,30 @@ void AHaykGameMode::UpdateCamera(float Dt)
 		if (AHaykArrow* A = Arrow.Get())
 		{
 			const FVector P = A->GetImpactPoint();
-			const FVector From = bBelTurn ? FVector(1.f, 0.6f, 0.f) : FVector(-1.f, 0.6f, 0.f);
-			WantPos = P + From.GetSafeNormal() * 520.f + FVector(0, 0, 140.f);
-			WantRot = (P - WantPos).Rotation();
-			Speed = 5.f;
+			if (A->GetResult() == EArrowResult::HitArcher)
+			{
+				// close on the hit; orbit slowly if this was the killing shot
+				const bool bKill = A->GetHitArcher() && A->GetHitArcher()->IsDead();
+				const float Orb = bKill ? Orbit * 0.4f : 0.f;
+				const FVector From = FRotator(0.f, (bBelTurn ? 30.f : 150.f) + FMath::RadiansToDegrees(Orb), 0.f).Vector();
+				WantPos = P + From * (bKill ? 620.f : 520.f) + FVector(0, 0, 140.f);
+				WantRot = (P - WantPos).Rotation();
+				Speed = 5.f;
+			}
+			else if (FMath::Abs(P.X) > AHaykWorld::BelX + 400.f)
+			{
+				WantPos = CamPos; WantRot = (P - CamPos).Rotation(); Speed = 3.f; // flew into the army: just look
+			}
+			else if (AHaykArcher* T = Target())
+			{
+				// frame the miss together with the target so the player sees how far off it was
+				const FVector Mid = (P + T->GetChestTarget()) * 0.5f;
+				const FVector Dir = (T->GetChestTarget() - P).GetSafeNormal2D();
+				WantPos = Mid - Dir * 700.f + FVector::CrossProduct(FVector::UpVector, Dir) * 450.f + FVector(0, 0, 260.f);
+				WantPos.Z = FMath::Max(WantPos.Z, AHaykWorld::TerrainZ(WantPos.X, WantPos.Y) + 300.f);
+				WantRot = (Mid - WantPos).Rotation();
+				Speed = 4.f;
+			}
 		}
 		break;
 	case EHaykState::End:
@@ -565,7 +591,7 @@ void AHaykGameMode::UpdateCamera(float Dt)
 		if (W)
 		{
 			const float A = Orbit * 0.25f;
-			const float Sc = W->IsBel() ? 1.45f : 1.f;
+			const float Sc = W->GetScale();
 			const FVector C = W->GetActorLocation() + FVector(0, 0, 120.f * Sc);
 			WantPos = C + FVector(FMath::Cos(A) * 520.f * Sc, FMath::Sin(A) * 520.f * Sc, 60.f * Sc);
 			WantRot = (C - WantPos).Rotation();

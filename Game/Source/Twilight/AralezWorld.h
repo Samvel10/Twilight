@@ -25,6 +25,8 @@ public:
 	static int32 ZoneAt(float T) { return T < 0.36f ? 0 : (T < 0.7f ? 1 : 2); }
 	/** Local search for the path parameter nearest to P, starting from Hint. */
 	static float NearestT(const FVector& P, float Hint);
+	/** Wall distance from the axis at path T and angle A (same noise as the mesh). */
+	static float WallRadius(float T, float A);
 	static constexpr float PathLength = 160000.f; // approx. cm
 
 	FVector GetGate() const { return PathPoint(1.f); }
@@ -42,5 +44,6 @@ private:
 	UPROPERTY() TArray<TObjectPtr<UInstancedStaticMeshComponent>> CrystalSets;
 	UPROPERTY() TObjectPtr<UStaticMeshComponent> GateCore;
 	UPROPERTY() TObjectPtr<UPointLightComponent> GateLight;
+	UPROPERTY() TObjectPtr<USceneComponent> GateRing;
 	int32 LastZone = -1;
 };

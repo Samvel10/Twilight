@@ -4,6 +4,8 @@
 #include "TwAssets.h"
 #include "TwFx.h"
 #include "AralezGame.h"
+#include "GameFramework/PlayerController.h"
+#include "Camera/PlayerCameraManager.h"
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/PointLightComponent.h"
@@ -36,7 +38,7 @@ void ASoulLight::BeginPlay()
 	{
 		M->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.8f, 0.4f));
 		M->SetScalarParameterValue(TEXT("GlowMode"), 1.f);
-		M->SetScalarParameterValue(TEXT("Intensity"), 14.f);
+		M->SetScalarParameterValue(TEXT("Intensity"), 8.f);
 		Mesh->SetMaterial(0, M);
 	}
 	Home = GetActorLocation();
@@ -60,7 +62,11 @@ void ASoulLight::Tick(float Dt)
 	FVector Want = Home + FVector(FMath::Sin(Phase * 1.3f) * 30.f, FMath::Cos(Phase) * 30.f, FMath::Sin(Phase * 2.f) * 40.f);
 	if (Puller.IsValid()) { Want = Puller->GetActorLocation(); Home = FMath::VInterpTo(Home, Want, Dt, 4.f); }
 	P = FMath::VInterpTo(P, Want, Dt, Puller.IsValid() ? 6.f : 2.f);
-	SetActorTransform(FTransform(FQuat::Identity, P, FVector(0.42f + 0.08f * FMath::Sin(Phase * 6.f))));
+	// never let a light fill the camera: fade it out when very close to the lens
+	float CamFade = 1.f;
+	if (APlayerController* PCc = GetWorld()->GetFirstPlayerController())
+		if (PCc->PlayerCameraManager) CamFade = FMath::SmoothStep(120.f, 650.f, (float)FVector::Dist(P, PCc->PlayerCameraManager->GetCameraLocation()));
+	SetActorTransform(FTransform(FQuat::Identity, P, FVector((0.42f + 0.08f * FMath::Sin(Phase * 6.f)) * CamFade + 0.001f)));
 
 	// collection by a spirit (stunned victims cannot grab)
 	const AAralezGameMode* GM = GetWorld()->GetAuthGameMode<AAralezGameMode>();
@@ -96,7 +102,7 @@ AShadowWraith::AShadowWraith()
 	EyeLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Eye"));
 	EyeLight->SetupAttachment(Body);
 	EyeLight->SetIntensityUnits(ELightUnits::Unitless);
-	EyeLight->SetIntensity(3500.f);
+	EyeLight->SetIntensity(1200.f);
 	EyeLight->SetAttenuationRadius(700.f);
 	EyeLight->SetLightColor(FLinearColor(1.f, 0.1f, 0.05f));
 	EyeLight->SetCastShadows(false);
@@ -110,13 +116,25 @@ void AShadowWraith::BeginPlay()
 	{
 		Dark->SetVectorParameterValue(TEXT("SkinColor"), FLinearColor(0.004f, 0.003f, 0.006f));
 		Dark->SetVectorParameterValue(TEXT("VeinColor"), FLinearColor(0.6f, 0.02f, 0.06f));
-		Dark->SetScalarParameterValue(TEXT("VeinIntensity"), 0.7f);
+		Dark->SetScalarParameterValue(TEXT("VeinIntensity"), 0.12f);
 		Dark->SetScalarParameterValue(TEXT("Metallic"), 0.f);
-		Dark->SetScalarParameterValue(TEXT("Roughness"), 1.f); Dark->SetScalarParameterValue(TEXT("RimIntensity"), 0.5f); Dark->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(0.35f, 0.05f, 0.25f));
+		Dark->SetScalarParameterValue(TEXT("Roughness"), 1.f); Dark->SetScalarParameterValue(TEXT("RimIntensity"), 0.2f); Dark->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(0.06f, 0.f, 0.1f));
 	}
+	// a hooded robe trailing into smoke, with a small head carrying the burning eyes
 	Body->SetStaticMesh(TwAssets::Sphere());
 	Body->SetMaterial(0, Dark);
-	Body->SetWorldScale3D(FVector(2.2f, 1.6f, 2.6f));
+	Body->SetWorldScale3D(FVector(1.f));
+	{
+		UStaticMeshComponent* Robe = NewObject<UStaticMeshComponent>(this);
+		Robe->SetStaticMesh(TwAssets::Cone());
+		Robe->SetupAttachment(Body);
+		Robe->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Robe->SetRelativeLocation(FVector(0.f, 0.f, -60.f));
+		Robe->SetRelativeRotation(FRotator(180.f, 0.f, 0.f));
+		Robe->SetRelativeScale3D(FVector(1.4f, 1.4f, 2.6f));
+		Robe->SetMaterial(0, Dark);
+		Robe->RegisterComponent();
+	}
 	UMaterialInstanceDynamic* Eye = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
 	if (Eye) { Eye->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.08f, 0.04f)); Eye->SetScalarParameterValue(TEXT("GlowMode"), 1.f); Eye->SetScalarParameterValue(TEXT("Intensity"), 30.f); }
 	for (int32 s = -1; s <= 1; s += 2)
@@ -124,8 +142,8 @@ void AShadowWraith::BeginPlay()
 		UStaticMeshComponent* E = NewObject<UStaticMeshComponent>(this);
 		E->SetStaticMesh(TwAssets::Sphere());
 		E->SetupAttachment(Body);
-		E->SetRelativeLocation(FVector(44.f, 14.f * s, 14.f));
-		E->SetRelativeScale3D(FVector(0.09f, 0.12f, 0.06f));
+		E->SetRelativeLocation(FVector(42.f, 16.f * s, 10.f));
+		E->SetRelativeScale3D(FVector(0.16f, 0.2f, 0.08f));
 		E->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		E->SetMaterial(0, Eye);
 		E->RegisterComponent();
@@ -140,7 +158,7 @@ void AShadowWraith::BeginPlay()
 		W->SetCastShadow(false);
 		W->SetMaterial(0, Dark);
 		W->SetRelativeLocation(FVector(-40.f - i * 28.f, 0.f, -20.f - i * 8.f));
-		W->SetRelativeScale3D(FVector(0.7f - i * 0.1f));
+		W->SetRelativeScale3D(FVector(0.6f, 0.25f, 0.25f) * (1.f - i * 0.12f));
 		W->RegisterComponent();
 		Wisps.Add(W);
 	}

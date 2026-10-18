@@ -143,7 +143,7 @@ void AVahagnGameMode::BeginWave(int32 Index)
 	switch (Index)
 	{
 	case 1:
-		Announce(LOCTEXT("W1", "Ալիք 1"), LOCTEXT("W1s", "Երեք վիշապ բարձրանում է ծիրանի ծովից"));
+		Announce(LOCTEXT("W1", "Ալիք 1"), LOCTEXT("W1s", "Չորս վիշապ բարձրանում է ծիրանի ծովից"));
 		for (int32 i = 0; i < 4; ++i) SpawnVishap(false, 0, 7500.f, Base + i * 90.f);
 		break;
 	case 2:

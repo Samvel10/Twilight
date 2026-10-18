@@ -193,7 +193,7 @@ void AVahagnPlayerController::PlayerTick(float Dt)
 	if (Screen == EVahagnScreen::Menu || Screen == EVahagnScreen::Controls)
 	{
 		MenuOrbit += Dt * 6.f;
-		if (AVahagnCharacter* H = Hero()) { H->SetMenuFraming(true); H->SetControlEnabled(false); }
+		if (AVahagnCharacter* H = Hero()) { H->SetMenuFraming(true); H->SetControlEnabled(false); H->SetActorRotation(FRotator(0.f, GetControlRotation().Yaw + 155.f, 0.f)); }
 		SetControlRotation(FRotator(-8.f + 4.f * FMath::Sin(MenuOrbit * 0.05f), 200.f + MenuOrbit, 0.f));
 	}
 }

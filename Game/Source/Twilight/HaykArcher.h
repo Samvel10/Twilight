@@ -43,6 +43,7 @@ public:
 	float ApplyHit(EArcherZone Zone, bool bSpecial, const FVector& Where);
 	bool IsDead() const { return Health <= 0.f; }
 	bool IsBel() const { return bBel; }
+	float GetScale() const { return Scale; }
 	float GetHealth() const { return Health; }
 	float GetMaxHealth() const { return MaxHealth; }
 	float GetHurtFlash() const { return HurtFlash; }
@@ -69,6 +70,8 @@ private:
 	UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> NockedArrow;
 	UPROPERTY(VisibleAnywhere) TObjectPtr<UPointLightComponent> Rim;
 	UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Regalia;
+	TArray<FVector> RegaliaOffset;
+	TArray<FRotator> RegaliaRot;
 	UPROPERTY() TObjectPtr<UTwPoseAnimInstance> Poser;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> BodyMat;
 

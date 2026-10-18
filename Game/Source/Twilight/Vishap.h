@@ -69,6 +69,8 @@ private:
 	UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> HeadParts;
 	UPROPERTY() TObjectPtr<UStaticMeshComponent> Skull;
 	UPROPERTY() TObjectPtr<UStaticMeshComponent> Jaw;
+	UPROPERTY() TObjectPtr<UStaticMeshComponent> BreathCone;
+	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> BreathMat;
 	UPROPERTY() TObjectPtr<UPointLightComponent> EyeLight;
 	UPROPERTY() TObjectPtr<UFXSystemComponent> BreathFx;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> SkinMat;

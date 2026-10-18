@@ -19,7 +19,15 @@ void AVahagnWorld::BuildLevel()
 	BuildIslands();
 	// the crimson reed of the birth myth, standing out of the sea at the world centre
 	UMaterialInstanceDynamic* ReedMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_FireBody")), this);
-	if (ReedMat) { ReedMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), 3.f); ReedMat->SetVectorParameterValue(TEXT("SkinColor"), FLinearColor(0.25f, 0.01f, 0.02f)); }
+	if (ReedMat)
+	{
+		// the crimson reed: its own palette, not the hero gold
+		ReedMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), 2.2f);
+		ReedMat->SetVectorParameterValue(TEXT("SkinColor"), FLinearColor(0.25f, 0.01f, 0.02f));
+		ReedMat->SetVectorParameterValue(TEXT("CrackColorDeep"), FLinearColor(0.45f, 0.f, 0.04f));
+		ReedMat->SetVectorParameterValue(TEXT("CrackColorHot"), FLinearColor(1.f, 0.12f, 0.18f));
+		ReedMat->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(0.9f, 0.05f, 0.2f));
+	}
 	const FVector Base(0.f, 0.f, -200.f);
 	for (int32 i = 0; i < 4; ++i)
 	{

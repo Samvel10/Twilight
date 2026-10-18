@@ -75,7 +75,7 @@ void AHaykArcher::Setup(bool bInBel, float InMaxHealth)
 {
 	bBel = bInBel;
 	MaxHealth = Health = InMaxHealth;
-	Scale = bBel ? 1.45f : 1.f;
+	Scale = bBel ? 1.9f : 1.f;
 }
 
 void AHaykArcher::BeginPlay()
@@ -109,33 +109,38 @@ void AHaykArcher::BeginPlay()
 		for (int32 i = 0; i < Body->GetNumMaterials(); ++i) Body->SetMaterial(i, BodyMat);
 	}
 
-	// regalia
+	// regalia, placed in world space every frame from the head bone (bone axes differ from the actor's)
 	UMaterialInstanceDynamic* Gold = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
-	if (Gold) { Gold->SetVectorParameterValue(TEXT("Color"), bBel ? FLinearColor(1.f, 0.6f, 0.15f) : FLinearColor(1.f, 0.85f, 0.4f)); Gold->SetScalarParameterValue(TEXT("GlowMode"), 1.f); Gold->SetScalarParameterValue(TEXT("Intensity"), 4.f); }
-	auto AddPart = [this](UStaticMesh* Mesh, FName Bone, const FVector& Loc, const FRotator& Rot, const FVector& Scl, UMaterialInterface* Mat)
+	if (Gold) { Gold->SetVectorParameterValue(TEXT("Color"), bBel ? FLinearColor(1.f, 0.6f, 0.15f) : FLinearColor(1.f, 0.85f, 0.4f)); Gold->SetScalarParameterValue(TEXT("GlowMode"), 1.f); Gold->SetScalarParameterValue(TEXT("Intensity"), 1.5f); }
+	UMaterialInstanceDynamic* Bronze = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_VishapSkin")), this);
+	if (Bronze) { Bronze->SetVectorParameterValue(TEXT("SkinColor"), FLinearColor(0.35f, 0.2f, 0.08f)); Bronze->SetScalarParameterValue(TEXT("Metallic"), 0.8f); Bronze->SetScalarParameterValue(TEXT("VeinIntensity"), 1.2f); Bronze->SetVectorParameterValue(TEXT("VeinColor"), FLinearColor(1.f, 0.7f, 0.3f)); Bronze->SetScalarParameterValue(TEXT("RimIntensity"), 0.3f); }
+	auto AddPart = [this](UStaticMesh* Mesh, const FVector& Off, const FRotator& Rot, const FVector& Scl, UMaterialInterface* Mat)
 	{
 		UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(this);
 		C->SetStaticMesh(Mesh);
-		C->SetupAttachment(Body, Bone);
-		C->SetRelativeLocationAndRotation(Loc, Rot);
-		C->SetRelativeScale3D(Scl);
+		C->SetupAttachment(Root);
+		C->SetAbsolute(true, true, true);
+		C->SetWorldScale3D(Scl * Scale);
 		C->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		if (Mat) C->SetMaterial(0, Mat);
 		C->RegisterComponent();
 		Regalia.Add(C);
+		RegaliaOffset.Add(Off);
+		RegaliaRot.Add(Rot);
 	};
 	if (bBel)
 	{
 		for (int32 i = 0; i < 6; ++i)
 		{
 			const float A = i * 60.f;
-			const FVector P = FRotator(0, A, 0).RotateVector(FVector(9.f, 0, 0));
-			AddPart(TwAssets::Cone(), TEXT("head"), FVector(0, 0, 0) + FVector(P.X, P.Y, 0) + FVector(0, 0, 0), FRotator(0, 0, 0), FVector(0.06f, 0.06f, 0.16f), Gold);
+			AddPart(TwAssets::Cone(), FVector(0, 0, 16.f) + FRotator(0, A, 0).RotateVector(FVector(10.f, 0, 0)), FRotator(-15.f, A, 0.f), FVector(0.06f, 0.06f, 0.16f), Gold);
 		}
 	}
 	else
 	{
-		AddPart(TwAssets::Cone(), TEXT("head"), FVector(0, 0, 0), FRotator(0, 0, 0), FVector(0.1f, 0.1f, 0.22f), Gold);
+		// conical bronze helmet with a small gold finial
+		AddPart(TwAssets::Cone(), FVector(0.f, 0, 14.f), FRotator::ZeroRotator, FVector(0.26f, 0.26f, 0.28f), Bronze);
+		AddPart(TwAssets::Sphere(), FVector(0.f, 0, 30.f), FRotator::ZeroRotator, FVector(0.035f), Gold);
 	}
 
 	BuildBow();
@@ -281,6 +286,11 @@ void AHaykArcher::UpdateBowAndZones()
 	const FVector Pelvis = Body->GetBoneLocation(TEXT("pelvis"));
 	const FVector Feet = (Body->GetBoneLocation(TEXT("foot_l")) + Body->GetBoneLocation(TEXT("foot_r"))) * 0.5f;
 	HeadZone->SetWorldLocation(Head + FVector(0, 0, 8.f * Scale));
+	for (int32 i = 0; i < Regalia.Num(); ++i)
+	{
+		const FRotator Y(0.f, AimYaw, 0.f);
+		Regalia[i]->SetWorldLocationAndRotation(Head + Y.RotateVector(RegaliaOffset[i] * Scale), FRotator(RegaliaRot[i].Pitch, AimYaw + RegaliaRot[i].Yaw, RegaliaRot[i].Roll));
+	}
 	auto PlaceCapsule = [](UCapsuleComponent* C, const FVector& A, const FVector& B)
 	{
 		const FVector D = B - A;
@@ -318,7 +328,8 @@ float AHaykArcher::ApplyHit(EArcherZone Zone, bool bSpecial, const FVector& Wher
 	if (bSpecial) D *= 1.8f;
 	Health = FMath::Max(0.f, Health - D);
 	HurtFlash = 1.f;
-	TwFx::Burst(GetWorld(), TwFx::EFx::Sparks, Where, 1.2f);
+	TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, Where, bSpecial ? 1.6f : 1.25f);
+	TwFx::LightFlash(GetWorld(), Where, FLinearColor(1.f, 0.45f, 0.1f), 30000.f, 1600.f, 0.35f);
 	TwFx::Sound(GetWorld(), TEXT("sfx_vishap_hit"), Where, 1.f, bBel ? 0.7f : 1.1f);
 	if (Health <= 0.f)
 	{

@@ -43,11 +43,13 @@ public:
 	bool GetAnnouncement(FText& Title, FText& Sub, float& Age) const;
 	int32 GetZone() const { return Zone; }
 
-	static constexpr float RaceLength = 300.f;
+	static constexpr float RaceLength = 165.f;
 
 private:
 	void SpawnLightsAndWraiths();
 	void EndRace();
+	void FinishCinematic();
+	bool bFinishing = false;
 	void Announce(const FText& T, const FText& S);
 
 	UPROPERTY() TObjectPtr<AAralezWorld> World;

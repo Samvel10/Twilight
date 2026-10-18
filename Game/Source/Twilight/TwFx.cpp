@@ -7,6 +7,7 @@
 #include "NiagaraSystem.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Particles/ParticleEmitter.h"
 #include "Components/PointLightComponent.h"
 #include "Engine/PointLight.h"
 #include "Engine/World.h"
@@ -57,7 +58,15 @@ namespace TwFx
 		}
 		if (UParticleSystem* P = Cascade ? TwAssets::Cascade(Cascade) : nullptr)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(World, P, Loc, Rot, FVector(Scale), true, EPSCPoolMethod::AutoRelease);
+			UParticleSystemComponent* C = UGameplayStatics::SpawnEmitterAtLocation(World, P, Loc, Rot, FVector(Scale), true, EPSCPoolMethod::AutoRelease);
+			// fire explosions without the black smoke that clutters the sunset sky
+			if (C && Type != EFx::Smoke && Type != EFx::Splash)
+			{
+				for (UParticleEmitter* E : P->Emitters)
+				{
+					if (E && E->EmitterName.ToString().Contains(TEXT("smoke"), ESearchCase::IgnoreCase)) C->SetEmitterEnable(E->EmitterName, false);
+				}
+			}
 		}
 	}
 

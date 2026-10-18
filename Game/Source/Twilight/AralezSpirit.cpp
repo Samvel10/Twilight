@@ -50,7 +50,7 @@ AAralezSpirit::AAralezSpirit()
 void AAralezSpirit::Setup(bool bInBot, const FLinearColor& InColor, const FText& InName, int32 InSkill)
 {
 	bBot = bInBot; Color = InColor; Name = InName; Skill = InSkill;
-	BotLane = FMath::FRandRange(-0.5f, 0.5f);
+	BotLane = (InSkill - 1) * 0.6f;
 }
 
 void AAralezSpirit::BeginPlay()
@@ -71,7 +71,7 @@ void AAralezSpirit::BuildBody()
 	{
 		Mat->SetVectorParameterValue(TEXT("Color"), Color);
 		Mat->SetScalarParameterValue(TEXT("GlowMode"), 1.f);
-		Mat->SetScalarParameterValue(TEXT("Intensity"), bBot ? 2.4f : 3.2f);
+		Mat->SetScalarParameterValue(TEXT("Intensity"), bBot ? 1.2f : 1.6f);
 	}
 	auto Part = [this](UStaticMesh* M, USceneComponent* Parent, const FVector& Loc, const FRotator& Rot, const FVector& Scl) -> UStaticMeshComponent*
 	{
@@ -127,12 +127,14 @@ void AAralezSpirit::BuildBody()
 	}
 	BodyRoot->SetRelativeScale3D(FVector(bBot ? 0.9f : 1.f));
 
-	Trail->SetStaticMesh(Sph);
+	Trail->SetStaticMesh(TwAssets::Cylinder());
 	Trail->SetMaterial(0, Mat);
 	TArray<FTransform> Init;
 	for (int32 i = 0; i < SpiritTrail; ++i) Init.Add(FTransform(FRotator::ZeroRotator, GetActorLocation(), FVector(0.001f)));
 	Trail->AddInstances(Init, false, true);
 	TrailBirth.Init(-100.f, SpiritTrail);
+	TrailLen.Init(0.f, SpiritTrail);
+	PrevTrail = GetActorLocation();
 }
 
 void AAralezSpirit::InLook(const FVector2D& V)
@@ -273,16 +275,21 @@ void AAralezSpirit::Animate(float Dt)
 	}
 	BodyRoot->SetRelativeLocation(FVector(0, 0, FMath::Sin(Flap * 0.5f) * 12.f));
 	Pulse = FMath::Max(0.f, Pulse - Dt * 2.f);
-	if (Mat) Mat->SetScalarParameterValue(TEXT("Intensity"), (bBot ? 2.4f : 3.2f) * (1.f + Pulse * 1.5f) * (Stun > 0.f ? 0.3f + 0.3f * FMath::Sin(Flap * 6.f) : 1.f));
+	if (Mat) Mat->SetScalarParameterValue(TEXT("Intensity"), (bBot ? 1.2f : 1.6f) * (1.f + Pulse * 1.5f) * (Stun > 0.f ? 0.3f + 0.3f * FMath::Sin(Flap * 6.f) : 1.f));
 
 	// light trail
 	const float Now = GetWorld()->GetTimeSeconds();
 	TrailTimer -= Dt;
 	if (TrailTimer <= 0.f)
 	{
-		TrailTimer = 0.04f;
+		TrailTimer = 0.025f;
 		TrailBirth[TrailNext] = Now;
-		Trail->UpdateInstanceTransform(TrailNext, FTransform(FRotator::ZeroRotator, GetActorLocation() - GetActorForwardVector() * 120.f, FVector(0.12f)), true, false, true);
+		const FVector Tail = GetActorLocation() - GetActorForwardVector() * 120.f;
+		const FVector Seg = Tail - PrevTrail;
+		const float Len = FMath::Min(Seg.Size(), 400.f);
+		TrailLen[TrailNext] = Len / 100.f;
+		if (Len > 1.f) Trail->UpdateInstanceTransform(TrailNext, FTransform(FRotationMatrix::MakeFromZ(Seg.GetSafeNormal()).Rotator(), Tail - Seg.GetSafeNormal() * Len * 0.5f, FVector(0.06f, 0.06f, Len / 100.f)), true, false, true);
+		PrevTrail = Tail;
 		TrailNext = (TrailNext + 1) % SpiritTrail;
 	}
 	for (int32 i = 0; i < SpiritTrail; ++i)
@@ -291,7 +298,8 @@ void AAralezSpirit::Animate(float Dt)
 		if (A < 0.f || A > 1.4f) continue;
 		FTransform T;
 		Trail->GetInstanceTransform(i, T, true);
-		T.SetScale3D(FVector(0.12f * (1.f - A / 1.4f) + 0.001f));
+		const float TW = 0.06f * (1.f - A / 1.4f) + 0.001f;
+		T.SetScale3D(FVector(TW, TW, TrailLen[i]));
 		Trail->UpdateInstanceTransform(i, T, true, false, true);
 	}
 	Trail->MarkRenderStateDirty();

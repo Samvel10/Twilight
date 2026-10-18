@@ -120,7 +120,7 @@ void AVahagnCharacter::BeginPlay()
 	AnimNova = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_ChargedAttack.MM_ChargedAttack"));
 	AnimHit = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Front_Lgt_01.MM_HitReact_Front_Lgt_01"));
 	AnimDeath = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Death/MM_Death_Front_01.MM_Death_Front_01"));
-	if (Poser) Poser->SetLoop(AnimHover, 0.01f, 1.f);
+	if (Poser) Poser->SetLoop(AnimFly, 0.01f, 0.22f);
 
 	// Molten fire body
 	BodyMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_FireBody")), this);
@@ -129,6 +129,7 @@ void AVahagnCharacter::BeginPlay()
 		BodyMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), 2.6f);
 		BodyMat->SetScalarParameterValue(TEXT("RimIntensity"), 1.6f);
 		BodyMat->SetScalarParameterValue(TEXT("AmbientFill"), 0.6f);
+		BodyMat->SetVectorParameterValue(TEXT("FlashColor"), FLinearColor(1.f, 0.22f, 0.04f));
 		for (int32 i = 0; i < GetMesh()->GetNumMaterials(); ++i) GetMesh()->SetMaterial(i, BodyMat);
 	}
 
@@ -138,6 +139,8 @@ void AVahagnCharacter::BeginPlay()
 	Auras.Add(TwFx::AttachFlame(GetMesh(), TEXT("head"), FVector(0, 8, 0), 0.55f));
 	Auras.Add(TwFx::AttachFlame(GetMesh(), TEXT("spine_03"), FVector::ZeroVector, 0.45f));
 	Auras.Add(TwFx::AttachSparks(GetMesh(), TEXT("pelvis"), FVector::ZeroVector, 0.6f));
+	Auras.Add(TwFx::AttachFlame(GetMesh(), TEXT("foot_l"), FVector::ZeroVector, 0.3f));
+	Auras.Add(TwFx::AttachFlame(GetMesh(), TEXT("foot_r"), FVector::ZeroVector, 0.3f));
 	Auras.RemoveAll([](const TObjectPtr<UFXSystemComponent>& C) { return C == nullptr; });
 
 	if (USoundBase* S = TwAssets::Sound(TEXT("sfx_flame_aura_loop"))) { FlameLoop->SetSound(S); FlameLoop->SetVolumeMultiplier(0.35f); FlameLoop->Play(); }
@@ -193,8 +196,9 @@ void AVahagnCharacter::InBoostStop() { bBoosting = false; }
 
 void AVahagnCharacter::SetMenuFraming(bool bMenu)
 {
-	Boom->SocketOffset = bMenu ? FVector(0.f, -330.f, 60.f) : FVector(0, 85.f, 110.f);
-	Boom->TargetArmLength = bMenu ? 640.f : 560.f;
+	Boom->SocketOffset = bMenu ? FVector(0.f, -420.f, 40.f) : FVector(0, 85.f, 110.f);
+	Boom->TargetArmLength = bMenu ? 520.f : 560.f;
+	Boom->bEnableCameraLag = !bMenu;
 }
 
 void AVahagnCharacter::SetControlEnabled(bool bEnabled)
@@ -209,12 +213,14 @@ void AVahagnCharacter::BeginBirth(const FVector& ReedTop, float Duration)
 	BirthDur = FMath::Max(0.5f, Duration);
 	BirthLeft = BirthDur;
 	BirthStage = 0;
-	BirthFrom = ReedTop - FVector(0, 0, 900.f);
-	BirthTo = ReedTop + FVector(0, 0, 2200.f);
+	BirthFrom = ReedTop + FVector(180.f, -140.f, -900.f);
+	BirthTo = ReedTop + FVector(180.f, -140.f, 2200.f);
+	GetMesh()->SetVisibility(false, true);
+	Boom->TargetOffset = FVector(0.f, 0.f, 650.f);
 	SetActorLocation(BirthFrom);
 	GetCharacterMovement()->StopMovementImmediately();
 	SetControlEnabled(false);
-	if (AController* C = GetController()) C->SetControlRotation(FRotator(-12.f, 205.f, 0.f));
+	if (AController* C = GetController()) C->SetControlRotation(FRotator(-22.f, 205.f, 0.f));
 	if (Poser) Poser->SetLoop(AnimFly, 0.1f, 0.4f);
 	bFlyPose = true;
 }
@@ -232,8 +238,9 @@ void AVahagnCharacter::Tick(float Dt)
 		const FVector Reed = BirthFrom + FVector(0, 0, 900.f);
 		if (BirthStage == 0 && A > 0.02f) { BirthStage = 1; TwFx::Burst(GetWorld(), TwFx::EFx::Smoke, Reed, 3.f); TwFx::Sound2D(GetWorld(), TEXT("sfx_fire_breath"), 0.9f, 0.7f); }
 		if (BirthStage == 1 && A > 0.22f) { BirthStage = 2; TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, Reed, 2.5f); TwFx::LightFlash(GetWorld(), Reed, FLinearColor(1.f, 0.4f, 0.1f), 120000.f, 6000.f, 1.f); }
-		if (BirthStage == 2 && A > 0.36f) { BirthStage = 3; TwFx::Burst(GetWorld(), TwFx::EFx::BigExplosion, Reed, 4.f); TwFx::Burst(GetWorld(), TwFx::EFx::Splash, FVector(Reed.X, Reed.Y, 10.f), 5.f); TwFx::Sound2D(GetWorld(), TEXT("sfx_special_nova"), 1.f, 0.8f); }
-		if (BirthLeft <= 0.f) { BirthLeft = 0.f; if (Poser) Poser->SetLoop(AnimHover, 0.5f); bFlyPose = false; }
+		if (BirthStage == 2 && A > 0.36f) { BirthStage = 3; GetMesh()->SetVisibility(true, true); TwFx::Burst(GetWorld(), TwFx::EFx::BigExplosion, Reed, 4.f); TwFx::Burst(GetWorld(), TwFx::EFx::Splash, FVector(Reed.X, Reed.Y, 10.f), 5.f); TwFx::Sound2D(GetWorld(), TEXT("sfx_special_nova"), 1.f, 0.8f); }
+		Boom->TargetOffset = FMath::VInterpTo(Boom->TargetOffset, A > 0.6f ? FVector::ZeroVector : FVector(0, 0, 650.f), Dt, 1.5f);
+		if (BirthLeft <= 0.f) { BirthLeft = 0.f; GetMesh()->SetVisibility(true, true); Boom->TargetOffset = FVector::ZeroVector; if (Poser) Poser->SetLoop(AnimFly, 0.5f, 0.22f); bFlyPose = false; }
 		UpdateVisuals(Dt);
 		return;
 	}
@@ -306,9 +313,12 @@ void AVahagnCharacter::UpdateFlight(float Dt)
 	if (!Wish.IsNearlyZero()) AddMovementInput(Wish.GetClampedToMaxSize(1.5f), 1.f);
 
 	// face the aim direction (yaw only on the actor; lean is visual)
-	const FRotator Cur = GetActorRotation();
-	const FRotator Target(0.f, Ctrl.Yaw, 0.f);
-	SetActorRotation(FMath::RInterpTo(Cur, Target, Dt, 9.f));
+	if (bControl || bAutopilot)
+	{
+		const FRotator Cur = GetActorRotation();
+		const FRotator Target(0.f, Ctrl.Yaw, 0.f);
+		SetActorRotation(FMath::RInterpTo(Cur, Target, Dt, 9.f));
+	}
 }
 
 void AVahagnCharacter::UpdateAim(float Dt)
@@ -394,7 +404,7 @@ void AVahagnCharacter::UpdateVisuals(float Dt)
 		if (bWantFly != bFlyPose)
 		{
 			bFlyPose = bWantFly;
-			Poser->SetLoop(bFlyPose ? AnimFly : AnimHover, 0.35f, bFlyPose ? 0.55f : 1.f);
+			Poser->SetLoop(AnimFly, 0.35f, bFlyPose ? 0.55f : 0.22f);
 		}
 	}
 
@@ -412,6 +422,14 @@ void AVahagnCharacter::UpdateVisuals(float Dt)
 		Camera->SetRelativeLocation(FVector(0, FMath::Sin(T2 * 47.f) * ShakeAmt, FMath::Sin(T2 * 61.f + 1.3f) * ShakeAmt));
 	}
 	else Camera->SetRelativeLocation(FVector::ZeroVector);
+
+	// steam boiling on the purple sea under the fire hero
+	SteamTimer -= Dt;
+	if (!bDead && GetActorLocation().Z < 1600.f && SteamTimer <= 0.f)
+	{
+		SteamTimer = 0.35f;
+		TwFx::Burst(GetWorld(), TwFx::EFx::Splash, FVector(GetActorLocation().X, GetActorLocation().Y, 10.f), 0.5f);
+	}
 
 	// fire trail
 	{
@@ -444,8 +462,8 @@ void AVahagnCharacter::UpdateVisuals(float Dt)
 	Glow->SetIntensity((7000.f + Charge * 14000.f) * Flicker * (bDead ? 0.2f : 1.f));
 	if (BodyMat)
 	{
-		BodyMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), 2.6f * (1.f + Charge * 2.f) * Flicker);
-		BodyMat->SetScalarParameterValue(TEXT("HitFlash"), DamageFlash * 0.18f);
+		BodyMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), 2.6f * (1.f + Charge * 2.f + 2.5f * DamageFlash) * Flicker);
+		BodyMat->SetScalarParameterValue(TEXT("HitFlash"), DamageFlash * DamageFlash * 0.04f);
 	}
 	if (WindLoop) WindLoop->SetVolumeMultiplier(FMath::Clamp(Speed / 5600.f, 0.f, 1.f) * 0.6f);
 }

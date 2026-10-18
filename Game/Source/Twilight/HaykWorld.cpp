@@ -31,7 +31,7 @@ FTwSkyPreset AHaykWorld::GetSkyPreset() const
 	if (!bNight)
 	{
 		// sun low behind Bel: his army is a dark silhouette against a burning sky
-		P.SunRot = FRotator(-5.f, 180.f, 0.f);
+		P.SunRot = FRotator(-6.f, 160.f, 0.f);
 		P.SunColor = FLinearColor(1.f, 0.55f, 0.3f);
 		P.SunIntensity = 8.f;
 		P.FogColor = FLinearColor(0.42f, 0.16f, 0.22f);
@@ -79,10 +79,11 @@ void AHaykWorld::BuildLevel()
 	BuildHeightfield(FVector(-30000.f, 70000.f, 0.f), 55000.f, 48000.f, 7, 96, true, Snow ? Snow : Rock, false);
 
 	// pavises between the archers
-	const FVector Shields[4] = { FVector(-1150.f, 230.f, 0.f), FVector(-150.f, -380.f, 0.f), FVector(800.f, 340.f, 0.f), FVector(1700.f, -140.f, 0.f) };
+	const FVector Shields[4] = { FVector(-1150.f, 480.f, 0.f), FVector(-150.f, -520.f, 0.f), FVector(800.f, 470.f, 0.f), FVector(1700.f, -460.f, 0.f) };
 	for (const FVector& S : Shields)
 	{
-		const FVector P(S.X, S.Y, TerrainZ(S.X, S.Y) + 115.f);
+		const float Ground = FMath::Min(TerrainZ(S.X, S.Y - 80.f), TerrainZ(S.X, S.Y + 80.f));
+		const FVector P(S.X, S.Y, Ground + 105.f);
 		FActorSpawnParameters Sp;
 		Sp.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		GetWorld()->SpawnActor<AHaykShield>(P, FRotator(0.f, FMath::FRandRange(-12.f, 12.f), 0.f), Sp);

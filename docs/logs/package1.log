@@ -1,0 +1,74 @@
+
+Running AutomationTool...
+
+Setting up bundled DotNet SDK
+
+Rebuilding: Found updated files
+Building UnrealBuildTool...
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:13.82
+Publishing UnrealBuildTool...
+
+
+Rebuilding: Found updated files
+Building AutomationTool...
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:04.28
+Publishing AutomationTool...
+
+Start UAT Interactively: dotnet AutomationTool.dll BuildCookRun -project=/var/www/html/Twilight/Game/Twilight.uproject -noP4 -platform=Linux -clientconfig=Shipping -build -cook -stage -pak -iostore -archive -archivedirectory=/var/www/html/Twilight/Build -utf8output -unattended -nocompileeditor
+/home/samo/UnrealEngine-5.8/Engine/Binaries/ThirdParty/DotNet/10.0/linux-x64/dotnet
+Starting AutomationTool...
+Parsing command line: BuildCookRun -project=/var/www/html/Twilight/Game/Twilight.uproject -noP4 -platform=Linux -clientconfig=Shipping -build -cook -stage -pak -iostore -archive -archivedirectory=/var/www/html/Twilight/Build -utf8output -unattended -nocompileeditor
+Initializing script modules...
+Building 43 projects...
+Build 43 projects time: 25.17 s
+Total script module initialization time: 27.86 s.
+Using /home/samo/UnrealEngine-5.8/Engine/Binaries/ThirdParty/DotNet/10.0/linux-x64/dotnet
+Executing commands...
+Setting up ProjectParams for /var/www/html/Twilight/Game/Twilight.uproject
+********** BUILD COMMAND STARTED **********
+Running: /home/samo/UnrealEngine-5.8/Engine/Binaries/ThirdParty/DotNet/10.0/linux-x64/dotnet "/home/samo/UnrealEngine-5.8/Engine/Binaries/DotNET/UnrealBuildTool/UnrealBuildTool.dll" -Target="UnrealPak Linux Development -Project=/var/www/html/Twilight/Game/Twilight.uproject" -Target="Twilight Linux Shipping -Project=/var/www/html/Twilight/Game/Twilight.uproject  -remoteini=\"/var/www/html/Twilight/Game\"  " -log="/home/samo/Library/Logs/Unreal Engine/LocalBuildLogs/UBA-UnrealPak-Linux-Development.txt"
+Log file: /home/samo/Library/Logs/Unreal Engine/LocalBuildLogs/UBA-UnrealPak-Linux-Development.txt
+Determining max actions to execute in parallel (14 physical cores, 20 logical cores)
+  Executing up to 14 processes, one per physical core
+Using 'git status' to determine working set for adaptive non-unity build (/home/samo/UnrealEngine-5.8).
+Using 'git status' to determine working set for adaptive non-unity build (/var/www/html/Twilight).
+Creating makefile for UnrealPak (no existing makefile)
+Creating makefile for Twilight (no existing makefile)
+UbaStorageServer - FileMapping backing: memfd
+UbaServer - Listening on 0.0.0.0:1345
+UHT compiled-in object format Default
+UHT compiled-in object format Default
+Building UnrealPak and Twilight...
+===== Toolchain Information =====
+UnrealPak Linux Development:
+  Using ISPC compiler (/home/samo/UnrealEngine-5.8/Engine/Source/ThirdParty/Intel/ISPC/bin/Linux/ispc)
+    Intel(r) Implicit SPMD Program Compiler (Intel(r) ISPC), 1.24.0 (build commit  @ 20240919, LLVM 18.1.6)
+  Using Clang compiler 20.1.8 (/home/samo/UnrealEngine-5.8/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu/bin/clang++)
+    clang version 20.1.8 (github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261) Target: x86_64-unknown-linux-gnu Thread model: posix InstalledDir: /home/samo/UnrealEngine-5.8/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu/bin
+  Using Clang archiver (/home/samo/UnrealEngine-5.8/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu/bin/llvm-ar)
+    LLVM (http://llvm.org/):   LLVM version 20.1.8   Optimized build.
+  Using toolchain located at '/home/samo/UnrealEngine-5.8/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu'
+  Using bundled libc++ standard C++ library.
+  Compressing debug files
+Twilight Linux Shipping:
+  Using ISPC compiler (/home/samo/UnrealEngine-5.8/Engine/Source/ThirdParty/Intel/ISPC/bin/Linux/ispc)
+    Intel(r) Implicit SPMD Program Compiler (Intel(r) ISPC), 1.24.0 (build commit  @ 20240919, LLVM 18.1.6)
+  Using Clang compiler 20.1.8 (/home/samo/UnrealEngine-5.8/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu/bin/clang++)
+    clang version 20.1.8 (github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261) Target: x86_64-unknown-linux-gnu Thread model: posix InstalledDir: /home/samo/UnrealEngine-5.8/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu/bin
+  Using Clang archiver (/home/samo/UnrealEngine-5.8/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu/bin/llvm-ar)
+    LLVM (http://llvm.org/):   LLVM version 20.1.8   Optimized build.
+  Using toolchain located at '/home/samo/UnrealEngine-5.8/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu'
+  Using bundled libc++ standard C++ library.
+  Compressing debug files
+Terminated
+RunUAT ERROR: AutomationTool was unable to run successfully. Exited with code: 143

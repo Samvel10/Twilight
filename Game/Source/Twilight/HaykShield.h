@@ -19,8 +19,9 @@ public:
 	bool IsBroken() const { return Hits >= MaxHits; }
 
 private:
-	UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> Board;
-	UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> Brace;
+	UPROPERTY(VisibleAnywhere) TObjectPtr<USceneComponent> Root;
+	UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> Board; // collision slab (hidden)
+	UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Parts;
 	int32 Hits = 0;
 	int32 MaxHits = 3;
 	float Shake = 0.f;

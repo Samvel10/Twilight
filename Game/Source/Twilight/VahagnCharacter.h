@@ -70,7 +70,7 @@ public:
 	void InNova();
 
 	static constexpr float ArenaRadius = 52000.f;
-	static constexpr float MinAltitude = 450.f;
+	static constexpr float MinAltitude = 800.f;
 	static constexpr float MaxAltitude = 26000.f;
 
 protected:
@@ -90,6 +90,7 @@ private:
 	int32 TrailNext = 0;
 	float TrailTimer = 0.f;
 	float Shake = 0.f;
+	float SteamTimer = 0.f;
 
 	UPROPERTY() TObjectPtr<UAnimSequence> AnimHover;
 	UPROPERTY() TObjectPtr<UAnimSequence> AnimFly;

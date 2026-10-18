@@ -47,7 +47,7 @@ void AHaykArrow::Launch(AHaykArcher* InShooter, const FVector& Dir, float Power0
 	UStaticMesh* Cyl = TwAssets::Cylinder();
 	UStaticMesh* Cone = TwAssets::Cone();
 	UStaticMesh* Cube = TwAssets::Cube();
-	const float S = InShooter && InShooter->IsBel() ? 1.45f : 1.f;
+	const float S = InShooter ? InShooter->GetScale() : 1.f;
 
 	UMaterialInstanceDynamic* Wood = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_VishapSkin")), this);
 	if (Wood) { Wood->SetVectorParameterValue(TEXT("SkinColor"), FLinearColor(0.25f, 0.12f, 0.05f)); Wood->SetScalarParameterValue(TEXT("VeinIntensity"), 0.5f); Wood->SetScalarParameterValue(TEXT("RimIntensity"), 0.35f); Wood->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(1.f, 0.55f, 0.25f)); }
@@ -81,7 +81,7 @@ void AHaykArrow::Launch(AHaykArcher* InShooter, const FVector& Dir, float Power0
 		Feathers.Add(F);
 	}
 
-	TrailDots->SetStaticMesh(TwAssets::Sphere());
+	TrailDots->SetStaticMesh(TwAssets::Cylinder());
 	UMaterialInstanceDynamic* TM = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
 	if (TM) { TM->SetVectorParameterValue(TEXT("Color"), GlowCol); TM->SetScalarParameterValue(TEXT("GlowMode"), 1.f); TM->SetScalarParameterValue(TEXT("Intensity"), bSpecial ? 14.f : 5.f); }
 	TrailDots->SetMaterial(0, TM);
@@ -89,6 +89,8 @@ void AHaykArrow::Launch(AHaykArcher* InShooter, const FVector& Dir, float Power0
 	for (int32 i = 0; i < TrailCount; ++i) Init.Add(FTransform(FRotator::ZeroRotator, GetActorLocation(), FVector(0.001f)));
 	TrailDots->AddInstances(Init, false, true);
 	TrailBirth.Init(-100.f, TrailCount);
+	TrailLen.Init(0.f, TrailCount);
+	PrevTrail = GetActorLocation();
 
 	Light->SetLightColor(GlowCol);
 	Light->SetIntensity(bSpecial ? 9000.f : 2500.f);
@@ -165,7 +167,12 @@ void AHaykArrow::Tick(float Dt)
 		{
 			TrailTimer = 0.016f;
 			TrailBirth[TrailNext] = Now;
-			TrailDots->UpdateInstanceTransform(TrailNext, FTransform(FRotator::ZeroRotator, P0, FVector(bSpecial ? 0.09f : 0.05f)), true, false, true);
+			const FVector Seg = P0 - PrevTrail;
+			const float Len = Seg.Size();
+			const float W = bSpecial ? 0.035f : 0.015f;
+			TrailLen[TrailNext] = Len / 100.f;
+			if (Len > 1.f) TrailDots->UpdateInstanceTransform(TrailNext, FTransform(FRotationMatrix::MakeFromZ(Seg / Len).Rotator(), (P0 + PrevTrail) * 0.5f, FVector(W, W, Len / 100.f)), true, false, true);
+			PrevTrail = P0;
 			TrailNext = (TrailNext + 1) % TrailCount;
 		}
 	}
@@ -176,7 +183,8 @@ void AHaykArrow::Tick(float Dt)
 		if (A < 0.f || A > 1.2f) continue;
 		FTransform T;
 		TrailDots->GetInstanceTransform(i, T, true);
-		T.SetScale3D(FVector((bSpecial ? 0.09f : 0.05f) * (1.f - A / 1.2f) + 0.001f));
+		const float W = (bSpecial ? 0.035f : 0.015f) * (1.f - A / 1.2f) + 0.001f;
+		T.SetScale3D(FVector(W, W, TrailLen[i]));
 		TrailDots->UpdateInstanceTransform(i, T, true, false, true);
 	}
 	TrailDots->MarkRenderStateDirty();

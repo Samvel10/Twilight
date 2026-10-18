@@ -13,7 +13,7 @@
 
 namespace
 {
-	const FLinearColor ZoneFog[3] = { FLinearColor(0.04f, 0.10f, 0.20f), FLinearColor(0.02f, 0.16f, 0.14f), FLinearColor(0.22f, 0.03f, 0.04f) };
+	const FLinearColor ZoneFog[3] = { FLinearColor(0.02f, 0.05f, 0.11f), FLinearColor(0.01f, 0.09f, 0.08f), FLinearColor(0.09f, 0.012f, 0.02f) };
 	const FLinearColor ZoneGlow[3] = { FLinearColor(0.35f, 0.75f, 1.f), FLinearColor(0.3f, 1.f, 0.7f), FLinearColor(1.f, 0.3f, 0.12f) };
 }
 
@@ -41,6 +41,14 @@ float AAralezWorld::TunnelRadius(float T)
 	const float Base = 1700.f + 300.f * FMath::Sin(T * 41.f) + 250.f * FMath::Sin(T * 13.f + 1.f);
 	const float Cav = 1500.f * (FMath::Exp(-FMath::Square((T - 0.36f) / 0.03f)) + FMath::Exp(-FMath::Square((T - 0.7f) / 0.03f))) + 2600.f * FMath::Exp(-FMath::Square((T - 1.f) / 0.04f));
 	return Base + Cav;
+}
+
+float AAralezWorld::WallRadius(float T, float A)
+{
+	const float S = A / (2.f * PI) * 26.f;
+	const float Noise = FMath::PerlinNoise2D(FVector2D(T * 180.f, S * 0.7f)) * 0.22f + FMath::PerlinNoise2D(FVector2D(T * 600.f, S * 2.1f)) * 0.08f;
+	const float Floor = FMath::Sin(A) < -0.6f ? 0.85f : 1.f;
+	return TunnelRadius(T) * (1.f + Noise) * Floor;
 }
 
 float AAralezWorld::NearestT(const FVector& P, float Hint)
@@ -71,8 +79,8 @@ FTwSkyPreset AAralezWorld::GetSkyPreset() const
 	P.FogDensity = 0.06f;
 	P.FogFalloff = 0.0001f;
 	P.FogStart = 600.f;
-	P.Exposure = 1.7f;
-	P.SkyLightIntensity = 0.25f;
+	P.Exposure = 2.2f;
+	P.SkyLightIntensity = 0.45f;
 	P.SkyLightColor = FLinearColor(0.4f, 0.6f, 1.f);
 	P.EmberColor = FLinearColor(0.5f, 0.85f, 1.f);
 	P.GainShadows = FVector4(0.85f, 0.95f, 1.2f, 1.f);
@@ -156,13 +164,13 @@ void AAralezWorld::BuildCrystals()
 		{
 			M->SetVectorParameterValue(TEXT("Color"), ZoneGlow[Z]);
 			M->SetScalarParameterValue(TEXT("GlowMode"), 1.f);
-			M->SetScalarParameterValue(TEXT("Intensity"), 6.f);
+			M->SetScalarParameterValue(TEXT("Intensity"), 2.5f);
 			Ism->SetMaterial(0, M);
 		}
 		CrystalSets.Add(Ism);
 	}
 	// crystals grow from the walls, pointing inward
-	for (int32 i = 0; i < 1250; ++i)
+	for (int32 i = 0; i < 420; ++i)
 	{
 		const float T = R.FRand();
 		const int32 Z = ZoneAt(T);
@@ -172,22 +180,27 @@ void AAralezWorld::BuildCrystals()
 		const FVector Up = FVector::CrossProduct(Fwd, Right).GetSafeNormal();
 		const float A = R.FRandRange(0.f, 2.f * PI);
 		const FVector Dir = Right * FMath::Cos(A) + Up * FMath::Sin(A);
-		const FVector Base = P + Dir * TunnelRadius(T) * 0.95f;
-		const FRotator Rot = FRotationMatrix::MakeFromZ((-Dir + FMath::VRand() * 0.35f).GetSafeNormal()).Rotator();
-		const float S = R.FRandRange(0.6f, 2.4f);
-		CrystalSets[Z]->AddInstance(FTransform(Rot, Base, FVector(0.35f * S, 0.35f * S, 1.6f * S)), true);
+		// clusters embedded in the rock
+		const FVector Base = P + Dir * WallRadius(T, A) * 1.04f;
+		const float S = R.FRandRange(0.6f, 2.2f);
+		for (int32 k = 0; k < 3; ++k)
+		{
+			const FRotator Rot = FRotationMatrix::MakeFromZ((-Dir + FMath::VRand() * 0.2f).GetSafeNormal()).Rotator();
+			const float Ks = k == 0 ? 1.f : (k == 1 ? 0.6f : 0.4f);
+			CrystalSets[Z]->AddInstance(FTransform(Rot, Base + FMath::VRand() * 60.f * S, FVector(0.35f, 0.35f, 1.6f) * S * Ks), true);
+		}
 	}
 	// a few real lights per zone so the walls catch colour
-	for (int32 i = 0; i < 20; ++i)
+	for (int32 i = 0; i < 28; ++i)
 	{
-		const float T = (i + 0.5f) / 20.f;
+		const float T = (i + 0.5f) / 28.f;
 		UPointLightComponent* L = NewObject<UPointLightComponent>(this);
 		L->SetupAttachment(RootComponent);
 		L->RegisterComponent();
 		L->SetWorldLocation(PathPoint(T));
 		L->SetIntensityUnits(ELightUnits::Unitless);
-		L->SetIntensity(60000.f);
-		L->SetAttenuationRadius(TunnelRadius(T) * 2.6f);
+		L->SetIntensity(90000.f);
+		L->SetAttenuationRadius(TunnelRadius(T) * 1.8f);
 		L->SetLightColor(ZoneGlow[ZoneAt(T)]);
 		L->SetCastShadows(false);
 	}
@@ -201,7 +214,28 @@ void AAralezWorld::BuildGate()
 	GateCore->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GateCore->RegisterComponent();
 	GateCore->SetWorldLocation(PathPoint(1.f));
-	GateCore->SetWorldScale3D(FVector(9.f));
+	GateCore->SetWorldScale3D(FVector(4.f));
+	// a slowly turning ring of golden crystals around the soul of Ara
+	GateRing = NewObject<USceneComponent>(this);
+	GateRing->SetupAttachment(RootComponent);
+	GateRing->RegisterComponent();
+	GateRing->SetWorldLocationAndRotation(PathPoint(1.f), PathTangent(1.f).Rotation());
+	UMaterialInstanceDynamic* GoldM = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
+	if (GoldM) { GoldM->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.8f, 0.4f)); GoldM->SetScalarParameterValue(TEXT("GlowMode"), 1.f); GoldM->SetScalarParameterValue(TEXT("Intensity"), 4.f); }
+	for (int32 k = 0; k < 20; ++k)
+	{
+		const float A = 2.f * PI * k / 20.f;
+		UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(this);
+		C->SetStaticMesh(TwAssets::Cone());
+		C->SetupAttachment(GateRing);
+		C->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		C->RegisterComponent();
+		const FVector Rad(0.f, FMath::Cos(A), FMath::Sin(A));
+		C->SetRelativeLocation(Rad * 1600.f);
+		C->SetRelativeRotation(FRotationMatrix::MakeFromZ(-Rad).Rotator());
+		C->SetRelativeScale3D(FVector(0.5f, 0.5f, 3.f));
+		if (GoldM) C->SetMaterial(0, GoldM);
+	}
 	if (UMaterialInstanceDynamic* M = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this))
 	{
 		M->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.85f, 0.5f));
@@ -231,6 +265,8 @@ void AAralezWorld::Tick(float Dt)
 	if (T >= 0.36f && T < 0.7f) Col = FMath::Lerp(ZoneFog[0], ZoneFog[1], FMath::Clamp((T - 0.33f) / 0.06f, 0.f, 1.f));
 	else if (T >= 0.7f) Col = FMath::Lerp(ZoneFog[1], ZoneFog[2], FMath::Clamp((T - 0.67f) / 0.06f, 0.f, 1.f));
 	Fog->SetFogInscatteringColor(Col);
-	if (GateCore) GateCore->SetWorldScale3D(FVector(9.f + FMath::Sin(GetWorld()->GetTimeSeconds() * 2.f) * 0.6f));
+	Fog->SetFogDensity(FMath::Lerp(0.035f, 0.025f, FMath::Clamp(T / 0.7f, 0.f, 1.f)));
+	if (GateRing) GateRing->AddLocalRotation(FRotator(0.f, 0.f, Dt * 20.f));
+	if (GateCore) GateCore->SetWorldScale3D(FVector(4.f + FMath::Sin(GetWorld()->GetTimeSeconds() * 2.f) * 0.4f));
 	(void)Zf;
 }
