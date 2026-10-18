@@ -315,6 +315,14 @@ void AAralezSpirit::Animate(float Dt)
 void AAralezSpirit::Tick(float Dt)
 {
 	Super::Tick(Dt);
+	// a rival flying through the lens fills the screen with a flat pale body: hide it for that instant
+	if (bBot && BodyRoot)
+	{
+		bool bNearLens = false;
+		if (APlayerController* LPC = GetWorld()->GetFirstPlayerController())
+			if (LPC->PlayerCameraManager) bNearLens = FVector::DistSquared(GetActorLocation(), LPC->PlayerCameraManager->GetCameraLocation()) < FMath::Square(320.f);
+		if (BodyRoot->IsVisible() == bNearLens) BodyRoot->SetVisibility(!bNearLens, true);
+	}
 	DashCd = FMath::Max(0.f, DashCd - Dt);
 	HowlCd = FMath::Max(0.f, HowlCd - Dt);
 	DashTime = FMath::Max(0.f, DashTime - Dt);
