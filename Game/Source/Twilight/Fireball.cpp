@@ -196,6 +196,7 @@ void AFireball::Explode(const FVector& Where, AActor* DirectActor, UPrimitiveCom
 			TwFx::Burst(GetWorld(), TwFx::EFx::BigExplosion, Where, 0.8f + Aoe / 900.f);
 			TwFx::LightFlash(GetWorld(), Where, FLinearColor(1.f, 0.5f, 0.15f), 60000.f, Aoe * 3.f, 0.4f);
 			TwFx::Sound(GetWorld(), TEXT("sfx_big_explosion"), Where, 1.f);
+			if (Hero) Hero->AddShake(FMath::Clamp(1.f - FVector::Dist(Hero->GetActorLocation(), Where) / 5000.f, 0.f, 0.6f));
 		}
 		else
 		{

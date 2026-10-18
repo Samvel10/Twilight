@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Ծիրանի (Twilight)
+Comment=Վահագն · Հայկ · Արալեզ — Թռիչք դեպի դիցաբանության խորքերը
+Exec=/var/www/html/Twilight/Game/Tools/play.sh
+Icon=/var/www/html/Twilight/art/keyart/vahagn.jpg
+Terminal=false
+Categories=Game;

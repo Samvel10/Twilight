@@ -13,6 +13,7 @@ class UTwPoseAnimInstance;
 class UAnimSequence;
 class UMaterialInstanceDynamic;
 class AVishap;
+class UInstancedStaticMeshComponent;
 struct FInputActionValue;
 
 /** Vahagn, the fire-born. Superhero flight, fireballs, charged shot and the Sun Nova. */
@@ -43,6 +44,8 @@ public:
 
 	void AddNova(float Amount) { Nova = FMath::Clamp(Nova + Amount, 0.f, 100.f); }
 	void Heal(float Amount);
+	/** Camera shake impulse (0..1+). */
+	void AddShake(float Amount) { Shake = FMath::Min(1.5f, Shake + Amount); }
 	void RegisterHit(bool bKill);
 	void SetControlEnabled(bool bEnabled);
 	/** Menu framing: hero off to the right of the menu panel. */
@@ -82,6 +85,11 @@ private:
 	UPROPERTY() TArray<TObjectPtr<UFXSystemComponent>> Auras;
 	UPROPERTY() TObjectPtr<UTwPoseAnimInstance> Poser;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> BodyMat;
+	UPROPERTY(VisibleAnywhere) TObjectPtr<UInstancedStaticMeshComponent> FireTrail;
+	TArray<float> TrailBirth;
+	int32 TrailNext = 0;
+	float TrailTimer = 0.f;
+	float Shake = 0.f;
 
 	UPROPERTY() TObjectPtr<UAnimSequence> AnimHover;
 	UPROPERTY() TObjectPtr<UAnimSequence> AnimFly;

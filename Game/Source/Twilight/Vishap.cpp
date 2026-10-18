@@ -549,6 +549,7 @@ void AVishap::StartDying(AVahagnCharacter* Killer)
 	TwFx::Burst(GetWorld(), TwFx::EFx::VishapDeath, HeadPos, bBoss ? 6.f : 2.5f);
 	TwFx::LightFlash(GetWorld(), HeadPos, FLinearColor(1.f, 0.4f, 0.1f), bBoss ? 400000.f : 80000.f, bBoss ? 12000.f : 4000.f, bBoss ? 1.5f : 0.6f);
 	TwFx::Sound(GetWorld(), TEXT("sfx_vishap_death"), HeadPos, 1.f, bBoss ? 0.7f : 1.f);
+	if (Killer) Killer->AddShake(bBoss ? 1.4f : FMath::Clamp(1.f - FVector::Dist(Killer->GetActorLocation(), HeadPos) / 6000.f, 0.f, 0.5f));
 	if (EyeMat) EyeMat->SetScalarParameterValue(TEXT("Intensity"), 0.f);
 
 	// fire orbs: heal + Nova charge

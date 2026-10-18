@@ -26,6 +26,7 @@
 #include "TimerManager.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "NiagaraComponent.h"
+#include "Components/InstancedStaticMeshComponent.h"
 
 static const FName SockHandR(TEXT("hand_r"));
 static const FName SockHandL(TEXT("hand_l"));
@@ -88,6 +89,11 @@ AVahagnCharacter::AVahagnCharacter()
 	FlameLoop = CreateDefaultSubobject<UAudioComponent>(TEXT("FlameLoop"));
 	FlameLoop->SetupAttachment(GetCapsuleComponent());
 	FlameLoop->bAutoActivate = false;
+	FireTrail = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("FireTrail"));
+	FireTrail->SetupAttachment(GetCapsuleComponent());
+	FireTrail->SetAbsolute(true, true, true);
+	FireTrail->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	FireTrail->SetCastShadow(false);
 	WindLoop = CreateDefaultSubobject<UAudioComponent>(TEXT("WindLoop"));
 	WindLoop->SetupAttachment(GetCapsuleComponent());
 	WindLoop->bAutoActivate = false;
@@ -137,6 +143,21 @@ void AVahagnCharacter::BeginPlay()
 	if (USoundBase* S = TwAssets::Sound(TEXT("sfx_flame_aura_loop"))) { FlameLoop->SetSound(S); FlameLoop->SetVolumeMultiplier(0.35f); FlameLoop->Play(); }
 	if (USoundBase* S = TwAssets::Sound(TEXT("sfx_wind_loop"))) { WindLoop->SetSound(S); WindLoop->SetVolumeMultiplier(0.f); WindLoop->Play(); }
 
+	// fire trail: recycled glowing embers left behind while flying fast
+	FireTrail->SetStaticMesh(TwAssets::Sphere());
+	if (UMaterialInstanceDynamic* TM = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this))
+	{
+		TM->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.45f, 0.12f));
+		TM->SetScalarParameterValue(TEXT("GlowMode"), 1.f);
+		TM->SetScalarParameterValue(TEXT("Intensity"), 8.f);
+		FireTrail->SetMaterial(0, TM);
+	}
+	{
+		TArray<FTransform> Init;
+		for (int32 i = 0; i < 48; ++i) Init.Add(FTransform(FRotator::ZeroRotator, GetActorLocation(), FVector(0.001f)));
+		FireTrail->AddInstances(Init, false, true);
+		TrailBirth.Init(-100.f, 48);
+	}
 	LastYaw = GetActorRotation().Yaw;
 	AimPoint = GetActorLocation() + GetActorForwardVector() * 10000.f;
 }
@@ -383,12 +404,39 @@ void AVahagnCharacter::UpdateVisuals(float Dt)
 	Camera->SetFieldOfView(FMath::FInterpTo(Camera->FieldOfView, TargetFov, Dt, 4.f));
 	Boom->TargetArmLength = FMath::FInterpTo(Boom->TargetArmLength, bBoosting ? 680.f : 560.f, Dt, 3.f);
 	// small shake when hurt
-	if (DamageFlash > 0.f)
+	Shake = FMath::Max(0.f, Shake - Dt * 1.8f);
+	const float ShakeAmt = DamageFlash * 6.f + Shake * 22.f;
+	if (ShakeAmt > 0.1f)
 	{
-		const float S = DamageFlash * 6.f;
-		Camera->SetRelativeLocation(FVector(0, FMath::FRandRange(-S, S), FMath::FRandRange(-S, S)));
+		const float T2 = GetWorld()->GetRealTimeSeconds();
+		Camera->SetRelativeLocation(FVector(0, FMath::Sin(T2 * 47.f) * ShakeAmt, FMath::Sin(T2 * 61.f + 1.3f) * ShakeAmt));
 	}
 	else Camera->SetRelativeLocation(FVector::ZeroVector);
+
+	// fire trail
+	{
+		const float Now = GetWorld()->GetTimeSeconds();
+		TrailTimer -= Dt;
+		if (TrailTimer <= 0.f && Speed > 1300.f && !bDead && TrailBirth.Num() > 0)
+		{
+			TrailTimer = bBoosting ? 0.02f : 0.04f;
+			TrailBirth[TrailNext] = Now;
+			const FVector Back = GetActorLocation() - V.GetSafeNormal() * 70.f + FMath::VRand() * 18.f;
+			FireTrail->UpdateInstanceTransform(TrailNext, FTransform(FRotator::ZeroRotator, Back, FVector(bBoosting ? 0.32f : 0.22f)), true, false, true);
+			TrailNext = (TrailNext + 1) % TrailBirth.Num();
+		}
+		for (int32 i = 0; i < TrailBirth.Num(); ++i)
+		{
+			const float A = Now - TrailBirth[i];
+			if (A < 0.f || A > 0.9f) continue;
+			FTransform T;
+			FireTrail->GetInstanceTransform(i, T, true);
+			T.SetScale3D(FVector((bBoosting ? 0.32f : 0.22f) * (1.f - A / 0.9f) + 0.001f));
+			T.AddToTranslation(FVector(0, 0, 60.f * Dt)); // embers drift up
+			FireTrail->UpdateInstanceTransform(i, T, true, false, true);
+		}
+		FireTrail->MarkRenderStateDirty();
+	}
 
 	// fire glow
 	const float T = GetWorld()->GetTimeSeconds();
@@ -459,6 +507,7 @@ void AVahagnCharacter::InNova()
 	TwFx::Burst(GetWorld(), TwFx::EFx::BigExplosion, C, 4.f);
 	TwFx::LightFlash(GetWorld(), C, FLinearColor(1.f, 0.6f, 0.2f), 300000.f, 9000.f, 0.9f);
 	TwFx::Sound2D(GetWorld(), TEXT("sfx_special_nova"), 1.f);
+	AddShake(1.f);
 	for (TActorIterator<AVishap> It(GetWorld()); It; ++It)
 	{
 		AVishap* V = *It;
