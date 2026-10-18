@@ -37,6 +37,11 @@ struct FTwSkyPreset
 	float SkyLightIntensity = 1.2f;
 	FLinearColor SkyLightColor = FLinearColor(0.9f, 0.75f, 1.f);
 	float ShadowDistance = 12000.f;
+	/** SkyAtmosphere luminance tint: low values turn a lit atmosphere into a night sky. */
+	FLinearColor SkyLuminance = FLinearColor(1.05f, 0.85f, 1.2f);
+	/** Night skies: number of stars on a far dome (0 = none) and a moon disc opposite the key light. */
+	int32 Stars = 0;
+	bool bMoonDisc = false;
 };
 
 /** Shared, fully procedural environment: sunset sky, fog, grading, music, ember motes. Games subclass it to add terrain. */
@@ -78,6 +83,7 @@ protected:
 private:
 	void BuildSky(const FTwSkyPreset& P);
 	void BuildEmbers(const FLinearColor& Color);
+	void BuildNightSky(const FTwSkyPreset& P);
 	void UpdateEmbers(float Dt);
 
 	TArray<FVector> EmberPos;

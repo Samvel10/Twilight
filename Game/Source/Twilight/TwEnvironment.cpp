@@ -56,7 +56,62 @@ void ATwEnvironment::BeginPlay()
 	BuildSky(P);
 	BuildLevel();
 	BuildEmbers(P.EmberColor);
+	BuildNightSky(P);
 	PlayMusic(GetStartMusic());
+}
+
+void ATwEnvironment::BuildNightSky(const FTwSkyPreset& P)
+{
+	if (P.Stars > 0)
+	{
+		UInstancedStaticMeshComponent* Ism = NewObject<UInstancedStaticMeshComponent>(this);
+		Ism->SetStaticMesh(TwAssets::Sphere());
+		Ism->SetupAttachment(RootComponent);
+		Ism->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Ism->SetCastShadow(false);
+		Ism->RegisterComponent();
+		Ism->SetWorldTransform(FTransform::Identity);
+		if (UMaterialInstanceDynamic* M = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this))
+		{
+			M->SetVectorParameterValue(TEXT("Color"), FLinearColor(0.8f, 0.85f, 1.f));
+			M->SetScalarParameterValue(TEXT("GlowMode"), 1.f);
+			M->SetScalarParameterValue(TEXT("Intensity"), 6.f);
+			M->SetScalarParameterValue(TEXT("Falloff"), 1.f);
+			Ism->SetMaterial(0, M);
+		}
+		// far dome: about one to two pixels per star at 1600x900
+		FRandomStream R(7);
+		TArray<FTransform> Xf;
+		for (int32 i = 0; i < P.Stars; ++i)
+		{
+			const float Az = R.FRandRange(0.f, 2.f * PI);
+			const float El = FMath::Asin(R.FRandRange(0.12f, 1.f)); // uniform over the upper dome, none at the horizon haze
+			const FVector Dir(FMath::Cos(El) * FMath::Cos(Az), FMath::Cos(El) * FMath::Sin(Az), FMath::Sin(El));
+			const float S = R.FRandRange(2.5f, 5.5f) * (R.FRand() < 0.06f ? 1.8f : 1.f);
+			Xf.Add(FTransform(FQuat::Identity, Dir * 300000.f, FVector(S)));
+		}
+		Ism->AddInstances(Xf, false, true);
+	}
+	if (P.bMoonDisc)
+	{
+		UStaticMeshComponent* MoonDisc = NewObject<UStaticMeshComponent>(this);
+		MoonDisc->SetStaticMesh(TwAssets::Sphere());
+		MoonDisc->SetupAttachment(RootComponent);
+		MoonDisc->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		MoonDisc->SetCastShadow(false);
+		MoonDisc->RegisterComponent();
+		// the key light points FROM the moon: put the disc against its direction
+		MoonDisc->SetWorldLocation(-P.SunRot.Vector() * 280000.f);
+		MoonDisc->SetWorldScale3D(FVector(75.f));
+		if (UMaterialInstanceDynamic* M = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this))
+		{
+			M->SetVectorParameterValue(TEXT("Color"), FLinearColor(0.85f, 0.9f, 1.f));
+			M->SetScalarParameterValue(TEXT("GlowMode"), 1.f);
+			M->SetScalarParameterValue(TEXT("Intensity"), 4.f);
+			M->SetScalarParameterValue(TEXT("Falloff"), 0.6f);
+			MoonDisc->SetMaterial(0, M);
+		}
+	}
 }
 
 void ATwEnvironment::Tick(float Dt)
@@ -107,7 +162,7 @@ void ATwEnvironment::BuildSky(const FTwSkyPreset& S)
 	Atmosphere->SetRayleighScatteringScale(0.0331f * 1.15f);
 	Atmosphere->SetMieScatteringScale(0.006f);
 	Atmosphere->SetMieAnisotropy(0.85f);
-	Atmosphere->SetSkyLuminanceFactor(FLinearColor(1.05f, 0.85f, 1.2f));
+	Atmosphere->SetSkyLuminanceFactor(S.SkyLuminance);
 
 	SkyLight->SetMobility(EComponentMobility::Movable);
 	SkyLight->SourceType = ESkyLightSourceType::SLS_CapturedScene;

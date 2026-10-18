@@ -45,18 +45,22 @@ FTwSkyPreset AHaykWorld::GetSkyPreset() const
 	{
 		// Masis at night: cold moonlight, warm torches
 		P.SunRot = FRotator(-28.f, 150.f, 0.f);
-		P.SunColor = FLinearColor(0.45f, 0.55f, 1.f);
-		P.SunIntensity = 1.6f;
+		P.SunColor = FLinearColor(0.62f, 0.7f, 1.f);
+		P.SunIntensity = 2.2f;
 		P.MoonRot = FRotator(-50.f, -20.f, 0.f);
 		P.MoonColor = FLinearColor(0.35f, 0.4f, 0.9f);
 		P.MoonIntensity = 0.4f;
-		P.FogColor = FLinearColor(0.05f, 0.07f, 0.16f);
+		P.FogColor = FLinearColor(0.022f, 0.03f, 0.07f);
 		P.FogSunColor = FLinearColor(0.3f, 0.4f, 0.8f);
 		P.FogDensity = 0.025f;
-		P.Exposure = 1.3f;
+		P.Exposure = 1.f;
+		// the moon drives the atmosphere, so it must not paint a blue day sky: darken the dome, add stars
+		P.SkyLuminance = FLinearColor(0.035f, 0.045f, 0.12f);
+		P.Stars = 1400;
+		P.bMoonDisc = true;
 		P.EmberColor = FLinearColor(1.f, 0.55f, 0.2f);
-		P.SkyLightIntensity = 1.6f;
-		P.SkyLightColor = FLinearColor(0.5f, 0.6f, 1.f);
+		P.SkyLightIntensity = 0.75f;
+		P.SkyLightColor = FLinearColor(0.6f, 0.68f, 1.f);
 		P.GainShadows = FVector4(0.85f, 0.92f, 1.2f, 1.f);
 		P.ShadowDistance = 9000.f;
 	}
