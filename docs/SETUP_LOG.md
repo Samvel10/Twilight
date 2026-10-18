@@ -123,3 +123,21 @@
   - Hayk 200 վ՝ հաղթանակ + երկրորդ մենամարտ, 83.8 FPS։
   - Aralez 185 վ՝ ավարտ (1-ին/3-րդ/4-րդ տեղ տարբեր run-երում), 94–109 FPS։
   - Սխալներ/վթարներ չկան։
+
+## 2026-10-19 01:00 — Քայլ 13. Երկրորդ աշխարհներ (փոթորիկ, գիշեր) և Shipping փաթեթ
+- **Վահագն. փոթորկի աշխարհ** (`VahagnWorld::SetStorm/ApplyStorm/StrikeLightning/UpdateBolt`)։ Մեծ վիշապի հայտնվելու պահին ~6 վրկ-ում փոխվում են արևը, SkyAtmosphere-ի luminance-ը (բոսորագույն), Mie մշուշը, մառախուղը, sky light-ը (երկու անգամ վերանկարվում է) և ծովի գույները (`SeaMat`)։ Ամեն 3.5–8 վրկ-ը մեկ կայծակ է խփում. 11 ատամնավոր հատված և 2 ճյուղ (18 cylinder-ի pool), թարթում, մանուշակագույն բռնկում Moon լույսով (+6), ջրի ցայտք և ուշացած ամպրոպ (`sfx_big_explosion` pitch 0.42)։ `StartMatch`-ը փոթորիկն անջատում է։ Փորձարկման դրոշ՝ `-TwBossTest` (ալիքները բաց է թողնում)։ Առաջին տարբերակում Rayleigh-ի իջեցումը վերին երկինքը սև էր դարձնում, ուստի այն պահպանվեց, իսկ գույնը տրվում է luminance factor-ով (1.6, 0.42, 0.55)։ Կայծակի flash-ը 18-ից իջեցվեց 6-ի, որովհետև կղզիները սպիտակում էին։
+- **Ծովի warp**։ Կայծակի լույսի տակ ալիքների ինտերֆերենցիան կանոնավոր կետեր էր տալիս։ Warp-ի հաճախականությունը 0.13-ից բարձրացվեց. 0.37 արժեքը մարմարյա տեսք տվեց, ուստի վերջնականը 0.2 է (WarpAmount 1.0)։
+- **Գիշերային երկինք** (`ATwEnvironment::BuildNightSky`, `FTwSkyPreset::SkyLuminance/Stars/bMoonDisc`)։ Հայկի գիշերը լուսավոր կապույտ «ցերեկ» էր (լուսինը SkyAtmosphere-ի համար արև է 28°-ում)։ Հիմա luminance-ը 0.035/0.045/0.12 է, կա 1400 աստղ 3 կմ գմբեթի վրա (ISM), լուսնի սկավառակ, ավելի մուգ մառախուղ և sky light, իսկ լուսնի լույսը պակաս հագեցած է։ Արդյունք՝ լուսնային գիշեր, աստղեր և Բելի բանակի տաք ջահեր։
+- **Հայկ**։ Հարվածի flash-ը կարմիր է (`FlashColor` 1/0.22/0.04, ×0.45)։ Հաբի քարտի ենթավերնագիրը կտրված էր, փոխվեց «Աղեղի մենամարտ · 1–2 խաղացող»։
+- **Shipping փաթեթ, փորձ 2** (`docs/logs/package2.log`)։ Շարժիչի Shipping մոդուլները հավաքվեցին 946/948 (21 րոպե, UBA)։ Ձախողում՝ `TwEnvironment.h` UHT mismatch, քանի որ header-ը խմբագրվել էր հավաքման ընթացքում։ Դաս. փաթեթավորման ժամանակ կոդ չխմբագրել։ Editor-ը զուգահեռ հավաքվում էր `-NoMutex`-ով։
+- **Փորձ 3**-ը գործարկված է (`docs/logs/package3.log`)։
+
+## 2026-10-19 02:00 — Քայլ 14. Shipping փաթեթ. փորձարկում և ուղղումներ
+- **Փաթեթ** (`RunUAT BuildCookRun ... -clientconfig=Shipping -build -cook -stage -pak -iostore -archive -archivedirectory=Build -nocompileeditor`)։ Փորձ 3-ը հաջողվեց (14.5 րոպե), հետագա incremental-ները տևում են 1–2 րոպե (`docs/logs/package3..7.log`)։ Արդյունք՝ `Build/Linux/Twilight.sh`, 1.7 ԳԲ։
+- **Բագ 1. վարորդի modal պատուհան։** Shipping-ը ցույց էր տալիս «WARNING: Known issues with graphics driver» (Intel Iris Xe 25.2.8-ը deny-list-ում է, `DynamicRHI.cpp:233`)։ Ուղղում՝ `DefaultEngine.ini [SystemSettings] r.WarnOfBadDrivers=0`։ Ստուգված է առանց `-unattended`-ի. պատուհան չկա։
+- **Բագ 2. հրամանային տողի քարտեզն անտեսվում է։** `UGameInstance::StartGameInstance`-ը Shipping-ում քարտեզը զրոյացնում է (`UE_ALLOW_MAP_OVERRIDE_IN_SHIPPING`)։ Ուղղում՝ `ATwHubController::BeginPlay`-ը կարդում է `-TwMap=L_X` և մեկ անգամ բացում գլուխը (static flag, որպեսզի մենյու վերադառնալիս չկրկնվի)։ `play.sh`-ն այժմ գործարկում է փաթեթը `-TwMap=$MAP`-ով։
+- **Բագ 3. փաթեթում 37 FPS։** Editor-ի `Saved/Config/.../GameUserSettings.ini`-ում `sg.Shadow/Reflection/PostProcess/EffectsQuality=0` էր, իսկ փաթեթը վերցնում էր `DefaultGameUserSettings.ini`-ի 2-երը։ Ուղղում՝ defaults-ը համապատասխանեցվեց (0)։ Արդյունք՝ փաթեթ Vahagn 104.4 FPS (p95 78.8, p99 70.7), Hayk 90.7, Aralez 103.8։
+- **Ծովի կետեր (վերջնական պատճառ)։** Warp-ը նմուշառում էր StarterContent-ի Perlin տեքստուրան, որի բծերը փուլը շեղում էին ու բարձրությունից կանոնավոր կետեր տալիս։ Ուղղում՝ առանց տեքստուրաների վերլուծական warp (3 երկար sine), երկար ալիքներին ամենամեծ warp, հավասարեցված կշիռներ։ Ծովի հարթությունը 5-ից 40 կմ է, որ բարձրությունից եզրը չերևա։ Արդյունք՝ մաքուր, բնական ալիքներ (`docs/capture/1019_013420`)։
+- **Արալեզ.** ռոբոտ-ոգին ոսպնյակի մոտ (<3.2 մ) թաքնվում է։
+- **Իսկական գործարկման թեստ.** `Tools/play.sh` (ամբողջ էկրան 1920×1200) → հաբ → Հայկ → «ԸՆԴԴԵՄ ԲԵԼԻ» → աղեղի լարում/կրակոց xdotool-ով → նետի տեսախցիկ → Բելի հերթ։ Ամեն ինչ աշխատում է։
+- **Գործիք.** `Game/Tools/pkg_test.sh <L_Map> <sec>`՝ փաթեթի autoplay թեստ (summary-ն՝ `~/.config/Epic/Twilight/Saved/TwTestSummary.txt`)։
