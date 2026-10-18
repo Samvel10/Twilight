@@ -47,3 +47,2091 @@ Twilight Linux Shipping:
   Using toolchain located at '/home/samo/UnrealEngine-5.8/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu'
   Using bundled libc++ standard C++ library.
   Compressing debug files
+=================================
+Using Unreal Build Accelerator local executor to run 948 action(s)
+  CPU 14 physical cores, 20 logical cores
+  Memory 30.97 GB physical, 31.21 GB/23.49 GB committed
+  UBA Storage capacity 40 GB
+** For UnrealPak-Linux-Development **
+[1/948] Link libUnrealPak-CoreUObject.so
+[2/948] Link libUnrealPak-DeveloperSettings.so
+[3/948] Link libUnrealPak-StateStream.so
+[4/948] Link libUnrealPak-ImageCore.so
+[5/948] Link libUnrealPak-InputCore.so
+[6/948] Compile Module.DesktopPlatform.cpp
+[7/948] Link libUnrealPak-DesktopPlatform.so
+[8/948] Compile Module.SlateCore.1.cpp
+[9/948] Compile Module.SlateCore.3.cpp
+[10/948] Compile Module.SlateCore.5.cpp
+[11/948] Compile Module.Slate.1.cpp
+[12/948] Compile Module.SlateCore.2.cpp
+[13/948] Compile Module.RenderCore.5.cpp
+[14/948] Compile Module.UELibSampleRate.cpp
+[15/948] Link libUnrealPak-UELibSampleRate.so
+[16/948] Compile Module.RenderCore.1.cpp
+[17/948] Compile Module.ImageWrapper.cpp
+[18/948] Compile Module.TextureFormat.cpp
+[19/948] Compile Module.AudioPlatformConfiguration.cpp
+[20/948] Link libUnrealPak-TextureFormat.so
+[21/948] Link libUnrealPak-AudioPlatformConfiguration.so
+[22/948] Link libUnrealPak-ImageWrapper.so
+[23/948] Compile Module.RSA.cpp
+[24/948] Link libUnrealPak-RSA.so
+[25/948] Compile Module.SlateCore.4.cpp
+[26/948] Compile Module.RenderCore.2.cpp
+[27/948] Link libUnrealPak-SlateCore.so
+[28/948] Compile Module.RenderCore.4.cpp
+[29/948] Compile Module.RenderCore.3.cpp
+[30/948] Link libUnrealPak-RenderCore.so
+[31/948] Compile Module.DeveloperToolSettings.cpp
+[32/948] Compile Module.TargetPlatform.cpp
+[33/948] Link libUnrealPak-DeveloperToolSettings.so
+[34/948] Compile Module.AssetRegistry.3.cpp
+[35/948] Compile cond_expr.c
+[36/948] Compile Module.Slate.4.cpp
+[37/948] Compile stb_alloc.c
+[38/948] Compile stb_ds.c
+[39/948] Compile preprocessor.c
+[40/948] Compile Module.Slate.7.cpp
+[41/948] Compile Module.CookMetadata.cpp
+[42/948] Link libUnrealPak-CookMetadata.so
+[43/948] Compile Module.PIEPreviewDeviceSpecification.cpp
+[44/948] Link libUnrealPak-PIEPreviewDeviceSpecification.so
+[45/948] Compile Module.SandboxFile.cpp
+[46/948] Compile Module.ShaderPreprocessor.cpp
+[47/948] Link libUnrealPak-SandboxFile.so
+[48/948] Link libUnrealPak-ShaderPreprocessor.so
+[49/948] Compile Module.HlslParser.cpp
+[50/948] Link libUnrealPak-HlslParser.so
+[51/948] Compile Module.Slate.6.cpp
+[52/948] Compile Module.AssetRegistry.1.cpp
+[53/948] Compile Module.PakFile.cpp
+[54/948] Link libUnrealPak-PakFile.so
+[55/948] Compile Module.Slate.3.cpp
+[56/948] Compile Module.LinuxTPSet.cpp
+[57/948] Compile Module.AndroidDeviceDetection.cpp
+[58/948] Compile Module.TurnkeyIO.cpp
+[59/948] Link libUnrealPak-TurnkeyIO.so
+[60/948] Compile Module.PlatformCryptoTypes.cpp
+[61/948] Link libUnrealPak-PlatformCryptoTypes.so
+[62/948] Compile Module.SessionMessages.cpp
+[63/948] Compile Module.UnrealEdMessages.cpp
+[64/948] Link libUnrealPak-SessionMessages.so
+[65/948] Link libUnrealPak-UnrealEdMessages.so
+[66/948] Compile Module.AndTPSet.cpp
+[67/948] Compile Module.EngineSettings.cpp
+[68/948] Link libUnrealPak-EngineSettings.so
+[69/948] Compile Module.LArm64TPSet.cpp
+[70/948] Compile Module.LinuxTPCon.cpp
+[71/948] Compile Module.Slate.2.cpp
+[72/948] Compile Module.Networking.cpp
+[73/948] Link libUnrealPak-Networking.so
+[74/948] Compile Module.JsonUtilities.cpp
+[75/948] Link libUnrealPak-JsonUtilities.so
+[76/948] Link libUnrealPak-AndroidDeviceDetection.so
+[77/948] Compile Module.SourceControl.cpp
+[78/948] Compile Module.AssetRegistry.4.cpp
+[79/948] Compile EncryptionContextOpenSSL.cpp
+[80/948] Compile PerModuleInline.gen.cpp
+[81/948] Compile PlatformCryptoAesDecryptorsOpenSSL.cpp
+[82/948] Compile PlatformCryptoAesEncryptorsOpenSSL.cpp
+[83/948] Compile PlatformCryptoContext.cpp
+[84/948] Compile PlatformCryptoUtilsOpenSSL.cpp
+[85/948] Link libUnrealPak-PlatformCryptoContext.so
+[86/948] Compile Module.ShaderCompilerCommon.cpp
+[87/948] Link libUnrealPak-ShaderCompilerCommon.so
+[88/948] Compile Module.VectorVM.cpp
+[89/948] Link libUnrealPak-VectorVM.so
+[90/948] Compile Module.AndroidTargetPlatform.cpp
+[91/948] Compile Module.AndTPCon.cpp
+[92/948] Compile Module.LinuxArm64TargetPlatform.cpp
+[93/948] Compile Module.LinuxTargetPlatform.cpp
+[94/948] Compile Module.LArm64TPCon.cpp
+[95/948] Compile Module.LauncherServices.cpp
+[96/948] Compile Module.Serialization.cpp
+[97/948] Link libUnrealPak-Serialization.so
+[98/948] Compile Module.Slate.5.cpp
+[99/948] Compile Module.ToolMenus.cpp
+[100/948] Link libUnrealPak-Slate.so
+[101/948] Link libUnrealPak-TargetPlatform.so
+[102/948] Link libUnrealPak-LinuxTargetPlatformSettings.so
+[103/948] Link libUnrealPak-AndroidTargetPlatformSettings.so
+[104/948] Compile Module.PakFileUtilities.cpp
+[105/948] Link libUnrealPak-LauncherServices.so
+[106/948] Compile Module.Messaging.cpp
+[107/948] Link libUnrealPak-LinuxTargetPlatformControls.so
+[108/948] Link libUnrealPak-LinuxArm64TargetPlatformSettings.so
+[109/948] Link libUnrealPak-AndroidTargetPlatform.so
+[110/948] Link libUnrealPak-AndroidTargetPlatformControls.so
+[111/948] Link libUnrealPak-LinuxTargetPlatform.so
+[112/948] Link libUnrealPak-LinuxArm64TargetPlatformControls.so
+[113/948] Link libUnrealPak-ToolMenus.so
+[114/948] Link libUnrealPak-LinuxArm64TargetPlatform.so
+[115/948] Link libUnrealPak-Messaging.so
+[116/948] Compile Module.PlatformCrypto.cpp
+[117/948] Link libUnrealPak-PlatformCrypto.so
+[118/948] Compile Module.AssetRegistry.2.cpp
+[119/948] Compile Module.ShaderFormatVectorVM.cpp
+[120/948] Link libUnrealPak-AssetRegistry.so
+[121/948] Link libUnrealPak-ShaderFormatVectorVM.so
+[122/948] Compile Module.MessageLog.cpp
+[123/948] Link libUnrealPak-SourceControl.so
+[124/948] Link libUnrealPak-MessageLog.so
+[125/948] Compile Module.TcpMessaging.cpp
+[126/948] Link libUnrealPak-TcpMessaging.so
+[127/948] Compile Module.UnrealPak.cpp
+[128/948] Compile Module.TurnkeySupport.cpp
+[129/948] Compile Module.VulkanShaderFormat.cpp
+[130/948] Link libUnrealPak-TurnkeySupport.so
+[131/948] Compile Module.ShaderFormatOpenGL.cpp
+[132/948] Link libUnrealPak-VulkanShaderFormat.so
+[133/948] Link libUnrealPak-ShaderFormatOpenGL.so
+** For Twilight-Linux-Shipping **
+[134/948] Compile Module.AISupportModule.cpp
+** For UnrealPak-Linux-Development **
+[135/948] Compile Module.IoStoreUtilities.2.cpp
+** For Twilight-Linux-Shipping **
+[136/948] Compile Module.AVIWriter.cpp
+[137/948] Compile Module.ActorLayerUtilities.cpp
+** For UnrealPak-Linux-Development **
+[138/948] Compile Module.Virtualization.cpp
+** For Twilight-Linux-Shipping **
+[139/948] Compile Module.Advertising.cpp
+** For UnrealPak-Linux-Development **
+[140/948] Link libUnrealPak-Virtualization.so
+** For Twilight-Linux-Shipping **
+[141/948] Compile Module.AdpcmAudioDecoder.cpp
+[142/948] Compile Module.AnalyticsCSV.cpp
+[143/948] Compile Module.Analytics.cpp
+[144/948] Compile Module.AnalyticsHorde.cpp
+[145/948] Compile Module.ACLPlugin.cpp
+[146/948] Compile Module.AnalyticsLog.cpp
+[147/948] Compile Module.ActorSequence.cpp
+[148/948] Compile Module.AndroidFileServer.cpp
+[149/948] Compile Module.AndroidPermission.cpp
+** For UnrealPak-Linux-Development **
+[150/948] Compile Module.PerforceSourceControl.cpp
+** For Twilight-Linux-Shipping **
+[151/948] Compile Module.AnalyticsET.cpp
+[152/948] Compile Module.AppFramework.3.cpp
+[153/948] Compile Module.AnimationCore.cpp
+[154/948] Compile Module.AppleImageUtils.cpp
+[155/948] Compile Module.AIModule.1.cpp
+[156/948] Compile Module.AIModule.3.cpp
+[157/948] Compile Module.AnimationSharing.cpp
+[158/948] Compile Module.ArchVisCharacter.cpp
+[159/948] Compile Module.ApplicationCore.cpp
+[160/948] Compile Module.AppFramework.2.cpp
+** For UnrealPak-Linux-Development **
+[161/948] Compile Module.TypedElementFramework.cpp
+** For Twilight-Linux-Shipping **
+[162/948] Compile Module.AIModule.2.cpp
+[163/948] Compile Module.AppFramework.1.cpp
+[164/948] Compile Module.AIModule.4.cpp
+** For UnrealPak-Linux-Development **
+[165/948] Link libUnrealPak-TypedElementFramework.so
+[166/948] Link libUnrealPak-PerforceSourceControl.so
+** For Twilight-Linux-Shipping **
+[167/948] Compile Module.AudioCaptureCore.cpp
+[168/948] Compile Module.AssetTags.cpp
+[169/948] Compile Module.AssetRegistry.3.cpp
+[170/948] Compile Module.AudioLinkCore.cpp
+[171/948] Compile Module.AudioCapture.cpp
+[172/948] Compile Module.AudioAnalyzer.cpp
+[173/948] Compile Module.AudioInsightsRuntime.cpp
+[174/948] Compile Module.AudioChannelAgnosticCore.cpp
+[175/948] Compile Module.AudioMixerCore.cpp
+[176/948] Compile Module.AudioExtensions.cpp
+[177/948] Compile Module.AudioPlatformConfiguration.cpp
+[178/948] Compile Module.AudioMixerPlatformAudioLink.cpp
+[179/948] Compile Module.AudioLinkEngine.cpp
+[180/948] Compile Module.AudioMixerSDL.cpp
+[181/948] Compile Module.AudioMixer.3.cpp
+[182/948] Compile Module.AutoRTFM.cpp
+[183/948] Compile Module.AdvancedWidgets.cpp
+[184/948] Compile Module.AvfMediaFactory.cpp
+[185/948] Compile Module.AudioSynesthesiaCore.cpp
+[186/948] Compile Module.AutomationUtils.cpp
+[187/948] Compile Module.BandwidthDebugDelegates.cpp
+** For UnrealPak-Linux-Development **
+[188/948] Compile Module.IoStoreUtilities.1.cpp
+** For Twilight-Linux-Shipping **
+[189/948] Compile Module.BackChannel.cpp
+[190/948] Compile Module.AudioSynesthesia.cpp
+[191/948] Compile Module.BandwidthMeasurementTool.cpp
+** For UnrealPak-Linux-Development **
+[192/948] Link libUnrealPak-IoStoreUtilities.so
+[193/948] Link libUnrealPak-PakFileUtilities.so
+** For Twilight-Linux-Shipping **
+[194/948] Compile Module.BinkAudioDecoder.cpp
+** For UnrealPak-Linux-Development **
+[195/948] Link UnrealPak
+[196/948] WriteMetadata UnrealPak.version [NoUba]
+[197/948] WriteMetadata UnrealPak.target [NoUba]
+** For Twilight-Linux-Shipping **
+[198/948] Compile Module.AssetRegistry.1.cpp
+[199/948] Compile Module.AssetRegistry.2.cpp
+[200/948] Compile Module.BuildSettings.cpp
+[201/948] Compile Module.Cbor.cpp
+[202/948] Compile Module.AudioMixer.1.cpp
+[203/948] Compile Module.AssetRegistry.4.cpp
+[204/948] Compile Module.BuildPatchServices.4.cpp
+[205/948] Compile Module.AudioMixer.2.cpp
+[206/948] Compile Module.CableComponent.cpp
+[207/948] Compile Module.AnimGraphRuntime.cpp
+[208/948] Compile Module.AudioWidgetsCore.cpp
+[209/948] Compile Module.Chaos.10.cpp
+[210/948] Compile Module.Chaos.11.cpp
+[211/948] Compile [x86-64] PBDSoftBodyCollisionConstraint_Simple.ispc
+[212/948] Compile Module.BuildPatchServices.2.cpp
+[213/948] Compile Module.BuildPatchServices.3.cpp
+[214/948] Compile Module.Buoyancy.cpp
+[215/948] Compile Module.BuildPatchServices.1.cpp
+[216/948] Compile Module.Chaos.19.cpp
+[217/948] Compile Module.Chaos.14.cpp
+[218/948] Compile Module.Chaos.13.cpp
+[219/948] Compile Module.Chaos.1.cpp
+[220/948] Compile Module.Chaos.20.cpp
+[221/948] Compile Module.Chaos.21.cpp
+[222/948] Compile Module.Chaos.12.cpp
+[223/948] Compile Module.AudioWidgets.cpp
+[224/948] Compile Module.Chaos.22.cpp
+[225/948] Compile Module.Chaos.16.cpp
+[226/948] Compile Module.Chaos.18.cpp
+[227/948] Compile Module.Chaos.27.cpp
+[228/948] Compile Module.Chaos.23.cpp
+[229/948] Compile Module.Chaos.2.cpp
+[230/948] Compile Module.Chaos.26.cpp
+[231/948] Compile Module.Chaos.24.cpp
+[232/948] Compile Module.Chaos.15.cpp
+[233/948] Compile Module.Chaos.4.cpp
+[234/948] Compile Module.ChaosCore.cpp
+[235/948] Compile Module.ChaosUserDataPT.cpp
+[236/948] Compile Module.Chaos.6.cpp
+[237/948] Compile Module.Chaos.7.cpp
+[238/948] Compile Module.CharacterAI.cpp
+[239/948] Compile Module.Chaos.17.cpp
+[240/948] Compile Module.Chaos.28.cpp
+[241/948] Compile Module.ChaosVDRuntime.cpp
+[242/948] Compile Module.ChaosVDBlueprint.cpp
+[243/948] Compile Module.ChunkDownloader.cpp
+[244/948] Compile Module.Chaos.8.cpp
+[245/948] Compile Module.ClothingSystemRuntimeNv.cpp
+[246/948] Compile Module.ChaosSolverEngine.cpp
+[247/948] Compile Module.ComputeDataInterface.cpp
+[248/948] Compile Module.CinematicCamera.cpp
+[249/948] Compile Module.ClothSysRuntimeIntrfc.cpp
+[250/948] Compile Module.ConsoleVariablesEditorRuntime.cpp
+[251/948] Compile Module.CompositeCore.cpp
+[252/948] Compile Module.ChaosCaching.cpp
+[253/948] Compile Module.ChaosNiagara.cpp
+[254/948] Compile Module.Chaos.3.cpp
+[255/948] Compile Module.Chaos.25.cpp
+[256/948] Compile Module.ClothingSystemRuntimeCommon.cpp
+[257/948] Compile Module.ComputeFramework.cpp
+[258/948] Compile Module.Chaos.9.cpp
+[259/948] Compile Module.CookOnTheFly.cpp
+[260/948] Compile Module.ControlRig.5.cpp
+[261/948] Compile MiMalloc.c
+[262/948] Compile Module.Core.12.cpp
+[263/948] Compile Module.ControlRigSpline.cpp
+[264/948] Compile Module.Constraints.cpp
+[265/948] Compile Module.Core.16.cpp
+[266/948] Compile Module.Chaos.5.cpp
+[267/948] Compile Module.Core.18.cpp
+[268/948] Compile Module.Core.17.cpp
+[269/948] Compile Module.Core.13.cpp
+[270/948] Compile Module.Core.19.cpp
+[271/948] Compile Module.Core.20.cpp
+[272/948] Compile Module.Core.1.cpp
+[273/948] Compile Module.Core.14.cpp
+[274/948] Compile Module.Core.10.cpp
+[275/948] Compile Module.Core.4.cpp
+[276/948] Compile Module.Core.15.cpp
+[277/948] Compile Module.ControlRigPhysics.cpp
+[278/948] Compile Module.Core.11.cpp
+[279/948] Compile Module.ChaosCloth.cpp
+[280/948] Compile Module.CorePreciseFP.cpp
+[281/948] Compile Module.Core.5.cpp
+[282/948] Compile Module.CoreOnline.cpp
+[283/948] Compile Module.Core.3.cpp
+[284/948] Compile Module.Core.2.cpp
+[285/948] Compile Module.Core.8.cpp
+[286/948] Compile Module.CoreUObject.15.cpp
+[287/948] Compile Module.ControlRig.2.cpp
+[288/948] Compile Module.Core.7.cpp
+[289/948] Compile Module.CoreUObject.17.cpp
+[290/948] Compile Module.CoreUObject.18.cpp
+[291/948] Compile Module.Core.6.cpp
+[292/948] Compile Module.CoreUObject.10.cpp
+[293/948] Compile Module.ControlRig.1.cpp
+[294/948] Compile Module.Core.9.cpp
+[295/948] Compile Module.CoreUObject.16.cpp
+[296/948] Compile Module.CoreUObject.1.cpp
+[297/948] Compile Module.CoreUObject.2.cpp
+[298/948] Compile Module.CoreUObject.11.cpp
+[299/948] Compile Module.CoreUObject.13.cpp
+[300/948] Compile Module.CoreUObject.3.cpp
+[301/948] Compile Module.CsvMetrics.cpp
+[302/948] Compile Module.CoreUObject.5.cpp
+[303/948] Compile Module.CoreUObject.19.cpp
+[304/948] Compile Module.CustomMeshComponent.cpp
+[305/948] Compile Module.CoreUObject.4.cpp
+[306/948] Compile Module.CoreUObject.14.cpp
+[307/948] Compile Module.ControlRig.4.cpp
+[308/948] Compile Module.DataflowMedialSkeleton.cpp
+[309/948] Compile Module.DeveloperSettings.cpp
+[310/948] Compile Module.CoreUObject.12.cpp
+[311/948] Compile Module.CoreUObject.8.cpp
+[312/948] Compile Module.CoreUObject.7.cpp
+[313/948] Compile Module.DownlinkBandwidthManager.cpp
+[314/948] Compile Module.EditableComputeGraph.cpp
+[315/948] Compile Module.DataflowEnginePlugin.cpp
+[316/948] Compile Module.DatasmithContent.cpp
+[317/948] Compile Module.ControlRig.3.cpp
+[318/948] Compile Module.CoreUObject.9.cpp
+[319/948] Compile Module.DataflowSimulation.cpp
+[320/948] Compile Module.CoreUObject.6.cpp
+[321/948] Compile Module.DataflowEngine.cpp
+[322/948] Compile Module.Engine.1.cpp
+[323/948] Compile Module.Engine.12.cpp
+[324/948] Compile Module.Engine.10.cpp
+[325/948] Compile Module.Engine.13.cpp
+[326/948] Compile Module.Engine.2.cpp
+[327/948] Compile Module.DataflowCore.cpp
+[328/948] Compile Module.Engine.14.cpp
+[329/948] Compile Module.Engine.11.cpp
+[330/948] Compile Module.DynamicMesh.1.cpp
+[331/948] Compile Module.DynamicMesh.2.cpp
+[332/948] Compile Module.DataflowNodes.cpp
+[333/948] Compile Module.DynamicMesh.4.cpp
+[334/948] Compile Module.Engine.18.cpp
+[335/948] Compile Module.Engine.17.cpp
+[336/948] Compile Module.Engine.21.cpp
+[337/948] Compile Module.Engine.19.cpp
+[338/948] Compile Module.DynamicMesh.3.cpp
+[339/948] Compile Module.Engine.3.cpp
+[340/948] Compile Module.Engine.28.cpp
+[341/948] Compile Module.Engine.20.cpp
+[342/948] Compile Module.Engine.26.cpp
+[343/948] Compile Module.Engine.23.cpp
+[344/948] Compile Module.Engine.24.cpp
+[345/948] Compile Module.Engine.22.cpp
+[346/948] Compile Module.Engine.29.cpp
+[347/948] Compile Module.Engine.30.cpp
+[348/948] Compile Module.Engine.16.cpp
+[349/948] Compile Module.Engine.27.cpp
+[350/948] Compile Module.Engine.31.cpp
+[351/948] Compile Module.Engine.4.cpp
+[352/948] Compile Module.Engine.35.cpp
+[353/948] Compile Module.Engine.36.cpp
+[354/948] Compile Module.Engine.34.cpp
+[355/948] Compile Module.Engine.15.cpp
+[356/948] Compile Module.Engine.33.cpp
+[357/948] Compile Module.Engine.32.cpp
+[358/948] Compile Module.Engine.25.cpp
+[359/948] Compile Module.Engine.37.cpp
+[360/948] Compile Module.Engine.45.cpp
+[361/948] Compile Module.Engine.42.cpp
+[362/948] Compile Module.Engine.41.cpp
+[363/948] Compile Module.Engine.44.cpp
+[364/948] Compile Module.Engine.39.cpp
+[365/948] Compile Module.Engine.46.cpp
+[366/948] Compile Module.Engine.53.cpp
+[367/948] Compile Module.Engine.40.cpp
+[368/948] Compile Module.Engine.48.cpp
+[369/948] Compile Module.Engine.49.cpp
+[370/948] Compile Module.Engine.52.cpp
+[371/948] Compile Module.Engine.43.cpp
+[372/948] Compile Module.Engine.50.cpp
+[373/948] Compile Module.Engine.38.cpp
+[374/948] Compile Module.Engine.47.cpp
+[375/948] Compile Module.Engine.61.cpp
+[376/948] Compile Module.Engine.5.cpp
+[377/948] Compile Module.Engine.51.cpp
+[378/948] Compile Module.Engine.62.cpp
+[379/948] Compile Module.Engine.60.cpp
+[380/948] Compile Module.EngineSettings.cpp
+[381/948] Compile Module.EngineMessages.cpp
+[382/948] Compile Module.Engine.58.cpp
+[383/948] Compile Module.EventLoop.cpp
+[384/948] Compile Module.ExampleDeviceProfileSelector.cpp
+[385/948] Compile Module.Engine.57.cpp
+[386/948] Compile Module.EngineCameras.cpp
+[387/948] Compile Module.EyeTracker.cpp
+[388/948] Compile Module.FieldNotification.cpp
+[389/948] Compile Module.Engine.59.cpp
+[390/948] Compile Module.ExrReaderGpu.cpp
+[391/948] Compile Module.FacialAnimation.cpp
+[392/948] Compile Module.Engine.7.cpp
+[393/948] Compile Module.Engine.54.cpp
+[394/948] Compile Module.Engine.55.cpp
+[395/948] Compile Module.Engine.6.cpp
+[396/948] Compile Module.Foliage.cpp
+[397/948] Compile Module.FieldSystemEngine.cpp
+[398/948] Compile Module.Engine.56.cpp
+[399/948] Compile Module.Engine.9.cpp
+[400/948] Compile Module.Engine.63.cpp
+[401/948] Compile Module.GameplayTasks.cpp
+[402/948] Compile Module.Engine.8.cpp
+[403/948] Compile Module.GLTFCore.cpp
+[404/948] Compile Module.EnhancedInput.cpp
+[405/948] Compile Module.FractureEngine.cpp
+[406/948] Compile Module.FullBodyIK.cpp
+[407/948] Compile Module.GameplayCameras.2.cpp
+[408/948] Compile Module.GameplayCameras.1.cpp
+[409/948] Compile Module.GeometryCacheTracks.cpp
+[410/948] Compile Module.GameplayCameras.4.cpp
+[411/948] Compile Module.GameplayTags.cpp
+[412/948] Compile Module.GeometryCollectionDepNodes.cpp
+[413/948] Compile Module.GeometryAlgorithms.3.cpp
+[414/948] Compile Module.GeometryCache.cpp
+[415/948] Compile Module.GeometryCollectionTracks.cpp
+[416/948] Compile Module.GameplayCameras.3.cpp
+[417/948] Compile Module.GlobalConfigurationData.cpp
+[418/948] Compile Module.GeometryCollectionNodes.3.cpp
+[419/948] Compile Module.GlobalConfigurationDataCore.cpp
+[420/948] Compile Module.GooglePAD.cpp
+[421/948] Compile Module.HTRun.cpp
+[422/948] Compile Module.HTAnimRun.cpp
+[423/948] Compile Module.GeometryDataflowNodes.cpp
+[424/948] Compile Module.GLTFExporter.cpp
+[425/948] Compile Module.GeometryCore.3.cpp
+[426/948] Compile Module.GeometryCore.4.cpp
+[427/948] Compile Module.HTTP.cpp
+[428/948] Compile Module.GeometryFramework.cpp
+[429/948] Compile Module.HairStrandsRuntime.cpp
+[430/948] Compile Module.HeadMountedDisplay.cpp
+[431/948] Compile Module.GeometryCore.1.cpp
+[432/948] Compile Module.GeometryAlgorithms.1.cpp
+[433/948] Compile Module.IESFile.cpp
+[434/948] Compile Module.HttpReplayStreaming.cpp
+[435/948] Compile Module.GeometryCollectionEngine.cpp
+[436/948] Compile Module.GeometryAlgorithms.2.cpp
+[437/948] Compile Module.IKRigUAF.cpp
+[438/948] Compile Module.ISMPool.cpp
+[439/948] Compile Module.HairStrandsSolver.cpp
+[440/948] Compile Module.HairStrandsCore.3.cpp
+[441/948] Compile Module.GeometryCollectionNodes.2.cpp
+[442/948] Compile Module.Icmp.cpp
+[443/948] Compile Module.ImgMediaFactory.cpp
+[444/948] Compile Module.IndexedCacheStorage.cpp
+[445/948] Compile Module.HairStrandsCore.2.cpp
+[446/948] Compile Module.ImgMediaEngine.cpp
+[447/948] Compile Module.ImageWriteQueue.cpp
+[448/948] Compile Module.HairStrandsDeformer.cpp
+[449/948] Compile Module.GeometryCollectionNodes.1.cpp
+[450/948] Compile Module.HairStrandsCore.4.cpp
+[451/948] Compile Module.InputCore.cpp
+[452/948] Compile Module.InterchangeAxFAssets.cpp
+[453/948] Compile Module.InteractiveToolsFramework.3.cpp
+[454/948] Compile Module.InterchangeCommon.cpp
+[455/948] Compile Module.InterchangeAssets.cpp
+[456/948] Compile Module.ImageCore.cpp
+[457/948] Compile Module.InterchangeExport.cpp
+[458/948] Compile Module.InterchangeCommonParser.cpp
+[459/948] Compile Module.InterchangeDispatcher.cpp
+[460/948] Compile Module.InstallBundleManager.cpp
+[461/948] Compile Module.ImgMedia.cpp
+[462/948] Compile Module.InterchangeAnalytics.cpp
+[463/948] Compile Module.GeometryCore.2.cpp
+[464/948] Compile Module.HairStrandsCore.1.cpp
+[465/948] Compile Module.InteractiveToolsFramework.1.cpp
+[466/948] Compile Module.InterchangeMessages.cpp
+[467/948] Compile Module.IoStoreHttpClient.cpp
+[468/948] Compile Module.ImageWrapper.cpp
+[469/948] Compile Module.IoStoreOnDemandCore.cpp
+[470/948] Compile Module.InteractiveToolsFramework.2.cpp
+[471/948] Compile Module.InterchangeEngine.cpp
+[472/948] Compile Module.InterchangeImport.4.cpp
+[473/948] Compile Module.InterchangeNodes.cpp
+[474/948] Compile Module.IKRig.cpp
+[475/948] Compile Module.InterchangeImport.1.cpp
+[476/948] Compile Module.InterchangeImport.2.cpp
+[477/948] Compile Module.IrisCore.1.cpp
+[478/948] Compile Module.IrisCore.2.cpp
+[479/948] Compile Module.Landmass.cpp
+[480/948] Compile Module.IoStoreOnDemand.cpp
+[481/948] Compile Module.InterchangeImport.3.cpp
+[482/948] Compile Module.IrisCore.3.cpp
+[483/948] Compile Module.JsonUtilities.cpp
+[484/948] Compile Module.Landscape.6.cpp
+[485/948] Compile Module.LFNRS.cpp
+[486/948] Compile Module.IrisCore.6.cpp
+[487/948] Compile Module.Json.cpp
+[488/948] Compile Module.InterchangeCore.cpp
+[489/948] Compile Module.IrisCore.5.cpp
+[490/948] Compile Module.LauncherChunkInstaller.cpp
+[491/948] Compile Module.LinuxDeviceProfileSelector.cpp
+[492/948] Compile Module.LocalizableMessage.cpp
+[493/948] Compile Module.LocalizableMessageBlueprint.cpp
+[494/948] Compile Module.InterchangeFactoryNodes.cpp
+[495/948] Compile Module.LocationServicesBPLibrary.cpp
+[496/948] Compile Module.Landscape.7.cpp
+[497/948] Compile Module.IrisCore.4.cpp
+[498/948] Compile Module.MP4Utilities.cpp
+[499/948] Compile Module.LiveLinkInterface.cpp
+[500/948] Compile Module.MSQS.cpp
+[501/948] Compile Module.MassCore.cpp
+[502/948] Compile Module.MP4Muxer.cpp
+[503/948] Compile Module.Landscape.5.cpp
+[504/948] Compile Module.Launch.cpp
+[505/948] Compile Module.Landscape.1.cpp
+[506/948] Compile Module.MP4Boxes.cpp
+[507/948] Compile Module.MassEntity.3.cpp
+[508/948] Compile Module.MathCore.cpp
+[509/948] Compile Module.MassSignals.cpp
+[510/948] Compile Module.Landscape.3.cpp
+[511/948] Compile Module.MRMesh.cpp
+[512/948] Compile Module.LevelSequence.cpp
+[513/948] Compile Module.Media.cpp
+[514/948] Compile Module.Landscape.2.cpp
+[515/948] Compile Module.MediaPlate.cpp
+[516/948] Compile Module.MediaUtils.cpp
+[517/948] Compile Module.Landscape.4.cpp
+[518/948] Compile Module.MessagingCommon.cpp
+[519/948] Compile Module.MeshUtilitiesCommon.cpp
+[520/948] Compile Module.MediaCompositing.cpp
+[521/948] Compile Module.MeshConversionEngineTypes.cpp
+[522/948] Compile Module.MassEntity.1.cpp
+[523/948] Compile Module.MediaAssets.cpp
+[524/948] Compile Module.Messaging.cpp
+[525/948] Compile Module.MetaHumanSDKRuntime.cpp
+[526/948] Compile Module.MassEntity.2.cpp
+[527/948] Compile Module.MeshConversion.cpp
+[528/948] Compile Module.InterchangePipelines.cpp
+[529/948] Compile Module.MeshDescription.cpp
+[530/948] Compile Module.MetasoundGenerator.cpp
+[531/948] Compile Module.MetasoundFrontend.2.cpp
+[532/948] Compile Module.MetasoundFrontend.3.cpp
+[533/948] Compile Module.MetasoundFrontend.4.cpp
+[534/948] Compile Module.MetasoundGraphCore.cpp
+[535/948] Compile Module.MetasoundStandardNodes.2.cpp
+[536/948] Compile Module.MetasoundStandardNodes.7.cpp
+[537/948] Compile Module.MetasoundStandardNodes.1.cpp
+[538/948] Compile Module.MobilePatchingUtils.cpp
+[539/948] Compile Module.MeshModelingTools.3.cpp
+[540/948] Compile Module.MetasoundStandardNodes.5.cpp
+[541/948] Compile Module.MetasoundFrontend.1.cpp
+[542/948] Compile Module.MeshModelingTools.1.cpp
+[543/948] Compile Module.MoviePlayerProxy.cpp
+[544/948] Compile Module.MetasoundStandardNodes.3.cpp
+[545/948] Compile Module.ModelingComponents.4.cpp
+[546/948] Compile Module.MoviePlayer.cpp
+[547/948] Compile Module.MeshModelingTools.2.cpp
+[548/948] Compile Module.ModelViewViewModel.cpp
+[549/948] Compile Module.MovieScene.6.cpp
+[550/948] Compile Module.MetasoundStandardNodes.4.cpp
+[551/948] Compile Module.MetasoundStandardNodes.6.cpp
+[552/948] Compile Module.MetasoundFrontend.5.cpp
+[553/948] Compile Module.ModelingOperators.cpp
+[554/948] Compile Module.MovieScene.1.cpp
+[555/948] Compile Module.ModelingComponents.3.cpp
+[556/948] Compile Module.MsQuicRuntime.cpp
+[557/948] Compile Module.MetasoundEngine.cpp
+[558/948] Compile Module.MovieSceneCapture.cpp
+[559/948] Compile Module.MovieSceneTracks.5.cpp
+[560/948] Compile Module.MovieScene.5.cpp
+[561/948] Compile Module.ModelingComponents.2.cpp
+[562/948] Compile Module.MovieScene.2.cpp
+[563/948] Compile Module.MovieScene.4.cpp
+[564/948] Compile Module.MovieScene.3.cpp
+[565/948] Compile Module.MutableAssetUserData.cpp
+[566/948] Compile Module.NNE.cpp
+[567/948] Compile Module.MuR.5.cpp
+[568/948] Compile Module.MuR.2.cpp
+[569/948] Compile Module.MuR.3.cpp
+[570/948] Compile Module.NNEDenoiserShaders.cpp
+[571/948] Compile Module.ModelingComponents.1.cpp
+[572/948] Compile Module.Nanosvg.cpp
+[573/948] Compile Module.NNERuntimeORT.cpp
+[574/948] Compile Module.MuR.4.cpp
+[575/948] Compile Module.NamingTokens.cpp
+[576/948] Compile Module.NNEDenoiser.cpp
+[577/948] Compile Module.MuCO.2.cpp
+[578/948] Compile Module.MuR.1.cpp
+[579/948] Compile Module.NetCommon.cpp
+[580/948] Compile Module.MovieSceneTracks.4.cpp
+[581/948] Compile Module.Navmesh.3.cpp
+[582/948] Compile Module.Networking.cpp
+[583/948] Compile Module.NetworkReplayStreaming.cpp
+[584/948] Compile Module.Navmesh.2.cpp
+[585/948] Compile Module.Navmesh.1.cpp
+[586/948] Compile Module.MovieSceneTracks.2.cpp
+[587/948] Compile Module.MuCO.1.cpp
+[588/948] Compile Module.NamingTokensUI.cpp
+[589/948] Compile Module.NFORDenoise.cpp
+[590/948] Compile Module.NetCore.cpp
+[591/948] Compile Module.NavigationSystem.3.cpp
+[592/948] Compile Module.MovieSceneTracks.3.cpp
+[593/948] Compile Module.NavigationSystem.1.cpp
+[594/948] Compile Module.Niagara.14.cpp
+[595/948] Compile Module.NavigationSystem.2.cpp
+[596/948] Compile Module.Niagara.10.cpp
+[597/948] Compile Module.Niagara.11.cpp
+[598/948] Compile Module.Niagara.1.cpp
+[599/948] Compile Module.NiagaraCore.cpp
+[600/948] Compile Module.NiagaraAnimNotifies.cpp
+[601/948] Compile Module.Niagara.12.cpp
+[602/948] Compile Module.NonRealtimeAudioRenderer.cpp
+[603/948] Compile Module.Niagara.13.cpp
+[604/948] Compile Module.NiagaraVertexFactories.cpp
+[605/948] Compile Module.OnlineBase.cpp
+[606/948] Compile Module.NullReplayStreaming.cpp
+[607/948] Compile Module.NullDrv.cpp
+[608/948] Compile Module.NiagaraSimCaching.cpp
+[609/948] Compile Module.Niagara.6.cpp
+[610/948] Compile Module.Niagara.4.cpp
+[611/948] Compile Module.Niagara.2.cpp
+[612/948] Compile Module.OnlineServicesCommonEngineUtils.cpp
+[613/948] Compile Module.Niagara.8.cpp
+[614/948] Compile Module.NiagaraShader.cpp
+[615/948] Compile Module.Niagara.9.cpp
+[616/948] Compile Module.Niagara.7.cpp
+[617/948] Compile Module.OodleNetworkPlugin.cpp
+[618/948] Compile Module.OnlineServicesCommon.3.cpp
+[619/948] Compile Module.OnlineServicesInterface.cpp
+[620/948] Compile Module.OnlineSubsystemUtils.2.cpp
+[621/948] Compile Module.OnlineSubsystemUtils.3.cpp
+[622/948] Compile Module.OptimusSettings.cpp
+[623/948] Compile Module.Niagara.3.cpp
+[624/948] Compile Module.OpusAudioDecoder.cpp
+[625/948] Compile Module.Overlay.cpp
+[626/948] Compile Module.OpenExrWrapper.cpp
+[627/948] Compile Module.MovieSceneTracks.1.cpp
+[628/948] Compile Module.OnlineSubsystemNull.cpp
+[629/948] Compile Module.PBIK.cpp
+[630/948] Compile Module.Niagara.5.cpp
+[631/948] Compile Module.OnlineSubsystemUtils.1.cpp
+[632/948] Compile Module.OpenGLDrv.cpp
+[633/948] Compile Module.PCG.16.cpp
+[634/948] Compile Module.PCG.17.cpp
+[635/948] Compile Module.PCG.11.cpp
+[636/948] Compile Module.OnlineSubsystem.cpp
+[637/948] Compile Module.PCG.1.cpp
+[638/948] Compile Module.PCG.19.cpp
+[639/948] Compile Module.PCG.18.cpp
+[640/948] Compile Module.PCG.14.cpp
+[641/948] Compile Module.OnlineServicesCommon.1.cpp
+[642/948] Compile Module.PCG.10.cpp
+[643/948] Compile Module.PCG.15.cpp
+[644/948] Compile Module.PacketHandler.cpp
+[645/948] Compile Module.OnlineServicesCommon.2.cpp
+[646/948] Compile Module.PCGCompute.cpp
+[647/948] Compile Module.PCG.13.cpp
+[648/948] Compile Module.PCG.2.cpp
+[649/948] Compile Module.Paper2D.cpp
+[650/948] Compile Module.PCG.12.cpp
+[651/948] Compile Module.PakFile.cpp
+[652/948] Compile Module.PlatformCrypto.cpp
+[653/948] Compile PlatformCryptoAesDecryptorsOpenSSL.cpp
+[654/948] Compile EncryptionContextOpenSSL.cpp
+[655/948] Compile PlatformCryptoAesEncryptorsOpenSSL.cpp
+[656/948] Compile PlatformCryptoContext.cpp
+[657/948] Compile PlatformCryptoUtilsOpenSSL.cpp
+[658/948] Compile Module.PlatformCryptoTypes.cpp
+[659/948] Compile Module.PCG.4.cpp
+[660/948] Compile Module.PCG.5.cpp
+[661/948] Compile Module.PropertyPath.cpp
+[662/948] Compile Module.PythonScriptPluginPreload.cpp
+[663/948] Compile Module.PreLoadScreen.cpp
+[664/948] Compile Module.PropertyBindingUtils.cpp
+[665/948] Compile Module.Projects.cpp
+[666/948] Compile Module.RSA.cpp
+[667/948] Compile Module.RHICore.cpp
+[668/948] Compile Module.RHI.2.cpp
+[669/948] Compile Module.ProceduralMeshComponent.cpp
+[670/948] Compile Module.RadAudioDecoder.cpp
+[671/948] Compile Module.ReliableHComp.cpp
+[672/948] Compile Module.PCG.7.cpp
+[673/948] Compile Module.RawMesh.cpp
+[674/948] Compile Module.OptimusCore.cpp
+[675/948] Compile Module.PCG.8.cpp
+[676/948] Compile Module.PCG.3.cpp
+[677/948] Compile Module.RenderCore.6.cpp
+[678/948] Compile Module.PhysicsControl.cpp
+[679/948] Compile Module.RHI.1.cpp
+[680/948] Compile Module.PCG.9.cpp
+[681/948] Compile Module.RenderCore.4.cpp
+[682/948] Compile Module.PlanarCut.cpp
+[683/948] Compile Module.PCG.6.cpp
+[684/948] Compile Module.RenderCore.2.cpp
+[685/948] Compile Module.RenderCore.5.cpp
+[686/948] Compile Module.PhysicsCore.cpp
+[687/948] Compile Module.RenderCore.1.cpp
+[688/948] Compile Module.RenderCore.3.cpp
+[689/948] Compile Module.Renderer.10.cpp
+[690/948] Compile Module.Renderer.11.cpp
+[691/948] Compile Module.Renderer.1.cpp
+[692/948] Compile Module.Renderer.13.cpp
+[693/948] Compile Module.Renderer.15.cpp
+[694/948] Compile Module.Renderer.16.cpp
+[695/948] Compile Module.Renderer.12.cpp
+[696/948] Compile Module.Renderer.18.cpp
+[697/948] Compile Module.Renderer.14.cpp
+[698/948] Compile Module.Renderer.2.cpp
+[699/948] Compile Module.Renderer.21.cpp
+[700/948] Compile Module.Renderer.19.cpp
+[701/948] Compile Module.Renderer.20.cpp
+[702/948] Compile Module.Renderer.17.cpp
+[703/948] Compile Module.Renderer.23.cpp
+[704/948] Compile Module.Renderer.22.cpp
+[705/948] Compile Module.Renderer.27.cpp
+[706/948] Compile Module.Renderer.25.cpp
+[707/948] Compile Module.Renderer.28.cpp
+[708/948] Compile Module.Renderer.24.cpp
+[709/948] Compile Module.Renderer.29.cpp
+[710/948] Compile Module.Renderer.31.cpp
+[711/948] Compile Module.Renderer.3.cpp
+[712/948] Compile Module.Renderer.34.cpp
+[713/948] Compile Module.Renderer.32.cpp
+[714/948] Compile Module.Renderer.33.cpp
+[715/948] Compile Module.Renderer.30.cpp
+[716/948] Compile ambisonic_binaural_decoder.cc
+[717/948] Compile ambisonic_binaural_decoder_node.cc
+[718/948] Compile ambisonic_lookup_table.cc
+[719/948] Compile associated_legendre_polynomials_generator.cc
+[720/948] Compile audio_buffer.cc
+[721/948] Compile ambisonic_mixing_encoder_node.cc
+[722/948] Compile binaural_surround_renderer.cc
+[723/948] Compile biquad_filter.cc
+[724/948] Compile buffer_crossfader.cc
+[725/948] Compile buffer_partitioner.cc
+[726/948] Compile Module.Renderer.26.cpp
+[727/948] Compile buffer_unpartitioner.cc
+[728/948] Compile channel_converter.cc
+[729/948] Compile buffered_source_node.cc
+[730/948] Compile channel_view.cc
+[731/948] Compile delay_filter.cc
+[732/948] Compile circular_buffer.cc
+[733/948] Compile binaural_surround_renderer_impl.cc
+[734/948] Compile distance_attenuation.cc
+[735/948] Compile fft_manager.cc
+[736/948] Compile Module.Renderer.37.cpp
+[737/948] Compile filter_coefficient_generators.cc
+[738/948] Compile fir_filter.cc
+[739/948] Compile gain.cc
+[740/948] Compile Module.Renderer.35.cpp
+[741/948] Compile gain_mixer.cc
+[742/948] Compile foa_rotator_node.cc
+[743/948] Compile gain_processor.cc
+[744/948] Compile gain_node.cc
+[745/948] Compile gain_mixer_node.cc
+[746/948] Compile hrtf_assets.cc
+[747/948] Compile foa_rotator.cc
+[748/948] Compile misc_math.cc
+[749/948] Compile hoa_rotator_node.cc
+[750/948] Compile Module.Renderer.38.cpp
+[751/948] Compile mixer.cc
+[752/948] Compile mono_pole_filter.cc
+[753/948] Compile lockless_task_queue.cc
+[754/948] Compile multi_channel_iir.cc
+[755/948] Compile mixer_node.cc
+[756/948] Compile near_field_processor.cc
+[757/948] Compile Module.Renderer.36.cpp
+[758/948] Compile mono_from_soundfield_node.cc
+[759/948] Compile occlusion_calculator.cc
+[760/948] Compile partitioned_fft_filter.cc
+[761/948] Compile near_field_effect_node.cc
+[762/948] Compile planar_interleaved_conversion.cc
+[763/948] Compile ogg_vorbis_recorder.cc
+[764/948] Compile graph_manager.cc
+[765/948] Compile occlusion_node.cc
+[766/948] Compile resampler.cc
+[767/948] Compile processing_node.cc
+[768/948] Compile resonance_audio_api.cc
+[769/948] Compile reflections_processor.cc
+[770/948] Compile reflections_node.cc
+[771/948] Compile sample_type_conversion.cc
+[772/948] Compile reverb_onset_update_processor.cc
+[773/948] Compile reverb_node.cc
+[774/948] Compile reverb_onset_compensator.cc
+[775/948] Compile sh_hrir_creator.cc
+[776/948] Compile shoe_box_room.cc
+[777/948] Compile source_config.cc
+[778/948] Compile room_effects_utils.cc
+[779/948] Compile source_node.cc
+[780/948] Compile simd_utils.cc
+[781/948] Compile stereo_from_soundfield_converter.cc
+[782/948] Compile Module.Renderer.7.cpp
+[783/948] Compile source_parameters_manager.cc
+[784/948] Compile stereo_panner.cc
+[785/948] Compile spectral_reverb.cc
+[786/948] Compile sink_node.cc
+[787/948] Compile spherical_angle.cc
+[788/948] Compile sum_and_difference_processor.cc
+[789/948] Compile hoa_rotator.cc
+[790/948] Compile wav_reader.cc
+[791/948] Compile utils.cc
+[792/948] Compile vorbis_stream_encoder.cc
+[793/948] Compile resonance_audio_api_impl.cc
+[794/948] Compile wav.cc
+[795/948] Compile task_thread_pool.cc
+[796/948] Compile stereo_mixing_panner_node.cc
+[797/948] Compile Module.RewindDebuggerRuntimeInterface.cpp
+[798/948] Compile Module.RewindDebuggerRuntime.cpp
+[799/948] Compile Module.Renderer.5.cpp
+[800/948] Compile Module.RewindDebuggerVLogRuntime.cpp
+[801/948] Compile Module.RigidPhysics.cpp
+[802/948] Compile Module.Renderer.4.cpp
+[803/948] Compile Module.RuntimeTelemetry.cpp
+[804/948] Compile Module.SQLiteCore.cpp
+[805/948] Compile Module.SSL.cpp
+[806/948] Compile Module.SandboxFile.cpp
+[807/948] Compile Module.Renderer.6.cpp
+[808/948] Compile Module.SequenceRuntimeRecorder.cpp
+[809/948] Compile Module.SerializedRecorderInterface.cpp
+[810/948] Compile Module.Scribble.cpp
+[811/948] Compile Module.RigVM.4.cpp
+[812/948] Compile Module.SessionMessages.cpp
+[813/948] Compile Module.Renderer.8.cpp
+[814/948] Compile Module.ResonanceAudio.cpp
+[815/948] Compile Module.SignalProcessing.3.cpp
+[816/948] Compile Module.SessionServices.cpp
+[817/948] Compile Module.Serialization.cpp
+[818/948] Compile Module.SignalProcessing.2.cpp
+[819/948] Compile Module.SignificanceManager.cpp
+[820/948] Compile Module.RigLogicModule.cpp
+[821/948] Compile Module.SkeletalMerging.cpp
+[822/948] Compile Module.SignalProcessing.1.cpp
+[823/948] Compile Module.RigVM.1.cpp
+[824/948] Compile Module.Renderer.9.cpp
+[825/948] Compile Module.RigVM.2.cpp
+[826/948] Compile Module.SlateBaseRenderer.cpp
+[827/948] Compile Module.SequencerScripting.cpp
+[828/948] Compile Module.SlateCore.1.cpp
+[829/948] Compile Module.Slate.1.cpp
+[830/948] Compile Module.Slate.7.cpp
+[831/948] Compile Module.SlateNullRenderer.cpp
+[832/948] Compile Module.Slate.4.cpp
+[833/948] Compile Module.SkeletalMeshDescription.cpp
+[834/948] Compile Module.Slate.6.cpp
+[835/948] Compile Module.Sockets.cpp
+[836/948] Compile Module.SlateCore.3.cpp
+[837/948] Compile Module.SoundFields.cpp
+[838/948] Compile Module.SoundFieldRendering.cpp
+[839/948] Compile Module.StateStream.cpp
+[840/948] Compile Module.Slate.3.cpp
+[841/948] Compile Module.RigVM.3.cpp
+[842/948] Compile Module.SlateCore.2.cpp
+[843/948] Compile Module.Slate.2.cpp
+[844/948] Compile Module.StreamingPauseRendering.cpp
+[845/948] Compile Module.SynthBenchmark.cpp
+[846/948] Compile Module.StudioTelemetry.cpp
+[847/948] Compile Module.SlateCore.4.cpp
+[848/948] Compile Module.TakeMovieScene.cpp
+[849/948] Compile Module.SlateCore.5.cpp
+[850/948] Compile Module.TakeRecorderNamingTokens.cpp
+[851/948] Compile Module.TelemetryUtils.cpp
+[852/948] Compile Module.StateTreeModule.2.cpp
+[853/948] Compile Module.TcpMessaging.cpp
+[854/948] Compile Module.TextureUtilitiesCommon.cpp
+[855/948] Compile SQLiteEmbedded.c
+[856/948] Compile Module.StateTreeModule.1.cpp
+[857/948] Compile Module.TakeRecorder.cpp
+[858/948] Compile Module.TmvMediaShaders.cpp
+[859/948] Compile Module.StaticMeshDescription.cpp
+[860/948] Compile Module.TimeManagement.cpp
+[861/948] Compile Module.TraceBasedDebuggers.cpp
+[862/948] Compile Module.TakesCore.cpp
+[863/948] Compile Module.TakeRecorderSources.cpp
+[864/948] Compile Module.TraceUtilities.cpp
+[865/948] Compile Module.TweeningUtils.cpp
+[866/948] Compile Module.SlateRHIRenderer.cpp
+[867/948] Compile Module.TraceLog.cpp
+[868/948] Compile AralezWorld.cpp
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:1:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:48:1: error: unknown type name 'FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG'
+   48 | UCLASS()
+      | ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:811:21: note: expanded from macro 'UCLASS'
+  811 | #define UCLASS(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_PROLOG)
+      |                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:11:1: note: expanded from here
+   11 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG
+      | ^
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:1:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:51:2: error: a type specifier is required for all declarations
+   51 |     GENERATED_BODY()
+      |     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:800:29: note: expanded from macro 'GENERATED_BODY'
+  800 | #define GENERATED_BODY(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_GENERATED_BODY);
+      |                             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:15:1: note: expanded from here
+   15 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_51_GENERATED_BODY
+      | ^
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:101:104: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AAralezWorld *'
+  101 |     UMaterialInstanceDynamic* Rock = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Rock")), this);
+      |                                                                                                           ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:110:34: error: no matching function for call to 'NewObject'
+  110 |         UProceduralMeshComponent* PM = NewObject<UProceduralMeshComponent>(this);
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AAralezWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:156:40: error: no matching function for call to 'NewObject'
+  156 |         UInstancedStaticMeshComponent* Ism = NewObject<UInstancedStaticMeshComponent>(this);
+      |                                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AAralezWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:163:110: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AAralezWorld *'
+  163 |         if (UMaterialInstanceDynamic* M = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this))
+      |                                                                                                                    ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:197:29: error: no matching function for call to 'NewObject'
+  197 |         UPointLightComponent* L = NewObject<UPointLightComponent>(this);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AAralezWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:211:13: error: no matching function for call to 'NewObject'
+  211 |     GateCore = NewObject<UStaticMeshComponent>(this);
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AAralezWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:219:13: error: no matching function for call to 'NewObject'
+  219 |     GateRing = NewObject<USceneComponent>(this);
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AAralezWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:223:109: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AAralezWorld *'
+  223 |     UMaterialInstanceDynamic* GoldM = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
+      |                                                                                                                ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:228:29: error: no matching function for call to 'NewObject'
+  228 |         UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(this);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AAralezWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:239:109: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AAralezWorld *'
+  239 |     if (UMaterialInstanceDynamic* M = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this))
+      |                                                                                                                ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:249:32: error: no matching function for call to 'NewObject'
+  249 |     UStaticMeshComponent* Heart = NewObject<UStaticMeshComponent>(this);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AAralezWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:256:110: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AAralezWorld *'
+  256 |     if (UMaterialInstanceDynamic* HM = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this))
+      |                                                                                                                 ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:266:31: error: no matching function for call to 'NewObject'
+  266 |         UStaticMeshComponent* Cap = NewObject<UStaticMeshComponent>(this);
+      |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AAralezWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:276:109: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AAralezWorld *'
+  276 |         if (UMaterialInstanceDynamic* CapM = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Rock")), this))
+      |                                                                                                                   ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:283:14: error: no matching function for call to 'NewObject'
+  283 |     GateLight = NewObject<UPointLightComponent>(this);
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AAralezWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:295:9: error: cannot initialize object parameter of type 'ATwEnvironment' with an expression of type 'AAralezWorld'
+  295 |     Super::Tick(Dt);
+      |            ^~~~
+/var/www/html/Twilight/Game/Source/Twilight/AralezWorld.cpp:297:71: error: cannot initialize a parameter of type 'const UObject *' with an rvalue of type 'AAralezWorld *'
+  297 |     APlayerCameraManager* Cam = UGameplayStatics::GetPlayerCameraManager(this, 0);
+      |                                                                          ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h:219:86: note: passing argument to parameter 'WorldContextObject' here
+  219 |     static ENGINE_API class APlayerCameraManager* GetPlayerCameraManager(const UObject* WorldContextObject, int32 PlayerIndex);
+      |                                                                                         ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+[869/948] Compile AralezActors.cpp
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezActors.cpp:3:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:48:1: error: unknown type name 'FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG'
+   48 | UCLASS()
+      | ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:811:21: note: expanded from macro 'UCLASS'
+  811 | #define UCLASS(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_PROLOG)
+      |                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:70:1: note: expanded from here
+   70 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG
+      | ^
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezActors.cpp:3:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:51:2: error: a type specifier is required for all declarations
+   51 |     GENERATED_BODY()
+      |     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:800:29: note: expanded from macro 'GENERATED_BODY'
+  800 | #define GENERATED_BODY(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_GENERATED_BODY);
+      |                             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:74:1: note: expanded from here
+   74 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_51_GENERATED_BODY
+      | ^
+2 errors generated.
+[870/948] Compile AralezSpirit.cpp
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezSpirit.cpp:7:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:48:1: error: unknown type name 'FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG'
+   48 | UCLASS()
+      | ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:811:21: note: expanded from macro 'UCLASS'
+  811 | #define UCLASS(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_PROLOG)
+      |                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:33:1: note: expanded from here
+   33 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG
+      | ^
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezSpirit.cpp:7:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:51:2: error: a type specifier is required for all declarations
+   51 |     GENERATED_BODY()
+      |     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:800:29: note: expanded from macro 'GENERATED_BODY'
+  800 | #define GENERATED_BODY(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_GENERATED_BODY);
+      |                             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:37:1: note: expanded from here
+   37 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_51_GENERATED_BODY
+      | ^
+2 errors generated.
+[871/948] Compile Module.TemplateSequence.cpp
+[872/948] Compile FireOrb.cpp
+[873/948] Compile HaykArcher.cpp
+[874/948] Compile HaykArrow.cpp
+[875/948] Compile AralezGame.cpp
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezGame.cpp:6:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:48:1: error: unknown type name 'FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG'
+   48 | UCLASS()
+      | ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:811:21: note: expanded from macro 'UCLASS'
+  811 | #define UCLASS(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_PROLOG)
+      |                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:96:1: note: expanded from here
+   96 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG
+      | ^
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezGame.cpp:6:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:51:2: error: a type specifier is required for all declarations
+   51 |     GENERATED_BODY()
+      |     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:800:29: note: expanded from macro 'GENERATED_BODY'
+  800 | #define GENERATED_BODY(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_GENERATED_BODY);
+      |                             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:100:1: note: expanded from here
+  100 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_51_GENERATED_BODY
+      | ^
+/var/www/html/Twilight/Game/Source/Twilight/AralezGame.cpp:132:13: error: cannot initialize object parameter of type 'ATwEnvironment' with an expression of type 'AAralezWorld'
+  132 |     if (World) World->PlayMusic(TEXT("music_aralez"));
+      |                ^~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/AralezGame.cpp:188:13: error: cannot initialize object parameter of type 'ATwEnvironment' with an expression of type 'AAralezWorld'
+  188 |     if (World) World->PlayMusic(TEXT("music_menu"));
+      |                ^~~~~~~
+4 errors generated.
+[876/948] Compile HaykGameMode.cpp
+In file included from /var/www/html/Twilight/Game/Source/Twilight/HaykGameMode.cpp:7:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/HaykWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:48:1: error: unknown type name 'FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG'
+   48 | UCLASS()
+      | ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:811:21: note: expanded from macro 'UCLASS'
+  811 | #define UCLASS(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_PROLOG)
+      |                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:4:1: note: expanded from here
+    4 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG
+      | ^
+In file included from /var/www/html/Twilight/Game/Source/Twilight/HaykGameMode.cpp:7:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/HaykWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:51:2: error: a type specifier is required for all declarations
+   51 |     GENERATED_BODY()
+      |     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:800:29: note: expanded from macro 'GENERATED_BODY'
+  800 | #define GENERATED_BODY(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_GENERATED_BODY);
+      |                             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:8:1: note: expanded from here
+    8 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_51_GENERATED_BODY
+      | ^
+/var/www/html/Twilight/Game/Source/Twilight/HaykGameMode.cpp:86:78: error: no viable conversion from 'TObjectPtr<AHaykWorld>' to 'class AActor *'
+   86 |     if (World) { World->SetNight(bNight); UGameplayStatics::FinishSpawningActor(World, FTransform::Identity); }
+      |                                                                                 ^~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectPtr.h:722:28: note: candidate function
+  722 |     [[nodiscard]] FORCEINLINE operator T* () const
+      |                               ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectPtr.h:728:37: note: explicit conversion function is not a candidate
+  728 |     [[nodiscard]] explicit FORCEINLINE operator U* () const
+      |                                        ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h:71:68: note: passing argument to parameter 'Actor' here
+   71 |     static ENGINE_API class AActor* FinishSpawningActor(class AActor* Actor, const FTransform& SpawnTransform, ESpawnActorScaleMethod TransformScaleMethod = ESpawnActorScaleMethod::MultiplyWithRoot);
+      |                                                                       ^
+/var/www/html/Twilight/Game/Source/Twilight/HaykGameMode.cpp:160:13: error: cannot initialize object parameter of type 'ATwEnvironment' with an expression of type 'AHaykWorld'
+  160 |     if (World) World->PlayMusic(TEXT("music_hayk"));
+      |                ^~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/HaykGameMode.cpp:306:14: error: cannot initialize object parameter of type 'ATwEnvironment' with an expression of type 'AHaykWorld'
+  306 |         if (World) World->PlayMusic(TEXT("music_menu"));
+      |                    ^~~~~~~
+5 errors generated.
+[877/948] Compile HaykShield.cpp
+[878/948] Compile Module.Twilight.gen.cpp
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:5:
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/AralezWorld.gen.cpp:8:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:48:1: error: unknown type name 'FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG'
+   48 | UCLASS()
+      | ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:811:21: note: expanded from macro 'UCLASS'
+  811 | #define UCLASS(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_PROLOG)
+      |                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:55:1: note: expanded from here
+   55 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG
+      | ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:5:
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/AralezWorld.gen.cpp:8:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/AralezWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:51:2: error: a type specifier is required for all declarations
+   51 |     GENERATED_BODY()
+      |     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:800:29: note: expanded from macro 'GENERATED_BODY'
+  800 | #define GENERATED_BODY(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_GENERATED_BODY);
+      |                             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:59:1: note: expanded from here
+   59 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_51_GENERATED_BODY
+      | ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:1:
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Engine/SharedPCH.Engine.Project.ValApi.ValExpApi.Cpp20.h:4:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/EngineSharedPCH.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Slate/Public/SlateSharedPCH.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/CoreUObjectSharedPCH.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/CoreSharedPCH.h:7:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Async/AsyncWork.h:11:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Misc/Compression.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Map.h:9:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Set.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/ContainerAllocationPolicies.h:12:
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/AlignmentTemplates.h:102:25: error: constexpr variable 'DataSize' must be initialized by a constant expression
+  102 |         constexpr std::size_t DataSize = offsetof(Derived, Byte);
+      |                               ^          ~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/AralezWorld.gen.cpp:128:5: note: in instantiation of function template specialization 'DataSizeOf<AAralezWorld>' requested here
+  128 |                 DataSizeOf<TClass>(),
+      |                 ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:1:
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Engine/SharedPCH.Engine.Project.ValApi.ValExpApi.Cpp20.h:4:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/EngineSharedPCH.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Slate/Public/SlateSharedPCH.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/CoreUObjectSharedPCH.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/CoreSharedPCH.h:7:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Async/AsyncWork.h:11:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Misc/Compression.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Map.h:9:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Set.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/ContainerAllocationPolicies.h:12:
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/AlignmentTemplates.h:103:17: error: static assertion expression is not an integral constant expression
+  103 |         static_assert(DataSize <= sizeof(T));
+      |                       ^~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/AlignmentTemplates.h:103:17: note: initializer of 'DataSize' is not a constant expression
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/AlignmentTemplates.h:102:25: note: declared here
+  102 |         constexpr std::size_t DataSize = offsetof(Derived, Byte);
+      |                               ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:5:
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/AralezWorld.gen.cpp:128:5: error: call to consteval function 'DataSizeOf<AAralezWorld>' is not a constant expression
+  128 |                 DataSizeOf<TClass>(),
+      |                 ^
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/AralezWorld.gen.cpp:149:1: error: no matching constructor for initialization of 'ATwEnvironment'
+  149 | DEFINE_VTABLE_PTR_HELPER_CTOR_NS(, AAralezWorld);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:1976:52: note: expanded from macro 'DEFINE_VTABLE_PTR_HELPER_CTOR_NS'
+ 1976 |     Namespace TClass::TClass(FVTableHelper& Helper) : Super(Helper) {};
+      |                                                       ^     ~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:49:20: note: candidate constructor (the implicit copy constructor) not viable: no known conversion from 'FVTableHelper' to 'const ATwEnvironment' for 1st argument
+   49 | class TWILIGHT_API ATwEnvironment : public AActor
+      |                    ^~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:49:20: note: candidate constructor (the implicit move constructor) not viable: no known conversion from 'FVTableHelper' to 'ATwEnvironment' for 1st argument
+   49 | class TWILIGHT_API ATwEnvironment : public AActor
+      |                    ^~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:53:2: note: candidate constructor not viable: requires 0 arguments, but 1 was provided
+   53 |     ATwEnvironment();
+      |     ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:1:
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Engine/SharedPCH.Engine.Project.ValApi.ValExpApi.Cpp20.h:4:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/EngineSharedPCH.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Slate/Public/SlateSharedPCH.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/CoreUObjectSharedPCH.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/CoreSharedPCH.h:7:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Async/AsyncWork.h:11:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Misc/Compression.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Map.h:9:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Set.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/ContainerAllocationPolicies.h:12:
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/AlignmentTemplates.h:102:25: error: constexpr variable 'DataSize' must be initialized by a constant expression
+  102 |         constexpr std::size_t DataSize = offsetof(Derived, Byte);
+      |                               ^          ~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/HaykWorld.gen.cpp:104:5: note: in instantiation of function template specialization 'DataSizeOf<AHaykWorld>' requested here
+  104 |                 DataSizeOf<TClass>(),
+      |                 ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:1:
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Engine/SharedPCH.Engine.Project.ValApi.ValExpApi.Cpp20.h:4:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/EngineSharedPCH.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Slate/Public/SlateSharedPCH.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/CoreUObjectSharedPCH.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/CoreSharedPCH.h:7:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Async/AsyncWork.h:11:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Misc/Compression.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Map.h:9:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Set.h:5:
+In file included from /home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/ContainerAllocationPolicies.h:12:
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/AlignmentTemplates.h:103:17: error: static assertion expression is not an integral constant expression
+  103 |         static_assert(DataSize <= sizeof(T));
+      |                       ^~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/AlignmentTemplates.h:103:17: note: initializer of 'DataSize' is not a constant expression
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/AlignmentTemplates.h:102:25: note: declared here
+  102 |         constexpr std::size_t DataSize = offsetof(Derived, Byte);
+      |                               ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:13:
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/HaykWorld.gen.cpp:104:5: error: call to consteval function 'DataSizeOf<AHaykWorld>' is not a constant expression
+  104 |                 DataSizeOf<TClass>(),
+      |                 ^
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/HaykWorld.gen.cpp:125:1: error: no matching constructor for initialization of 'ATwEnvironment'
+  125 | DEFINE_VTABLE_PTR_HELPER_CTOR_NS(, AHaykWorld);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:1976:52: note: expanded from macro 'DEFINE_VTABLE_PTR_HELPER_CTOR_NS'
+ 1976 |     Namespace TClass::TClass(FVTableHelper& Helper) : Super(Helper) {};
+      |                                                       ^     ~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:49:20: note: candidate constructor (the implicit copy constructor) not viable: no known conversion from 'FVTableHelper' to 'const ATwEnvironment' for 1st argument
+   49 | class TWILIGHT_API ATwEnvironment : public AActor
+      |                    ^~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:49:20: note: candidate constructor (the implicit move constructor) not viable: no known conversion from 'FVTableHelper' to 'ATwEnvironment' for 1st argument
+   49 | class TWILIGHT_API ATwEnvironment : public AActor
+      |                    ^~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:53:2: note: candidate constructor not viable: requires 0 arguments, but 1 was provided
+   53 |     ATwEnvironment();
+      |     ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:14:
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/TwEnvironment.gen.cpp:124:276: error: 'Sun' is a protected member of 'ATwEnvironment'
+  124 | const UECodeGen_Private::FObjectPropertyParams UHT_STATICS::NewProp_Sun = { "Sun", nullptr, (EPropertyFlags)0x01240800000a0009, UECodeGen_Private::EPropertyGenFlags::Object | UECodeGen_Private::EPropertyGenFlags::ObjectPtr, nullptr, nullptr, 1, STRUCT_OFFSET(ATwEnvironment, Sun), Z_Construct_UClass_UDirectionalLightComponent, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_Sun_MetaData), NewProp_Sun_MetaData) };
+      |                                                                                                                                                                                                                                                                                    ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:72:68: note: declared protected here
+   72 |     UPROPERTY(VisibleAnywhere) TObjectPtr<UDirectionalLightComponent> Sun;
+      |                                                                       ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:14:
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/TwEnvironment.gen.cpp:125:278: error: 'Moon' is a protected member of 'ATwEnvironment'
+  125 | const UECodeGen_Private::FObjectPropertyParams UHT_STATICS::NewProp_Moon = { "Moon", nullptr, (EPropertyFlags)0x01240800000a0009, UECodeGen_Private::EPropertyGenFlags::Object | UECodeGen_Private::EPropertyGenFlags::ObjectPtr, nullptr, nullptr, 1, STRUCT_OFFSET(ATwEnvironment, Moon), Z_Construct_UClass_UDirectionalLightComponent, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_Moon_MetaData), NewProp_Moon_MetaData) };
+      |                                                                                                                                                                                                                                                                                      ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:73:68: note: declared protected here
+   73 |     UPROPERTY(VisibleAnywhere) TObjectPtr<UDirectionalLightComponent> Moon;
+      |                                                                       ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:14:
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/TwEnvironment.gen.cpp:126:290: error: 'Atmosphere' is a protected member of 'ATwEnvironment'
+  126 | const UECodeGen_Private::FObjectPropertyParams UHT_STATICS::NewProp_Atmosphere = { "Atmosphere", nullptr, (EPropertyFlags)0x01240800000a0009, UECodeGen_Private::EPropertyGenFlags::Object | UECodeGen_Private::EPropertyGenFlags::ObjectPtr, nullptr, nullptr, 1, STRUCT_OFFSET(ATwEnvironment, Atmosphere), Z_Construct_UClass_USkyAtmosphereComponent, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_Atmosphere_MetaData), NewProp_Atmosphere_MetaData) };
+      |                                                                                                                                                                                                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:74:65: note: declared protected here
+   74 |     UPROPERTY(VisibleAnywhere) TObjectPtr<USkyAtmosphereComponent> Atmosphere;
+      |                                                                    ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:14:
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/TwEnvironment.gen.cpp:127:286: error: 'SkyLight' is a protected member of 'ATwEnvironment'
+  127 | const UECodeGen_Private::FObjectPropertyParams UHT_STATICS::NewProp_SkyLight = { "SkyLight", nullptr, (EPropertyFlags)0x01240800000a0009, UECodeGen_Private::EPropertyGenFlags::Object | UECodeGen_Private::EPropertyGenFlags::ObjectPtr, nullptr, nullptr, 1, STRUCT_OFFSET(ATwEnvironment, SkyLight), Z_Construct_UClass_USkyLightComponent, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_SkyLight_MetaData), NewProp_SkyLight_MetaData) };
+      |                                                                                                                                                                                                                                                                                              ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:75:60: note: declared protected here
+   75 |     UPROPERTY(VisibleAnywhere) TObjectPtr<USkyLightComponent> SkyLight;
+      |                                                               ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:14:
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/TwEnvironment.gen.cpp:128:276: error: 'Fog' is a protected member of 'ATwEnvironment'
+  128 | const UECodeGen_Private::FObjectPropertyParams UHT_STATICS::NewProp_Fog = { "Fog", nullptr, (EPropertyFlags)0x01240800000a0009, UECodeGen_Private::EPropertyGenFlags::Object | UECodeGen_Private::EPropertyGenFlags::ObjectPtr, nullptr, nullptr, 1, STRUCT_OFFSET(ATwEnvironment, Fog), Z_Construct_UClass_UExponentialHeightFogComponent, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_Fog_MetaData), NewProp_Fog_MetaData) };
+      |                                                                                                                                                                                                                                                                                    ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:76:72: note: declared protected here
+   76 |     UPROPERTY(VisibleAnywhere) TObjectPtr<UExponentialHeightFogComponent> Fog;
+      |                                                                           ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:14:
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/TwEnvironment.gen.cpp:129:278: error: 'Post' is a protected member of 'ATwEnvironment'
+  129 | const UECodeGen_Private::FObjectPropertyParams UHT_STATICS::NewProp_Post = { "Post", nullptr, (EPropertyFlags)0x01240800000a0009, UECodeGen_Private::EPropertyGenFlags::Object | UECodeGen_Private::EPropertyGenFlags::ObjectPtr, nullptr, nullptr, 1, STRUCT_OFFSET(ATwEnvironment, Post), Z_Construct_UClass_UPostProcessComponent, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_Post_MetaData), NewProp_Post_MetaData) };
+      |                                                                                                                                                                                                                                                                                      ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:77:63: note: declared protected here
+   77 |     UPROPERTY(VisibleAnywhere) TObjectPtr<UPostProcessComponent> Post;
+      |                                                                  ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:14:
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/TwEnvironment.gen.cpp:130:280: error: 'Music' is a protected member of 'ATwEnvironment'
+  130 | const UECodeGen_Private::FObjectPropertyParams UHT_STATICS::NewProp_Music = { "Music", nullptr, (EPropertyFlags)0x01240800000a0009, UECodeGen_Private::EPropertyGenFlags::Object | UECodeGen_Private::EPropertyGenFlags::ObjectPtr, nullptr, nullptr, 1, STRUCT_OFFSET(ATwEnvironment, Music), Z_Construct_UClass_UAudioComponent, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_Music_MetaData), NewProp_Music_MetaData) };
+      |                                                                                                                                                                                                                                                                                        ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:78:57: note: declared protected here
+   78 |     UPROPERTY(VisibleAnywhere) TObjectPtr<UAudioComponent> Music;
+      |                                                            ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:14:
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/TwEnvironment.gen.cpp:131:282: error: 'MusicB' is a protected member of 'ATwEnvironment'
+  131 | const UECodeGen_Private::FObjectPropertyParams UHT_STATICS::NewProp_MusicB = { "MusicB", nullptr, (EPropertyFlags)0x01240800000a0009, UECodeGen_Private::EPropertyGenFlags::Object | UECodeGen_Private::EPropertyGenFlags::ObjectPtr, nullptr, nullptr, 1, STRUCT_OFFSET(ATwEnvironment, MusicB), Z_Construct_UClass_UAudioComponent, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_MusicB_MetaData), NewProp_MusicB_MetaData) };
+      |                                                                                                                                                                                                                                                                                          ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:79:57: note: declared protected here
+   79 |     UPROPERTY(VisibleAnywhere) TObjectPtr<UAudioComponent> MusicB;
+      |                                                            ^
+In file included from /var/www/html/Twilight/Game/Intermediate/Build/Linux/x64/Twilight/Shipping/Twilight/Module.Twilight.gen.cpp:14:
+/var/www/html/Twilight/Game/Intermediate/Build/Linux/Twilight/Inc/Twilight/UHT/TwEnvironment.gen.cpp:132:282: error: 'Embers' is a protected member of 'ATwEnvironment'
+  132 | const UECodeGen_Private::FObjectPropertyParams UHT_STATICS::NewProp_Embers = { "Embers", nullptr, (EPropertyFlags)0x01240800000a0009, UECodeGen_Private::EPropertyGenFlags::Object | UECodeGen_Private::EPropertyGenFlags::ObjectPtr, nullptr, nullptr, 1, STRUCT_OFFSET(ATwEnvironment, Embers), Z_Construct_UClass_UInstancedStaticMeshComponent, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_Embers_MetaData), NewProp_Embers_MetaData) };
+      |                                                                                                                                                                                                                                                                                          ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:80:71: note: declared protected here
+   80 |     UPROPERTY(VisibleAnywhere) TObjectPtr<UInstancedStaticMeshComponent> Embers;
+      |                                                                          ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+[879/948] Compile HaykWorld.cpp
+In file included from /var/www/html/Twilight/Game/Source/Twilight/HaykWorld.cpp:1:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/HaykWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:48:1: error: unknown type name 'FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG'
+   48 | UCLASS()
+      | ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:811:21: note: expanded from macro 'UCLASS'
+  811 | #define UCLASS(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_PROLOG)
+      |                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:11:1: note: expanded from here
+   11 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG
+      | ^
+In file included from /var/www/html/Twilight/Game/Source/Twilight/HaykWorld.cpp:1:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/HaykWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:51:2: error: a type specifier is required for all declarations
+   51 |     GENERATED_BODY()
+      |     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:800:29: note: expanded from macro 'GENERATED_BODY'
+  800 | #define GENERATED_BODY(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_GENERATED_BODY);
+      |                             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:15:1: note: expanded from here
+   15 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_51_GENERATED_BODY
+      | ^
+/var/www/html/Twilight/Game/Source/Twilight/HaykWorld.cpp:72:104: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AHaykWorld *'
+   72 |     UMaterialInstanceDynamic* Rock = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Rock")), this);
+      |                                                                                                           ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/HaykWorld.cpp:78:2: error: cannot initialize object parameter of type 'ATwEnvironment' with an expression of type 'AHaykWorld'
+   78 |     BuildTerrain(FVector::ZeroVector, 22000.f, 16000.f, 176, 128, [](float X, float Y) { return TerrainZ(X, Y); }, Rock, true, 1200.f);
+      |     ^~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/HaykWorld.cpp:81:104: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AHaykWorld *'
+   81 |     UMaterialInstanceDynamic* Snow = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Rock")), this);
+      |                                                                                                           ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/HaykWorld.cpp:83:2: error: cannot initialize object parameter of type 'ATwEnvironment' with an expression of type 'AHaykWorld'
+   83 |     BuildHeightfield(FVector(-30000.f, 70000.f, 0.f), 55000.f, 48000.f, 7, 96, true, Snow ? Snow : Rock, false);
+      |     ^~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/HaykWorld.cpp:93:3: error: cannot initialize object parameter of type 'const AActor' with an expression of type 'AHaykWorld'
+   93 |         GetWorld()->SpawnActor<AHaykShield>(P, FRotator(0.f, FMath::FRandRange(-12.f, 12.f), 0.f), Sp);
+      |         ^~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/HaykWorld.cpp:105:38: error: no matching function for call to 'NewObject'
+  105 |         UInstancedStaticMeshComponent* C = NewObject<UInstancedStaticMeshComponent>(this);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AHaykWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/HaykWorld.cpp:116:110: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AHaykWorld *'
+  116 |     UMaterialInstanceDynamic* Dark = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_VishapSkin")), this);
+      |                                                                                                                 ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/HaykWorld.cpp:123:108: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AHaykWorld *'
+  123 |     UMaterialInstanceDynamic* Fire = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
+      |                                                                                                               ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/HaykWorld.cpp:156:29: error: no matching function for call to 'NewObject'
+  156 |         UPointLightComponent* L = NewObject<UPointLightComponent>(this);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AHaykWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+11 errors generated.
+[880/948] Compile Fireball.cpp
+[881/948] Compile TwFlash.cpp
+[882/948] Compile TwEnvironment.cpp
+In file included from /var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:1:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:48:1: error: unknown type name 'FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG'
+   48 | UCLASS()
+      | ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:811:21: note: expanded from macro 'UCLASS'
+  811 | #define UCLASS(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_PROLOG)
+      |                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:11:1: note: expanded from here
+   11 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG
+      | ^
+In file included from /var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:1:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:51:2: error: a type specifier is required for all declarations
+   51 |     GENERATED_BODY()
+      |     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:800:29: note: expanded from macro 'GENERATED_BODY'
+  800 | #define GENERATED_BODY(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_GENERATED_BODY);
+      |                             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:15:1: note: expanded from here
+   15 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_51_GENERATED_BODY
+      | ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:24:26: error: no matching member function for call to 'CreateDefaultSubobject'
+   24 |     USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:151:15: note: candidate function template not viable: no known conversion from 'ATwEnvironment' to 'UObject' for object argument
+  151 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:165:15: note: candidate template ignored: couldn't infer template argument 'TClassToConstructByDefault'
+  165 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:26:8: error: no matching member function for call to 'CreateDefaultSubobject'
+   26 |     Sun = CreateDefaultSubobject<UDirectionalLightComponent>(TEXT("Sun"));
+      |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:151:15: note: candidate function template not viable: no known conversion from 'ATwEnvironment' to 'UObject' for object argument
+  151 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:165:15: note: candidate template ignored: couldn't infer template argument 'TClassToConstructByDefault'
+  165 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:28:9: error: no matching member function for call to 'CreateDefaultSubobject'
+   28 |     Moon = CreateDefaultSubobject<UDirectionalLightComponent>(TEXT("Moon"));
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:151:15: note: candidate function template not viable: no known conversion from 'ATwEnvironment' to 'UObject' for object argument
+  151 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:165:15: note: candidate template ignored: couldn't infer template argument 'TClassToConstructByDefault'
+  165 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:30:15: error: no matching member function for call to 'CreateDefaultSubobject'
+   30 |     Atmosphere = CreateDefaultSubobject<USkyAtmosphereComponent>(TEXT("Atmosphere"));
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:151:15: note: candidate function template not viable: no known conversion from 'ATwEnvironment' to 'UObject' for object argument
+  151 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:165:15: note: candidate template ignored: couldn't infer template argument 'TClassToConstructByDefault'
+  165 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:32:13: error: no matching member function for call to 'CreateDefaultSubobject'
+   32 |     SkyLight = CreateDefaultSubobject<USkyLightComponent>(TEXT("SkyLight"));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:151:15: note: candidate function template not viable: no known conversion from 'ATwEnvironment' to 'UObject' for object argument
+  151 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:165:15: note: candidate template ignored: couldn't infer template argument 'TClassToConstructByDefault'
+  165 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:34:8: error: no matching member function for call to 'CreateDefaultSubobject'
+   34 |     Fog = CreateDefaultSubobject<UExponentialHeightFogComponent>(TEXT("Fog"));
+      |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:151:15: note: candidate function template not viable: no known conversion from 'ATwEnvironment' to 'UObject' for object argument
+  151 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:165:15: note: candidate template ignored: couldn't infer template argument 'TClassToConstructByDefault'
+  165 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:36:9: error: no matching member function for call to 'CreateDefaultSubobject'
+   36 |     Post = CreateDefaultSubobject<UPostProcessComponent>(TEXT("Post"));
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:151:15: note: candidate function template not viable: no known conversion from 'ATwEnvironment' to 'UObject' for object argument
+  151 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:165:15: note: candidate template ignored: couldn't infer template argument 'TClassToConstructByDefault'
+  165 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:38:10: error: no matching member function for call to 'CreateDefaultSubobject'
+   38 |     Music = CreateDefaultSubobject<UAudioComponent>(TEXT("Music"));
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:151:15: note: candidate function template not viable: no known conversion from 'ATwEnvironment' to 'UObject' for object argument
+  151 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:165:15: note: candidate template ignored: couldn't infer template argument 'TClassToConstructByDefault'
+  165 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:42:11: error: no matching member function for call to 'CreateDefaultSubobject'
+   42 |     MusicB = CreateDefaultSubobject<UAudioComponent>(TEXT("MusicB"));
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:151:15: note: candidate function template not viable: no known conversion from 'ATwEnvironment' to 'UObject' for object argument
+  151 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:165:15: note: candidate template ignored: couldn't infer template argument 'TClassToConstructByDefault'
+  165 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:46:11: error: no matching member function for call to 'CreateDefaultSubobject'
+   46 |     Embers = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("Embers"));
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:151:15: note: candidate function template not viable: no known conversion from 'ATwEnvironment' to 'UObject' for object argument
+  151 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:165:15: note: candidate template ignored: couldn't infer template argument 'TClassToConstructByDefault'
+  165 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:52:2: error: no member named 'BeginPlay' in 'UObject'; did you mean simply 'BeginPlay'?
+   52 |     Super::BeginPlay();
+      |     ^~~~~~~~~~~~~~~~
+      |     BeginPlay
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:50:22: note: 'BeginPlay' declared here
+   50 | void ATwEnvironment::BeginPlay()
+      |                      ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:67:40: error: no matching function for call to 'NewObject'
+   67 |         UInstancedStaticMeshComponent* Ism = NewObject<UInstancedStaticMeshComponent>(this);
+      |                                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'ATwEnvironment *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:74:110: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'ATwEnvironment *'
+   74 |         if (UMaterialInstanceDynamic* M = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this))
+      |                                                                                                                    ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:97:36: error: no matching function for call to 'NewObject'
+   97 |         UStaticMeshComponent* MoonDisc = NewObject<UStaticMeshComponent>(this);
+      |                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'ATwEnvironment *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:106:110: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'ATwEnvironment *'
+  106 |         if (UMaterialInstanceDynamic* M = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this))
+      |                                                                                                                    ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:119:9: error: no type named 'Tick' in 'UObject'
+  119 |     Super::Tick(Dt);
+      |     ~~~~~~~^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:119:14: error: declaration shadows a local variable [-Werror,-Wshadow]
+  119 |     Super::Tick(Dt);
+      |                 ^
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.cpp:117:33: note: previous declaration is here
+  117 | void ATwEnvironment::Tick(float Dt)
+      |                                 ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+[883/948] Compile Module.Slate.5.cpp
+[884/948] Compile HaykPlayerController.cpp
+[885/948] Compile TwPoseAnimInstance.cpp
+[886/948] Compile TwHub.cpp
+In file included from /var/www/html/Twilight/Game/Source/Twilight/TwHub.cpp:6:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:48:1: error: unknown type name 'FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG'
+   48 | UCLASS()
+      | ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:811:21: note: expanded from macro 'UCLASS'
+  811 | #define UCLASS(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_PROLOG)
+      |                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:95:1: note: expanded from here
+   95 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG
+      | ^
+In file included from /var/www/html/Twilight/Game/Source/Twilight/TwHub.cpp:6:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:51:2: error: a type specifier is required for all declarations
+   51 |     GENERATED_BODY()
+      |     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:800:29: note: expanded from macro 'GENERATED_BODY'
+  800 | #define GENERATED_BODY(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_GENERATED_BODY);
+      |                             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:99:1: note: expanded from here
+   99 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_51_GENERATED_BODY
+      | ^
+2 errors generated.
+[887/948] Compile TwTestHarness.cpp
+[888/948] Compile TwAssets.cpp
+[889/948] Compile Twilight.cpp
+[890/948] Compile HaykHud.cpp
+[891/948] Compile VahagnWorld.cpp
+In file included from /var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:1:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:48:1: error: unknown type name 'FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG'
+   48 | UCLASS()
+      | ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:811:21: note: expanded from macro 'UCLASS'
+  811 | #define UCLASS(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_PROLOG)
+      |                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:11:1: note: expanded from here
+   11 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG
+      | ^
+In file included from /var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:1:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:51:2: error: a type specifier is required for all declarations
+   51 |     GENERATED_BODY()
+      |     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:800:29: note: expanded from macro 'GENERATED_BODY'
+  800 | #define GENERATED_BODY(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_GENERATED_BODY);
+      |                             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:15:1: note: expanded from here
+   15 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_51_GENERATED_BODY
+      | ^
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:21:8: error: no matching member function for call to 'CreateDefaultSubobject'
+   21 |     Sea = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sea"));
+      |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:151:15: note: candidate function template not viable: no known conversion from 'AVahagnWorld' to 'UObject' for object argument
+  151 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h:165:15: note: candidate template ignored: couldn't infer template argument 'TClassToConstructByDefault'
+  165 |     TReturnType* CreateDefaultSubobject(FName SubobjectName, bool bTransient = false)
+      |                  ^
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:30:111: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AVahagnWorld *'
+   30 |     UMaterialInstanceDynamic* ReedMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_FireBody")), this);
+      |                                                                                                                  ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:43:29: error: no matching function for call to 'NewObject'
+   43 |         UStaticMeshComponent* S = NewObject<UStaticMeshComponent>(this);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AVahagnWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:69:109: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AVahagnWorld *'
+   69 |     UMaterialInstanceDynamic* M = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Water_Purple")), this);
+      |                                                                                                                ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:84:9: error: cannot initialize object parameter of type 'ATwEnvironment' with an expression of type 'AVahagnWorld'
+   84 |     Super::Tick(Dt);
+      |            ^~~~
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:137:26: error: cannot initialize object parameter of type 'const AActor' with an expression of type 'AVahagnWorld'
+  137 |     APlayerController* PC = GetWorld()->GetFirstPlayerController();
+      |                             ^~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:149:86: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AVahagnWorld *'
+  149 |         BoltMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
+      |                                                                                            ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:159:30: error: no matching function for call to 'NewObject'
+  159 |             UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(this);
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AVahagnWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:203:2: error: use of undeclared identifier 'UCFS_FChecker'
+  203 |     UE_LOG(LogTwilight, Display, TEXT("[TwTest] lightning at %s dist=%.0f"), *End.ToCompactString(), FVector::Dist(Cam, End));
+      |     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Logging/LogMacros.h:191:4: note: expanded from macro 'UE_LOG'
+  191 |             LowLevelFatalError(Format, ##__VA_ARGS__); \
+      |             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Misc/AssertionMacros.h:593:3: note: expanded from macro 'LowLevelFatalError'
+  593 |         UE_VALIDATE_FORMAT_STRING(Format, ##__VA_ARGS__); \
+      |         ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/String/FormatStringSan.h:27:36: note: expanded from macro 'UE_VALIDATE_FORMAT_STRING'
+   27 |     #define UE_VALIDATE_FORMAT_STRING UE_CHECK_FORMAT_STRING
+      |                                       ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/String/FormatStringSan.h:18:41: note: expanded from macro 'UE_CHECK_FORMAT_STRING'
+   18 |         constexpr UCFS::FResult UCFS_Result = UCFS_FChecker::Check(false, 0, Fmt); \
+      |                                               ^
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:203:2: error: non-type template argument is not a constant expression
+  203 |     UE_LOG(LogTwilight, Display, TEXT("[TwTest] lightning at %s dist=%.0f"), *End.ToCompactString(), FVector::Dist(Cam, End));
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Logging/LogMacros.h:191:4: note: expanded from macro 'UE_LOG'
+  191 |             LowLevelFatalError(Format, ##__VA_ARGS__); \
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Misc/AssertionMacros.h:593:3: note: expanded from macro 'LowLevelFatalError'
+  593 |         UE_VALIDATE_FORMAT_STRING(Format, ##__VA_ARGS__); \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/String/FormatStringSan.h:27:36: note: expanded from macro 'UE_VALIDATE_FORMAT_STRING'
+   27 |     #define UE_VALIDATE_FORMAT_STRING UE_CHECK_FORMAT_STRING
+      |                                       ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/String/FormatStringSan.h:19:65: note: expanded from macro 'UE_CHECK_FORMAT_STRING'
+   19 |         (UCFS::AssertFormatStatus<UCFS_Result.Status, UCFS::TAtArgPos<UCFS_Result.ArgPos>>()); \
+      |                                                                       ^~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:203:2: note: initializer of 'UCFS_Result' is unknown
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Logging/LogMacros.h:191:4: note: expanded from macro 'UE_LOG'
+  191 |             LowLevelFatalError(Format, ##__VA_ARGS__); \
+      |             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Misc/AssertionMacros.h:593:3: note: expanded from macro 'LowLevelFatalError'
+  593 |         UE_VALIDATE_FORMAT_STRING(Format, ##__VA_ARGS__); \
+      |         ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/String/FormatStringSan.h:27:36: note: expanded from macro 'UE_VALIDATE_FORMAT_STRING'
+   27 |     #define UE_VALIDATE_FORMAT_STRING UE_CHECK_FORMAT_STRING
+      |                                       ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/String/FormatStringSan.h:19:65: note: expanded from macro 'UE_CHECK_FORMAT_STRING'
+   19 |         (UCFS::AssertFormatStatus<UCFS_Result.Status, UCFS::TAtArgPos<UCFS_Result.ArgPos>>()); \
+      |                                                                       ^
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:203:2: note: declared here
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Logging/LogMacros.h:191:4: note: expanded from macro 'UE_LOG'
+  191 |             LowLevelFatalError(Format, ##__VA_ARGS__); \
+      |             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Misc/AssertionMacros.h:593:3: note: expanded from macro 'LowLevelFatalError'
+  593 |         UE_VALIDATE_FORMAT_STRING(Format, ##__VA_ARGS__); \
+      |         ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/String/FormatStringSan.h:27:36: note: expanded from macro 'UE_VALIDATE_FORMAT_STRING'
+   27 |     #define UE_VALIDATE_FORMAT_STRING UE_CHECK_FORMAT_STRING
+      |                                       ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/String/FormatStringSan.h:18:27: note: expanded from macro 'UE_CHECK_FORMAT_STRING'
+   18 |         constexpr UCFS::FResult UCFS_Result = UCFS_FChecker::Check(false, 0, Fmt); \
+      |                                 ^
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:204:14: error: cannot initialize object parameter of type 'const AActor' with an expression of type 'AVahagnWorld'
+  204 |     TwFx::Burst(GetWorld(), TwFx::EFx::Splash, End + FVector(0, 0, 10.f), 3.f);
+      |                 ^~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:209:2: error: cannot initialize object parameter of type 'const AActor' with an expression of type 'AVahagnWorld'
+  209 |     GetWorldTimerManager().SetTimer(H, FTimerDelegate::CreateLambda([Self]()
+      |     ^~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:211:37: error: cannot initialize object parameter of type 'const AActor' with an expression of type 'AVahagnWorld'
+  211 |         if (Self.IsValid()) TwFx::Sound2D(Self->GetWorld(), TEXT("sfx_big_explosion"), 0.75f, 0.42f);
+      |                                           ^~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:238:105: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AVahagnWorld *'
+  238 |     UMaterialInstanceDynamic* Stone = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Rock")), this);
+      |                                                                                                            ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:240:109: error: cannot initialize a parameter of type 'class UObject *' with an rvalue of type 'AVahagnWorld *'
+  240 |     UMaterialInstanceDynamic* Glyph = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
+      |                                                                                                                ^~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h:176:111: note: passing argument to parameter 'InOuter' here
+  176 |     static ENGINE_API UMaterialInstanceDynamic* Create( class UMaterialInterface* ParentMaterial, class UObject* InOuter, FName Name = NAME_None);
+      |                                                                                                                  ^
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:245:29: error: no matching function for call to 'NewObject'
+  245 |         UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(this);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AVahagnWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.cpp:267:28: error: no matching function for call to 'NewObject'
+  267 |     UPointLightComponent* L = NewObject<UPointLightComponent>(this);
+      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1959:5: note: candidate function template not viable: no known conversion from 'AVahagnWorld *' to 'UObject *' for 1st argument
+ 1959 |     T* NewObject(UObject* Outer = GetTransientPackageAsObject())
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1974:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1974 |     T* NewObject(UObject* Outer, FName Name, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h:1931:5: note: candidate function template not viable: requires at least 2 arguments, but 1 was provided
+ 1931 |     T* NewObject(UObject* Outer, const UClass* Class, FName Name = NAME_None, EObjectFlags Flags = RF_NoFlags, UObject* Template = nullptr, bool bCopyTransientsFromClassDefaults = false, FObjectInstancingGraph* InInstanceGraph = nullptr, UPackage* InExternalPackage = nullptr)
+      |        ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+[892/948] Compile Module.Synthesis.cpp
+[893/948] Compile TwUi.cpp
+[894/948] Compile VahagnGameMode.cpp
+In file included from /var/www/html/Twilight/Game/Source/Twilight/VahagnGameMode.cpp:7:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:48:1: error: unknown type name 'FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG'
+   48 | UCLASS()
+      | ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:811:21: note: expanded from macro 'UCLASS'
+  811 | #define UCLASS(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_PROLOG)
+      |                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:20:1: note: expanded from here
+   20 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_48_PROLOG
+      | ^
+In file included from /var/www/html/Twilight/Game/Source/Twilight/VahagnGameMode.cpp:7:
+In file included from /var/www/html/Twilight/Game/Source/Twilight/VahagnWorld.h:4:
+/var/www/html/Twilight/Game/Source/Twilight/TwEnvironment.h:51:2: error: a type specifier is required for all declarations
+   51 |     GENERATED_BODY()
+      |     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:800:29: note: expanded from macro 'GENERATED_BODY'
+  800 | #define GENERATED_BODY(...) BODY_MACRO_COMBINE(CURRENT_FILE_ID,_,__LINE__,_GENERATED_BODY);
+      |                             ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:795:37: note: expanded from macro 'BODY_MACRO_COMBINE'
+  795 | #define BODY_MACRO_COMBINE(A,B,C,D) BODY_MACRO_COMBINE_INNER(A,B,C,D)
+      |                                     ^
+/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h:794:43: note: expanded from macro 'BODY_MACRO_COMBINE_INNER'
+  794 | #define BODY_MACRO_COMBINE_INNER(A,B,C,D) A##B##C##D
+      |                                           ^
+<scratch space>:24:1: note: expanded from here
+   24 | FID_var_www_html_Twilight_Game_Source_Twilight_TwEnvironment_h_51_GENERATED_BODY
+      | ^
+/var/www/html/Twilight/Game/Source/Twilight/VahagnGameMode.cpp:121:15: error: cannot initialize object parameter of type 'ATwEnvironment' with an expression of type 'AVahagnWorld'
+  121 |     if (World) { World->PlayMusic(TEXT("music_battle")); World->SetStorm(false); }
+      |                  ^~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/VahagnGameMode.cpp:230:14: error: cannot initialize object parameter of type 'ATwEnvironment' with an expression of type 'AVahagnWorld'
+  230 |         if (World) World->PlayMusic(TEXT("music_menu"));
+      |                    ^~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/VahagnGameMode.cpp:235:14: error: cannot initialize object parameter of type 'ATwEnvironment' with an expression of type 'AVahagnWorld'
+  235 |         if (World) World->PlayMusic(TEXT("music_menu"));
+      |                    ^~~~~~~
+/var/www/html/Twilight/Game/Source/Twilight/VahagnGameMode.cpp:293:20: error: cannot initialize object parameter of type 'ATwEnvironment' with an expression of type 'AVahagnWorld'
+  293 |                         if (World) { World->PlayMusic(TEXT("music_boss")); World->SetStorm(true); }
+      |                                      ^~~~~~~
+6 errors generated.
+[895/948] Compile TwFx.cpp
+[896/948] Compile Module.TakeTrackRecorders.cpp
+[897/948] Compile VahagnPlayerController.cpp
+[898/948] Compile VahagnHud.cpp
+[899/948] Compile Vishap.cpp
+[900/948] Compile VahagnCharacter.cpp
+[901/948] Compile Module.TypedElementRuntime.cpp
+[902/948] Compile Module.UObjectPlugin.cpp
+[903/948] Compile Module.UELibSampleRate.cpp
+[904/948] Compile Module.UniversalObjectLocator.cpp
+[905/948] Compile Module.RigLogicLib.cpp
+[906/948] Compile Module.UnixCommonStartup.cpp
+[907/948] Compile Module.TmvMedia.cpp
+[908/948] Compile Module.Voice.cpp
+[909/948] Compile Module.VectorVM.cpp
+[910/948] Compile Module.UAF.3.cpp
+[911/948] Compile Module.VorbisAudioDecoder.cpp
+[912/948] Compile c_loops.cc
+[913/948] Compile Module.TypedElementFramework.cpp
+[914/948] Compile Module.Voronoi.cpp
+[915/948] Compile Module.UAFAnimGraph.3.cpp
+[916/948] Compile container.cc
+[917/948] Compile Module.UdpMessaging.cpp
+[918/948] Compile v_base.cc
+[919/948] Compile pre_container.cc
+[920/948] Compile unitcell.cc
+[921/948] Compile Module.VariantManagerContent.cpp
+[922/948] Compile wall.cc
+[923/948] Compile cell.cc
+[924/948] Compile v_compute.cc
+[925/948] Compile Module.UAF.2.cpp
+[926/948] Compile Module.UAFAnimGraph.1.cpp
+[927/948] Compile Module.UAFAnimGraph.2.cpp
+[928/948] Compile Module.WaveTable.cpp
+[929/948] Compile Module.VulkanRHI.5.cpp
+[930/948] Compile Module.WebMMediaFactory.cpp
+[931/948] Compile Module.Water.3.cpp
+[932/948] Compile Module.UAF.1.cpp
+[933/948] Compile Module.WmfMediaFactory.cpp
+[934/948] Compile Module.WebMMedia.cpp
+[935/948] Compile Module.WebMMoviePlayer.cpp
+[936/948] Compile Module.VulkanRHI.1.cpp
+[937/948] Compile Module.WorldMetricsCore.cpp
+[938/948] Compile Module.VulkanRHI.2.cpp
+[939/948] Compile Module.XmlParser.cpp
+[940/948] Compile Module.UMG.3.cpp
+[941/948] Compile Module.VulkanRHI.3.cpp
+[942/948] Compile Module.VulkanRHI.4.cpp
+[943/948] Compile Module.UMG.2.cpp
+[944/948] Compile Module.Water.1.cpp
+[945/948] Compile Module.Water.2.cpp
+[946/948] Compile Module.UMG.1.cpp
+Total time in Unreal Build Accelerator local executor: 1279.79 seconds
+
+Result: Failed (OtherCompilationError)
+Total execution time: 1283.58 seconds
+Trace written to file /home/samo/UnrealEngine-5.8/Engine/Programs/UnrealBuildTool/Trace.uba with size 333.6kb
+Took 1,283.88s to run dotnet, ExitCode=6
+UnrealBuildTool failed. See log for more details. (/home/samo/Library/Logs/Unreal Engine/LocalBuildLogs/UBA-UnrealPak-Linux-Development.txt)
+AutomationTool executed for 0h 21m 25s
+AutomationTool exiting with ExitCode=6 (6)
+RunUAT ERROR: AutomationTool was unable to run successfully. Exited with code: 6
+EXIT=6
