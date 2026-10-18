@@ -45,8 +45,13 @@ public:
 	void Heal(float Amount);
 	void RegisterHit(bool bKill);
 	void SetControlEnabled(bool bEnabled);
+	/** Menu framing: hero off to the right of the menu panel. */
+	void SetMenuFraming(bool bMenu);
 	/** Autopilot used by the automated play-test (-TwAutoPlay). */
 	void SetAutopilot(bool bOn) { bAutopilot = bOn; }
+	/** Myth intro: rise out of the purple sea through the burning reed. */
+	void BeginBirth(const FVector& ReedTop, float Duration);
+	bool IsBeingBorn() const { return BirthLeft > 0.f; }
 	bool IsAutopilot() const { return bAutopilot; }
 
 	// --- input handlers (bound by the controller)
@@ -126,6 +131,11 @@ private:
 
 	FVector AimPoint = FVector::ZeroVector;
 	TWeakObjectPtr<AVishap> AimTarget;
+
+	// birth
+	FVector BirthFrom = FVector::ZeroVector, BirthTo = FVector::ZeroVector;
+	float BirthLeft = 0.f, BirthDur = 1.f;
+	int32 BirthStage = 0;
 
 	// autopilot
 	float AutoFireTimer = 0.f;

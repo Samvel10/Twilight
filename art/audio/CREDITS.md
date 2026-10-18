@@ -4,6 +4,9 @@ All music and almost all SFX are **procedurally synthesized** by the scripts in
 `src/` (numpy/scipy, no samples, no paid or AI services). Seeds are fixed, so a
 re-run gives the same files.
 
+Chapter 2 «Hayk» and chapter 3 «Aralez» (13 SFX + `music_hayk`, `music_aralez`, made by
+`src/gen_chapters23.py`) are 100 % procedural: no downloads and no third-party samples.
+
 ## Third-party CC0 recordings (layered into 3 SFX)
 
 | Source file | Used in | Pack | Author | License |

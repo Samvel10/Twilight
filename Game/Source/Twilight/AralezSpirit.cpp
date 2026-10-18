@@ -70,7 +70,7 @@ void AAralezSpirit::BuildBody()
 	{
 		Mat->SetVectorParameterValue(TEXT("Color"), Color);
 		Mat->SetScalarParameterValue(TEXT("GlowMode"), 1.f);
-		Mat->SetScalarParameterValue(TEXT("Intensity"), bBot ? 5.f : 7.f);
+		Mat->SetScalarParameterValue(TEXT("Intensity"), bBot ? 2.4f : 3.2f);
 	}
 	auto Part = [this](UStaticMesh* M, USceneComponent* Parent, const FVector& Loc, const FRotator& Rot, const FVector& Scl) -> UStaticMeshComponent*
 	{
@@ -110,8 +110,20 @@ void AAralezSpirit::BuildBody()
 	// feathered wings (flattened cubes) pivoting at the shoulders
 	USceneComponent* PivotL = NewObject<USceneComponent>(this); PivotL->SetupAttachment(BodyRoot); PivotL->SetRelativeLocation(FVector(30, 20, 30)); PivotL->RegisterComponent();
 	USceneComponent* PivotR = NewObject<USceneComponent>(this); PivotR->SetupAttachment(BodyRoot); PivotR->SetRelativeLocation(FVector(30, -20, 30)); PivotR->RegisterComponent();
-	WingL = Part(TwAssets::Cube(), PivotL, FVector(-20, 110, 0), FRotator(0, -12, 0), FVector(0.9f, 2.2f, 0.04f));
-	WingR = Part(TwAssets::Cube(), PivotR, FVector(-20, -110, 0), FRotator(0, 12, 0), FVector(0.9f, 2.2f, 0.04f));
+	// feathered wings: a fan of long tapered feathers per side
+	for (int32 s = 0; s < 2; ++s)
+	{
+		USceneComponent* Pv = s == 0 ? PivotL : PivotR;
+		const float Side = s == 0 ? 1.f : -1.f;
+		for (int32 f = 0; f < 6; ++f)
+		{
+			const float Ang = (-10.f - f * 13.f) * Side;            // fan sweeping backwards
+			const float Len = 1.5f + 0.35f * FMath::Sin(f * 0.6f);   // long primaries in the middle
+			const FVector Dir = FRotator(0.f, -90.f * Side + Ang, 0.f).Vector() * -1.f;
+			UStaticMeshComponent* Fe = Part(TwAssets::Sphere(), Pv, FVector(Dir.X, Dir.Y, 0.f) * Len * 50.f, FRotator(0.f, Ang + 90.f * Side, 0.f), FVector(0.22f, Len, 0.03f));
+			if (f == 2) { if (s == 0) WingL = Fe; else WingR = Fe; }
+		}
+	}
 	BodyRoot->SetRelativeScale3D(FVector(bBot ? 0.9f : 1.f));
 
 	Trail->SetStaticMesh(Sph);
@@ -142,7 +154,7 @@ void AAralezSpirit::InHowl()
 	if (!bControl || HowlCd > 0.f || Stun > 0.f) return;
 	HowlCd = 12.f;
 	const FVector P = GetActorLocation();
-	TwFx::Sound(GetWorld(), TEXT("sfx_vishap_roar"), P, bBot ? 0.4f : 1.f, 1.8f);
+	TwFx::Sound(GetWorld(), TEXT("sfx_aralez_howl"), P, bBot ? 0.4f : 1.f);
 	TwFx::Burst(GetWorld(), TwFx::EFx::Nova, P, 2.f);
 	for (TActorIterator<AShadowWraith> It(GetWorld()); It; ++It)
 		if (FVector::Dist(It->GetActorLocation(), P) < 2600.f) It->Repel(P);
@@ -174,6 +186,11 @@ void AAralezSpirit::ThinkBot(float Dt)
 		for (TActorIterator<ASoulLight> It(GetWorld()); It; ++It)
 		{
 			if (It->IsTaken()) continue;
+			{
+				const FVector LP = It->GetActorLocation();
+				const float LT = AAralezWorld::NearestT(LP, PathT);
+				if (FVector::Dist(LP, AAralezWorld::PathPoint(LT)) > AAralezWorld::TunnelRadius(LT) * 0.6f) continue; // unreachable
+			}
 			const FVector To = It->GetActorLocation() - GetActorLocation();
 			const float D = To.Size();
 			if (D < Best && FVector::DotProduct(To.GetSafeNormal(), Fwd) > -0.2f) { Best = D; BotGoal = It->GetActorLocation(); }
@@ -205,7 +222,7 @@ void AAralezSpirit::Move(float Dt)
 	}
 	if (Stun > 0.f) Wish *= 0.15f;
 	const float BotScale = bBot ? (0.86f + 0.05f * Skill) : 1.f;
-	const float MaxSpd = Speed * BotScale * (DashTime > 0.f ? 2.4f : 1.f);
+	const float MaxSpd = Speed * BotScale * (DashTime > 0.f ? 2.2f : 1.f);
 	const FVector Target = Wish * MaxSpd;
 	Vel = FMath::VInterpTo(Vel, Target, Dt, Wish.IsNearlyZero() ? 1.5f : 3.f);
 
@@ -213,15 +230,23 @@ void AAralezSpirit::Move(float Dt)
 	// stay inside the tunnel (soft wall)
 	PathT = AAralezWorld::NearestT(P, PathT);
 	const FVector C = AAralezWorld::PathPoint(PathT);
-	const float R = AAralezWorld::TunnelRadius(PathT) * 0.78f;
 	FVector Off = P - C;
 	const FVector Tan = AAralezWorld::PathTangent(PathT);
 	Off -= Tan * FVector::DotProduct(Off, Tan);
 	const float D = Off.Size();
-	if (D > R)
+	if (D > KINDA_SMALL_NUMBER)
 	{
-		P -= Off / D * (D - R);
-		Vel -= Off / D * FMath::Max(0.f, FVector::DotProduct(Vel, Off / D));
+		const FVector Dir = Off / D;
+		// same frame as AAralezWorld::BuildTunnel; the floor is flatter (closer) than the walls
+		const FVector RightV = FVector::CrossProduct(FVector::UpVector, Tan).GetSafeNormal();
+		const FVector UpV = FVector::CrossProduct(Tan, RightV).GetSafeNormal();
+		const float Frac = FVector::DotProduct(Dir, UpV) < -0.35f ? 0.60f : 0.76f;
+		const float Lim = AAralezWorld::TunnelRadius(PathT) * Frac;
+		if (D > Lim)
+		{
+			P -= Dir * (D - Lim);
+			Vel -= Dir * FMath::Max(0.f, FVector::DotProduct(Vel, Dir));
+		}
 	}
 	if (PathT <= 0.001f && FVector::DotProduct(Vel, Tan) < 0.f) Vel -= Tan * FVector::DotProduct(Vel, Tan);
 	SetActorLocation(P);
@@ -242,7 +267,7 @@ void AAralezSpirit::Animate(float Dt)
 	}
 	BodyRoot->SetRelativeLocation(FVector(0, 0, FMath::Sin(Flap * 0.5f) * 12.f));
 	Pulse = FMath::Max(0.f, Pulse - Dt * 2.f);
-	if (Mat) Mat->SetScalarParameterValue(TEXT("Intensity"), (bBot ? 5.f : 7.f) * (1.f + Pulse * 1.5f) * (Stun > 0.f ? 0.3f + 0.3f * FMath::Sin(Flap * 6.f) : 1.f));
+	if (Mat) Mat->SetScalarParameterValue(TEXT("Intensity"), (bBot ? 2.4f : 3.2f) * (1.f + Pulse * 1.5f) * (Stun > 0.f ? 0.3f + 0.3f * FMath::Sin(Flap * 6.f) : 1.f));
 
 	// light trail
 	const float Now = GetWorld()->GetTimeSeconds();
@@ -277,6 +302,7 @@ void AAralezSpirit::Tick(float Dt)
 	{
 		if (bBot) ThinkBot(Dt);
 		Move(Dt);
+		if (bBot && Controller && !Vel.IsNearlyZero(50.f)) Controller->SetControlRotation(FMath::RInterpTo(Controller->GetControlRotation(), Vel.Rotation(), Dt, 2.5f));
 	}
 	else
 	{

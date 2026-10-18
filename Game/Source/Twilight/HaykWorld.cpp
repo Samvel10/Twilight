@@ -53,7 +53,7 @@ FTwSkyPreset AHaykWorld::GetSkyPreset() const
 		P.FogColor = FLinearColor(0.05f, 0.07f, 0.16f);
 		P.FogSunColor = FLinearColor(0.3f, 0.4f, 0.8f);
 		P.FogDensity = 0.025f;
-		P.Exposure = 12.8f;
+		P.Exposure = 1.3f;
 		P.EmberColor = FLinearColor(1.f, 0.55f, 0.2f);
 		P.SkyLightIntensity = 1.6f;
 		P.SkyLightColor = FLinearColor(0.5f, 0.6f, 1.f);
@@ -79,7 +79,7 @@ void AHaykWorld::BuildLevel()
 	BuildHeightfield(FVector(-30000.f, 70000.f, 0.f), 55000.f, 48000.f, 7, 96, true, Snow ? Snow : Rock, false);
 
 	// pavises between the archers
-	const FVector Shields[4] = { FVector(-1500.f, 260.f, 0.f), FVector(-200.f, -420.f, 0.f), FVector(1100.f, 380.f, 0.f), FVector(2300.f, -150.f, 0.f) };
+	const FVector Shields[4] = { FVector(-1150.f, 230.f, 0.f), FVector(-150.f, -380.f, 0.f), FVector(800.f, 340.f, 0.f), FVector(1700.f, -140.f, 0.f) };
 	for (const FVector& S : Shields)
 	{
 		const FVector P(S.X, S.Y, TerrainZ(S.X, S.Y) + 115.f);
@@ -89,8 +89,8 @@ void AHaykWorld::BuildLevel()
 	}
 
 	// armies
-	BuildArmy(5600.f, 9800.f, -3800.f, 3800.f, 260, true, 11);
-	BuildArmy(-8200.f, -5600.f, -2400.f, 2400.f, 90, false, 23);
+	BuildArmy(5200.f, 9800.f, -3800.f, 3800.f, 260, true, 11);
+	BuildArmy(-7800.f, -5200.f, -2400.f, 2400.f, 90, false, 23);
 }
 
 void AHaykWorld::BuildArmy(float X0, float X1, float Y0, float Y1, int32 Count, bool bEnemy, int32 Seed)
@@ -113,12 +113,13 @@ void AHaykWorld::BuildArmy(float X0, float X1, float Y0, float Y1, int32 Count, 
 	{
 		Dark->SetVectorParameterValue(TEXT("SkinColor"), bEnemy ? FLinearColor(0.02f, 0.015f, 0.02f) : FLinearColor(0.12f, 0.07f, 0.04f));
 		Dark->SetVectorParameterValue(TEXT("VeinColor"), bEnemy ? FLinearColor(1.f, 0.1f, 0.03f) : FLinearColor(1.f, 0.6f, 0.2f));
-		Dark->SetScalarParameterValue(TEXT("VeinIntensity"), 0.6f);
+		Dark->SetScalarParameterValue(TEXT("VeinIntensity"), 0.6f); Dark->SetScalarParameterValue(TEXT("RimIntensity"), 0.35f); Dark->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(1.f, 0.55f, 0.25f));
 	}
 	UMaterialInstanceDynamic* Fire = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
 	if (Fire) { Fire->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.45f, 0.12f)); Fire->SetScalarParameterValue(TEXT("GlowMode"), 1.f); Fire->SetScalarParameterValue(TEXT("Intensity"), 25.f); }
 
-	UInstancedStaticMeshComponent* Bodies = MakeIsm(TwAssets::Cylinder(), Dark);
+	UInstancedStaticMeshComponent* Bodies = MakeIsm(TwAssets::Cone(), Dark);
+	UInstancedStaticMeshComponent* Shields = MakeIsm(TwAssets::Cylinder(), Dark);
 	UInstancedStaticMeshComponent* Heads = MakeIsm(TwAssets::Sphere(), Dark);
 	UInstancedStaticMeshComponent* Spears = MakeIsm(TwAssets::Cylinder(), Dark);
 	UInstancedStaticMeshComponent* Torches = MakeIsm(TwAssets::Sphere(), Fire);
@@ -130,8 +131,11 @@ void AHaykWorld::BuildArmy(float X0, float X1, float Y0, float Y1, int32 Count, 
 		const float X = R.FRandRange(X0, X1), Y = R.FRandRange(Y0, Y1);
 		const float Z = TerrainZ(X, Y);
 		const float H = R.FRandRange(0.9f, 1.1f) * (bEnemy ? 1.15f : 1.f);
-		Bodies->AddInstance(FTransform(FRotator(0, 0, R.FRandRange(-4.f, 4.f)), FVector(X, Y, Z + 85.f * H), FVector(0.5f, 0.42f, 1.7f * H)), true);
-		Heads->AddInstance(FTransform(FRotator::ZeroRotator, FVector(X, Y, Z + 185.f * H), FVector(0.26f * H)), true);
+		// a robed warrior: cone body, round head, a round shield facing the valley
+		const float Face = bEnemy ? -1.f : 1.f;
+		Bodies->AddInstance(FTransform(FRotator(0, 0, R.FRandRange(-3.f, 3.f)), FVector(X, Y, Z + 82.f * H), FVector(0.62f, 0.55f, 1.65f * H)), true);
+		Heads->AddInstance(FTransform(FRotator::ZeroRotator, FVector(X, Y, Z + 172.f * H), FVector(0.24f * H)), true);
+		if (R.FRand() < 0.55f) Shields->AddInstance(FTransform(FRotator(90.f, 0.f, 0.f), FVector(X + 32.f * Face, Y + 8.f, Z + 105.f * H), FVector(0.75f, 0.75f, 0.06f)), true);
 		if (R.FRand() < 0.6f)
 			Spears->AddInstance(FTransform(FRotator(0, 0, R.FRandRange(-8.f, 8.f)), FVector(X + 22.f, Y, Z + 170.f * H), FVector(0.04f, 0.04f, 3.4f * H)), true);
 		if (R.FRand() < 0.22f)

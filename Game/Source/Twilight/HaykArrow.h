@@ -28,7 +28,7 @@ public:
 	virtual void Tick(float Dt) override;
 
 	/** Steering input for the special arrow (-1..1 each axis). */
-	void Steer(const FVector2D& In) { SteerInput = In; }
+	void Steer(const FVector2D& In) { SteerInput = (SteerInput + In).ClampAxes(-1.f, 1.f); }
 
 	EArrowResult GetResult() const { return Result; }
 	bool IsSpecial() const { return bSpecial; }

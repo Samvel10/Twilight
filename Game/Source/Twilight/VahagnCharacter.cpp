@@ -120,7 +120,9 @@ void AVahagnCharacter::BeginPlay()
 	BodyMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_FireBody")), this);
 	if (BodyMat)
 	{
-		BodyMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), 8.f);
+		BodyMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), 2.6f);
+		BodyMat->SetScalarParameterValue(TEXT("RimIntensity"), 1.6f);
+		BodyMat->SetScalarParameterValue(TEXT("AmbientFill"), 0.6f);
 		for (int32 i = 0; i < GetMesh()->GetNumMaterials(); ++i) GetMesh()->SetMaterial(i, BodyMat);
 	}
 
@@ -168,6 +170,12 @@ void AVahagnCharacter::InChargeRelease()
 void AVahagnCharacter::InBoostStart() { if (bControl) bBoosting = BoostEnergy > 8.f; }
 void AVahagnCharacter::InBoostStop() { bBoosting = false; }
 
+void AVahagnCharacter::SetMenuFraming(bool bMenu)
+{
+	Boom->SocketOffset = bMenu ? FVector(0.f, -330.f, 60.f) : FVector(0, 85.f, 110.f);
+	Boom->TargetArmLength = bMenu ? 640.f : 560.f;
+}
+
 void AVahagnCharacter::SetControlEnabled(bool bEnabled)
 {
 	bControl = bEnabled;
@@ -175,9 +183,39 @@ void AVahagnCharacter::SetControlEnabled(bool bEnabled)
 }
 
 // ---------------------------------------------------------------- tick
+void AVahagnCharacter::BeginBirth(const FVector& ReedTop, float Duration)
+{
+	BirthDur = FMath::Max(0.5f, Duration);
+	BirthLeft = BirthDur;
+	BirthStage = 0;
+	BirthFrom = ReedTop - FVector(0, 0, 900.f);
+	BirthTo = ReedTop + FVector(0, 0, 2200.f);
+	SetActorLocation(BirthFrom);
+	GetCharacterMovement()->StopMovementImmediately();
+	SetControlEnabled(false);
+	if (AController* C = GetController()) C->SetControlRotation(FRotator(-12.f, 205.f, 0.f));
+	if (Poser) Poser->SetLoop(AnimFly, 0.1f, 0.4f);
+	bFlyPose = true;
+}
+
 void AVahagnCharacter::Tick(float Dt)
 {
 	Super::Tick(Dt);
+	if (BirthLeft > 0.f)
+	{
+		BirthLeft -= Dt;
+		const float A = FMath::Clamp(1.f - BirthLeft / BirthDur, 0.f, 1.f);
+		const float E = A < 0.35f ? 0.f : FMath::InterpEaseOut(0.f, 1.f, (A - 0.35f) / 0.65f, 2.5f);
+		SetActorLocation(FMath::Lerp(BirthFrom, BirthTo, E));
+		// smoke from the reed, then flame, then the fire-youth bursts out of the sea
+		const FVector Reed = BirthFrom + FVector(0, 0, 900.f);
+		if (BirthStage == 0 && A > 0.02f) { BirthStage = 1; TwFx::Burst(GetWorld(), TwFx::EFx::Smoke, Reed, 3.f); TwFx::Sound2D(GetWorld(), TEXT("sfx_fire_breath"), 0.9f, 0.7f); }
+		if (BirthStage == 1 && A > 0.22f) { BirthStage = 2; TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, Reed, 2.5f); TwFx::LightFlash(GetWorld(), Reed, FLinearColor(1.f, 0.4f, 0.1f), 120000.f, 6000.f, 1.f); }
+		if (BirthStage == 2 && A > 0.36f) { BirthStage = 3; TwFx::Burst(GetWorld(), TwFx::EFx::BigExplosion, Reed, 4.f); TwFx::Burst(GetWorld(), TwFx::EFx::Splash, FVector(Reed.X, Reed.Y, 10.f), 5.f); TwFx::Sound2D(GetWorld(), TEXT("sfx_special_nova"), 1.f, 0.8f); }
+		if (BirthLeft <= 0.f) { BirthLeft = 0.f; if (Poser) Poser->SetLoop(AnimHover, 0.5f); bFlyPose = false; }
+		UpdateVisuals(Dt);
+		return;
+	}
 	if (bAutopilot && !bDead) UpdateAutopilot(Dt);
 	if (!bDead)
 	{
@@ -358,8 +396,8 @@ void AVahagnCharacter::UpdateVisuals(float Dt)
 	Glow->SetIntensity((7000.f + Charge * 14000.f) * Flicker * (bDead ? 0.2f : 1.f));
 	if (BodyMat)
 	{
-		BodyMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), 8.f * (1.f + Charge * 2.f) * Flicker);
-		BodyMat->SetScalarParameterValue(TEXT("HitFlash"), DamageFlash * 0.8f);
+		BodyMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), 2.6f * (1.f + Charge * 2.f) * Flicker);
+		BodyMat->SetScalarParameterValue(TEXT("HitFlash"), DamageFlash * 0.18f);
 	}
 	if (WindLoop) WindLoop->SetVolumeMultiplier(FMath::Clamp(Speed / 5600.f, 0.f, 1.f) * 0.6f);
 }

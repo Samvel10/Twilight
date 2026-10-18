@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "TwTestHarness.h"
 #include "HaykGameMode.generated.h"
 
 class AHaykArcher;
@@ -53,6 +54,7 @@ public:
 	void AimDelta(const FVector2D& Delta);
 	void DrawStart();
 	void DrawRelease();
+	void CancelDraw();
 	void ToggleSpecial();
 	void SteerArrow(const FVector2D& In);
 
@@ -61,7 +63,7 @@ public:
 	AHaykArcher* GetHayk() const { return Hayk; }
 	AHaykArcher* GetBel() const { return Bel; }
 	bool IsBelTurn() const { return bBelTurn; }
-	bool IsHumanTurn() const { return !bBelTurn || !bVsBot; }
+	bool IsHumanTurn() const { return !bAutoBoth && (!bBelTurn || !bVsBot); }
 	bool IsVsBot() const { return bVsBot; }
 	float GetPower() const { return Power; }
 	float GetTurnLeft() const { return TurnLeft; }
@@ -123,7 +125,10 @@ private:
 	FVector CamPos = FVector::ZeroVector;
 	FRotator CamRot = FRotator::ZeroRotator;
 	float Orbit = 0.f;
+	float CamFov = 72.f;
 
 	FText AnnTitle, AnnSub;
 	float AnnTime = -100.f;
+	FTwTestHarness Test;
+	bool bAutoBoth = false;
 };

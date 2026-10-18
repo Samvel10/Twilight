@@ -11,6 +11,7 @@
 #include "Engine/PointLight.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "TwFlash.h"
 
 namespace TwFx
 {
@@ -24,6 +25,18 @@ namespace TwFx
 	void Burst(UWorld* World, EFx Type, const FVector& Loc, float Scale, const FRotator& Rot)
 	{
 		if (!World) return;
+		// small hits and muzzle flashes: a single additive flash instead of a particle system (cheap on CPU/GPU)
+		if ((Type == EFx::FireballImpact && Scale < 1.2f) || Type == EFx::MuzzleFlash || (Type == EFx::Sparks && Scale < 0.8f))
+		{
+			FActorSpawnParameters P;
+			P.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			if (ATwFlash* F = World->SpawnActor<ATwFlash>(Loc, FRotator::ZeroRotator, P))
+			{
+				const FLinearColor C = Type == EFx::Sparks ? FLinearColor(1.f, 0.85f, 0.5f) : FLinearColor(1.f, 0.5f, 0.15f);
+				F->Init(C, (Type == EFx::MuzzleFlash ? 1.2f : 3.2f) * Scale, Type == EFx::MuzzleFlash ? 0.12f : 0.3f);
+			}
+			return;
+		}
 		const TCHAR* NsName = nullptr;
 		const TCHAR* Cascade = nullptr;
 		switch (Type)

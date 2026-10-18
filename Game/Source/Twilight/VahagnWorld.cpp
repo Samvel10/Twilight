@@ -17,6 +17,28 @@ void AVahagnWorld::BuildLevel()
 {
 	BuildSea();
 	BuildIslands();
+	// the crimson reed of the birth myth, standing out of the sea at the world centre
+	UMaterialInstanceDynamic* ReedMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_FireBody")), this);
+	if (ReedMat) { ReedMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), 3.f); ReedMat->SetVectorParameterValue(TEXT("SkinColor"), FLinearColor(0.25f, 0.01f, 0.02f)); }
+	const FVector Base(0.f, 0.f, -200.f);
+	for (int32 i = 0; i < 4; ++i)
+	{
+		UStaticMeshComponent* S = NewObject<UStaticMeshComponent>(this);
+		S->SetStaticMesh(i == 0 ? TwAssets::Cylinder() : TwAssets::Cone());
+		S->SetupAttachment(RootComponent);
+		S->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		S->RegisterComponent();
+		if (i == 0) { S->SetWorldLocation(Base + FVector(0, 0, 450.f)); S->SetWorldScale3D(FVector(0.3f, 0.3f, 9.f)); }
+		else
+		{
+			// long leaves
+			const float Yaw = i * 120.f;
+			S->SetWorldLocation(Base + FVector(0, 0, 250.f + i * 120.f) + FRotator(0, Yaw, 0).RotateVector(FVector(40.f, 0, 0)));
+			S->SetWorldRotation(FRotator(-25.f, Yaw, 0.f) + FRotator(0, 0, 0));
+			S->SetWorldScale3D(FVector(0.18f, 0.05f, 3.2f));
+		}
+		if (ReedMat) S->SetMaterial(0, ReedMat);
+	}
 }
 
 void AVahagnWorld::BuildSea()

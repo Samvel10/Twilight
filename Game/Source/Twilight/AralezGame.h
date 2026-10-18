@@ -4,6 +4,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/PlayerController.h"
 #include "Widgets/SCompoundWidget.h"
+#include "TwTestHarness.h"
 #include "AralezGame.generated.h"
 
 class AAralezSpirit;
@@ -42,7 +43,7 @@ public:
 	bool GetAnnouncement(FText& Title, FText& Sub, float& Age) const;
 	int32 GetZone() const { return Zone; }
 
-	static constexpr float RaceLength = 360.f;
+	static constexpr float RaceLength = 300.f;
 
 private:
 	void SpawnLightsAndWraiths();
@@ -60,8 +61,10 @@ private:
 	int32 Finished = 0;
 	int32 Zone = 0;
 	TMap<const AAralezSpirit*, int32> FinishBonus;
+	TMap<const AAralezSpirit*, int32> FrozenScore;
 	FText AnnTitle, AnnSub;
 	float AnnTime = -100.f;
+	FTwTestHarness Test;
 };
 
 UENUM()

@@ -28,8 +28,10 @@ struct FTwSkyPreset
 	float FogDensity = 0.012f;
 	float FogFalloff = 0.08f;
 	float FogStart = 4500.f;
-	float Exposure = 11.5f;
+	float Exposure = 0.f;
 	FLinearColor EmberColor = FLinearColor(1.f, 0.42f, 0.12f);
+	/** Embers below this Z are mirrored above it (sea level). Lowest() disables it (caves). */
+	float EmberFloorZ = TNumericLimits<float>::Lowest();
 	FVector4 GainShadows = FVector4(0.95f, 0.85f, 1.15f, 1.f);
 	FVector4 GainHighlights = FVector4(1.08f, 0.98f, 0.9f, 1.f);
 	float SkyLightIntensity = 1.2f;
@@ -80,6 +82,7 @@ private:
 
 	TArray<FVector> EmberPos;
 	TArray<float> EmberSize;
+	float EmberFloorZ = TNumericLimits<float>::Lowest();
 	float SkyRecaptureTimer = 0.3f;
 	int32 SkyCaptures = 0;
 	bool bMusicA = true;

@@ -40,3 +40,34 @@ The audio subagent wrote this log for the Vahagn audio work. Each step lists wha
 Blocked or not done:
 - No human listening was possible. Quality was judged from spectrograms and numeric analysis only.
 - The UE import has not been run.
+
+# Chapters 2 «Hayk» + 3 «Aralez» audio (subagent, 2026-10-18 21:28–21:40)
+
+12. **21:28 Read the chapter-1 toolkit** (`dsp.py`, `gen_sfx.py`, `gen_music.py`, `analyze.py`, README, this log). Decided to import it rather than copy it: `gs.finish` / `gs.finish_loop` / `gs.glottal_roar` / `gs.choir`, and `gm.Track` / `add_reed` / `dhol_*` / `taiko` / `daf` / `choir` / `string_note` / `mixdown`.
+13. **21:30 Wrote `src/gen_chapters23.py`.**
+    - New: IFFT "spectral additive" oscillators (`ifft_partials`, `brass`, `ifft_drone`, `pad_chord`), so drones and pads are loop-periodic and cheap. The UE build was using all cores (load about 11.5).
+    - Also new: a deterministic glass `bell()`, `davul_dum()`, `drip()` and the stereo-safe `finish_loop_st()`.
+    - Reed ornaments follow each track's own mode via `gm.SCALE`: A Phrygian for Hayk, D double-harmonic for Aralez.
+14. **21:31 First SFX render.** Ran `OMP_NUM_THREADS=1 nice -n 15 python3 gen_chapters23.py sfx_`. It took about 10 s and wrote all 13 SFX. Every duration was exact and every peak was -1 dBFS or lower.
+15. **21:32 Music render** (in the background, nice 15, single-threaded): about 2.5 min for both loops.
+16. **21:33 Spectrogram and band-energy review** (scratch script, not kept). Fixes:
+    - **bow_release:** the twang was too bright and buzzy. Fix: excitation low-passed, damping 0.5, a moving SVF low-pass so the highs die first, and a lighter limb thump.
+    - **wraith_hiss:** not dark enough. Fix: sibilance halved, overall low-pass at 6 kHz, growl louder.
+    - **bow_draw:** the creak was continuous. Fix: sparser gating.
+    - **war_drums_loop:** 100–400 Hz sat 11 dB under the sub. Fix: +5 dB at 190 Hz, +3 dB at 2.5 kHz and a -4 dB low shelf, so the drums read on laptop speakers.
+    - **flesh/ground hits:** the thump fundamental was raised to 58–64 Hz.
+    - **cave drips:** shorter, and the reverb wet was cut from 0.7 to 0.45.
+17. **21:36 Fixed `music_hayk`.** In the mono sum its intro showed a comb-filter pattern. The cause was brass fed as `[br, roll(br, 37)]`. It is now mono-centred, and the stereo reverb gives the width. Re-rendered in about 78 s.
+18. **21:38 Verification.**
+    - `gen_chapters23.py --verify` and `analyze.py`: ALL CHECKS PASSED, across all 35 files.
+    - New files: 0 clipped samples, DC at most 2.6e-4, durations exact, loop seams 0.03–0.42x (analyze.py metric).
+    - `ffmpeg ebur128`: music_hayk I = -14.0 LUFS (peak -1.5), music_aralez -14.0 LUFS (peak -6.0).
+19. **21:39 Docs.**
+    - README: new section with a table of 15 files, plus updated folder and regeneration notes.
+    - `run_all.sh` now runs `gen_chapters23.py`.
+    - CREDITS: chapters 2–3 are fully procedural, with no downloads.
+    - `ue_import_audio.py` scans the folders, so the new files, and the loop flags for `*_loop` and `music_*`, are covered without changes.
+
+Not done or blocked:
+- No human listening was possible. Quality was judged from spectrograms and numeric analysis only.
+- No UE import was run. Nothing under `Game/` was touched.

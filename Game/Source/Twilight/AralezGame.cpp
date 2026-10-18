@@ -28,6 +28,7 @@
 #include "Styling/CoreStyle.h"
 #include "Framework/Application/SlateApplication.h"
 #include "EngineUtils.h"
+#include "Misc/App.h"
 
 #define LOCTEXT_NAMESPACE "Aralez"
 
@@ -48,7 +49,8 @@ void AAralezGameMode::StartPlay()
 	P.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	World = GetWorld()->SpawnActor<AAralezWorld>(FVector::ZeroVector, FRotator::ZeroRotator, P);
 	Super::StartPlay();
-	if (UGameplayStatics::HasOption(OptionsString, TEXT("TwStart"))) StartRace();
+	if (Test.Init()) { if (PlayerSpirit) PlayerSpirit->SetBotDriven(true); StartRace(); }
+	else if (UGameplayStatics::HasOption(OptionsString, TEXT("TwStart"))) StartRace();
 }
 
 void AAralezGameMode::RestartPlayer(AController* NewPlayer)
@@ -92,9 +94,9 @@ void AAralezGameMode::SpawnLightsAndWraiths()
 	FActorSpawnParameters S;
 	S.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	// clusters of lights along the whole descent
-	for (int32 c = 0; c < 44; ++c)
+	for (int32 c = 0; c < 62; ++c)
 	{
-		const float T = 0.03f + 0.95f * c / 44.f + R.FRandRange(-0.006f, 0.006f);
+		const float T = 0.03f + 0.95f * c / 62.f + R.FRandRange(-0.006f, 0.006f);
 		const FVector P = AAralezWorld::PathPoint(T);
 		const FVector Fwd = AAralezWorld::PathTangent(T);
 		const FVector Right = FVector::CrossProduct(FVector::UpVector, Fwd).GetSafeNormal();
@@ -125,7 +127,8 @@ void AAralezGameMode::StartRace()
 	State = EAralezState::Intro;
 	IntroLeft = 3.f;
 	TimeLeft = RaceLength;
-	if (World) World->PlayMusic(TEXT("music_battle"));
+	if (World) World->PlayMusic(TEXT("music_aralez"));
+	TwFx::Sound2D(GetWorld(), TEXT("sfx_cave_ambience_loop"), 0.6f);
 	Announce(LOCTEXT("Intro", "Իջի՛ր խորքերը"), LOCTEXT("IntroSub", "Հավաքի՛ր Արայի հոգու լույսերը և հասի՛ր անդունդի դարպասին"));
 	if (AAralezController* PC = Cast<AAralezController>(UGameplayStatics::GetPlayerController(this, 0))) PC->SetScreen(EAralezScreen::None);
 }
@@ -136,6 +139,7 @@ void AAralezGameMode::ToMenu() { UGameplayStatics::OpenLevel(this, FName(*UGamep
 int32 AAralezGameMode::ScoreOf(const AAralezSpirit* S) const
 {
 	if (!S) return 0;
+	if (const int32* F = FrozenScore.Find(S)) return *F;
 	const int32* B = FinishBonus.Find(S);
 	return S->GetLights() + (B ? *B : 0);
 }
@@ -157,6 +161,7 @@ int32 AAralezGameMode::RankOf(const AAralezSpirit* S) const
 void AAralezGameMode::EndRace()
 {
 	if (State == EAralezState::End) return;
+	for (AAralezSpirit* S : Racers) FrozenScore.Add(S, ScoreOf(S));
 	State = EAralezState::End;
 	for (AAralezSpirit* S : Racers) S->SetControlEnabled(false);
 	const bool bWin = DidPlayerWin();
@@ -166,6 +171,7 @@ void AAralezGameMode::EndRace()
 	{
 		// Ara returns: a pillar of light from the gate
 		const FVector G = World->GetGate();
+		TwFx::Sound2D(GetWorld(), TEXT("sfx_gate_open"), 1.f);
 		for (int32 i = 0; i < 8; ++i) TwFx::Burst(GetWorld(), TwFx::EFx::Nova, G + FVector(0, 0, i * 900.f), 4.f);
 		TwFx::LightFlash(GetWorld(), G, FLinearColor(1.f, 0.85f, 0.55f), 600000.f, 20000.f, 4.f);
 	}
@@ -175,6 +181,10 @@ void AAralezGameMode::EndRace()
 void AAralezGameMode::Tick(float Dt)
 {
 	Super::Tick(Dt);
+	if (Test.IsActive())
+	{
+		Test.Tick(GetWorld(), FApp::GetDeltaTime(), FString::Printf(TEXT("state=%d time=%.0f zone=%d player_t=%.3f lights=%d rank=%d"), (int32)State, TimeLeft, Zone, PlayerSpirit ? PlayerSpirit->GetProgress() : -1.f, PlayerSpirit ? PlayerSpirit->GetLights() : -1, RankOf(PlayerSpirit)), TEXT("Aralez"));
+	}
 	switch (State)
 	{
 	case EAralezState::Intro:
@@ -430,7 +440,7 @@ int32 SAralezHud::OnPaint(const FPaintArgs& Args, const FGeometry& Geo, const FS
 		{
 			const FVector2D P(40 * S, (40 + i * 46) * S);
 			const FLinearColor Col = R[i]->GetColor();
-			Text(Out, L + 4, Geo, P, FText::FromString(FString::Printf(TEXT("%d. %s  ✦ %d"), i + 1, *R[i]->GetRacerName().ToString(), GM->ScoreOf(R[i]))), TwAssets::Font((R[i] == Me ? 20 : 17) * S, false, true), Col);
+			Text(Out, L + 4, Geo, P, FText::FromString(FString::Printf(TEXT("%d. %s  ·  %d"), i + 1, *R[i]->GetRacerName().ToString(), GM->ScoreOf(R[i]))), TwAssets::Font((R[i] == Me ? 20 : 17) * S, false, true), Col);
 			Bar(Out, L + 4, Geo, P + FVector2D(0, 30 * S), FVector2D(220 * S, 5 * S), R[i]->GetProgress(), Col, FLinearColor(1, 1, 1, 0.6f));
 		}
 		if (Me)

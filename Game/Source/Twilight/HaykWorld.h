@@ -17,8 +17,8 @@ public:
 	static float TerrainZ(float X, float Y);
 	void SetNight(bool bInNight) { bNight = bInNight; }
 
-	static constexpr float HaykX = -3800.f;
-	static constexpr float BelX = 3800.f;
+	static constexpr float HaykX = -2700.f;
+	static constexpr float BelX = 2700.f;
 
 protected:
 	virtual FTwSkyPreset GetSkyPreset() const override;

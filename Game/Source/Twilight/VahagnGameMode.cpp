@@ -116,9 +116,10 @@ void AVahagnGameMode::StartMatch()
 	Kills = 0;
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
 	if (AVahagnPlayerController* PC = Cast<AVahagnPlayerController>(UGameplayStatics::GetPlayerController(this, 0))) PC->OnMatchStarted();
-	if (AVahagnCharacter* H = Hero()) H->SetControlEnabled(true);
+	IntroLeft = 4.2f;
+	if (AVahagnCharacter* H = Hero()) { if (AutoTestSeconds > 0.f) { IntroLeft = 1.f; H->SetControlEnabled(true); } else H->BeginBirth(FVector(0.f, 0.f, 700.f), IntroLeft); }
 	if (World) World->PlayMusic(TEXT("music_battle"));
-	Announce(LOCTEXT("Ready", "Պատրաստվի՛ր"), LOCTEXT("ReadySub", "Վիշապները բարձրանում են ծովի խորքից"));
+	Announce(LOCTEXT("Ready", "«Երկնէր երկին, երկնէր երկիր, երկնէր և ծովն ծիրանի…»"), LOCTEXT("ReadySub", "Ծիրանի ծովի եղեգից ծնվում է Վահագնը"));
 }
 
 void AVahagnGameMode::RestartMatch()
@@ -143,17 +144,17 @@ void AVahagnGameMode::BeginWave(int32 Index)
 	{
 	case 1:
 		Announce(LOCTEXT("W1", "Ալիք 1"), LOCTEXT("W1s", "Երեք վիշապ բարձրանում է ծիրանի ծովից"));
-		for (int32 i = 0; i < 3; ++i) SpawnVishap(false, 0, 7500.f, Base + i * 120.f);
+		for (int32 i = 0; i < 4; ++i) SpawnVishap(false, 0, 7500.f, Base + i * 90.f);
 		break;
 	case 2:
 		Announce(LOCTEXT("W2", "Ալիք 2"), LOCTEXT("W2s", "Կարմիր վիշապը ավելի արագ է"));
-		for (int32 i = 0; i < 3; ++i) SpawnVishap(false, 0, 8000.f, Base + i * 90.f);
-		SpawnVishap(false, 1, 9000.f, Base + 270.f);
+		for (int32 i = 0; i < 4; ++i) SpawnVishap(false, 0, 8000.f, Base + i * 72.f);
+		SpawnVishap(false, 1, 9000.f, Base + 288.f);
 		break;
 	case 3:
 		Announce(LOCTEXT("W3", "Ալիք 3"), LOCTEXT("W3s", "Ծովը եռում է"));
-		for (int32 i = 0; i < 3; ++i) SpawnVishap(false, 0, 8000.f, Base + i * 72.f);
-		SpawnVishap(false, 1, 9000.f, Base + 216.f);
+		for (int32 i = 0; i < 4; ++i) SpawnVishap(false, 0, 8000.f, Base + i * 60.f);
+		SpawnVishap(false, 1, 9000.f, Base + 240.f);
 		SpawnVishap(false, 1, 9000.f, Base + 288.f);
 		break;
 	default:
@@ -253,7 +254,7 @@ void AVahagnGameMode::Tick(float Dt)
 	{
 	case EVahagnMatch::Intro:
 		IntroLeft -= Dt;
-		if (IntroLeft <= 0.f) { MatchState = EVahagnMatch::Playing; BeginWave(1); }
+		if (IntroLeft <= 0.f) { MatchState = EVahagnMatch::Playing; if (AVahagnCharacter* H = Hero()) H->SetControlEnabled(true); BeginWave(1); }
 		break;
 	case EVahagnMatch::Playing:
 	{
@@ -268,7 +269,7 @@ void AVahagnGameMode::Tick(float Dt)
 		if (!bBossSpawned)
 		{
 			const bool bCleared = Alive == 0;
-			const bool bOverdue = WaveTime > 95.f;
+			const bool bOverdue = WaveTime > 110.f;
 			if ((bCleared || bOverdue) && NextWaveDelay < 0.f) NextWaveDelay = bCleared ? 3.5f : 0.f;
 			if (NextWaveDelay >= 0.f)
 			{
@@ -305,10 +306,11 @@ void AVahagnGameMode::TickAutoTest(float RealDt)
 	if (StatTimer >= 10.f)
 	{
 		StatTimer = 0.f;
-		float Sum = 0.f; for (float F : FrameTimes) Sum += F;
-		const int32 N = FMath::Max(1, FrameTimes.Num());
-		UE_LOG(LogTwilight, Display, TEXT("[TwTest] t=%.0f fps=%.1f state=%d wave=%d alive=%d hp=%.0f score=%d kills=%d"),
-			AutoTestElapsed, N / FMath::Max(Sum, 0.001f), (int32)MatchState, Wave, AliveVishaps(), H ? H->GetHealth() : -1.f, Score, Kills);
+		float Sum = 0.f; int32 N = 0;
+		for (int32 i = FrameTimes.Num() - 1; i >= 0 && Sum < 10.f; --i) { Sum += FrameTimes[i]; ++N; }
+		N = FMath::Max(1, N);
+		UE_LOG(LogTwilight, Display, TEXT("[TwTest] t=%.0f fps=%.1f actors=%d state=%d wave=%d alive=%d hp=%.0f score=%d kills=%d"),
+			AutoTestElapsed, N / FMath::Max(Sum, 0.001f), GetWorld()->GetActorCount(), (int32)MatchState, Wave, AliveVishaps(), H ? H->GetHealth() : -1.f, Score, Kills);
 	}
 	if (AutoShotTimer >= 15.f)
 	{

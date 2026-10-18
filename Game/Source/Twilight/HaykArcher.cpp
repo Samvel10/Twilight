@@ -104,7 +104,7 @@ void AHaykArcher::BeginPlay()
 	{
 		BodyMat->SetVectorParameterValue(TEXT("SkinColor"), bBel ? FLinearColor(0.025f, 0.02f, 0.02f) : FLinearColor(0.32f, 0.17f, 0.07f));
 		BodyMat->SetVectorParameterValue(TEXT("VeinColor"), bBel ? FLinearColor(1.f, 0.08f, 0.02f) : FLinearColor(1.f, 0.7f, 0.25f));
-		BodyMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBel ? 4.f : 1.2f);
+		BodyMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBel ? 4.f : 1.2f); BodyMat->SetScalarParameterValue(TEXT("RimIntensity"), 0.35f); BodyMat->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(1.f, 0.55f, 0.25f));
 		BodyMat->SetScalarParameterValue(TEXT("Metallic"), 0.6f);
 		for (int32 i = 0; i < Body->GetNumMaterials(); ++i) Body->SetMaterial(i, BodyMat);
 	}
@@ -204,7 +204,7 @@ void AHaykArcher::BuildBow()
 	{
 		Wood->SetVectorParameterValue(TEXT("SkinColor"), bBel ? FLinearColor(0.05f, 0.03f, 0.02f) : FLinearColor(0.22f, 0.1f, 0.04f));
 		Wood->SetVectorParameterValue(TEXT("VeinColor"), bBel ? FLinearColor(1.f, 0.1f, 0.02f) : FLinearColor(1.f, 0.75f, 0.3f));
-		Wood->SetScalarParameterValue(TEXT("VeinIntensity"), 1.5f);
+		Wood->SetScalarParameterValue(TEXT("VeinIntensity"), 1.5f); Wood->SetScalarParameterValue(TEXT("RimIntensity"), 0.35f); Wood->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(1.f, 0.55f, 0.25f));
 		Bow->SetMaterial(0, Wood);
 	}
 }
@@ -240,7 +240,8 @@ void AHaykArcher::Release()
 	Draw = 0.f;
 	NockedArrow->SetVisibility(false);
 	if (Poser && AnimShoot) Poser->PlayOneShot(AnimShoot, 1.f, 0.05f, 0.25f, 0.7f);
-	TwFx::Sound(GetWorld(), TEXT("sfx_boost"), GetArrowSpawn(), 0.8f, 1.5f);
+	TwFx::Sound(GetWorld(), TEXT("sfx_bow_release"), GetArrowSpawn(), 1.f, bBel ? 0.8f : 1.f);
+	TwFx::Sound(GetWorld(), TEXT("sfx_arrow_whoosh"), GetArrowSpawn(), 0.7f);
 }
 
 FVector AHaykArcher::GetArrowSpawn() const

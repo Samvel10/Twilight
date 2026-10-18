@@ -16,6 +16,7 @@ public:
 
 protected:
 	virtual void BuildLevel() override;
+	virtual FTwSkyPreset GetSkyPreset() const override { FTwSkyPreset P; P.EmberFloorZ = 60.f; return P; }
 
 private:
 	void BuildSea();

@@ -14,6 +14,9 @@
 #include "Camera/PlayerCameraManager.h"
 #include "Sound/SoundBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/Engine.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 
 ATwEnvironment::ATwEnvironment()
 {
@@ -47,7 +50,9 @@ ATwEnvironment::ATwEnvironment()
 void ATwEnvironment::BeginPlay()
 {
 	Super::BeginPlay();
+	if (GEngine) GEngine->bEnableOnScreenDebugMessages = false; // no debug text over the presentation
 	const FTwSkyPreset P = GetSkyPreset();
+	EmberFloorZ = P.EmberFloorZ;
 	BuildSky(P);
 	BuildLevel();
 	BuildEmbers(P.EmberColor);
@@ -90,6 +95,7 @@ void ATwEnvironment::BuildSky(const FTwSkyPreset& S)
 	Sun->SetBloomTint(FColor(255, 150, 90));
 
 	// cool purple rim light from the opposite side (the "night" half of the sky)
+	Sun->SetForwardShadingPriority(1);
 	Moon->SetMobility(EComponentMobility::Movable);
 	Moon->SetWorldRotation(S.MoonRot);
 	Moon->SetIntensity(S.MoonIntensity);
@@ -129,6 +135,7 @@ void ATwEnvironment::BuildSky(const FTwSkyPreset& S)
 	FPostProcessSettings& P = Post->Settings;
 	P.bOverride_AutoExposureMethod = true; P.AutoExposureMethod = EAutoExposureMethod::AEM_Manual;
 	P.bOverride_AutoExposureBias = true; P.AutoExposureBias = S.Exposure;
+	{ float Ov = 0.f; if (FParse::Value(FCommandLine::Get(), TEXT("TwExposure="), Ov)) P.AutoExposureBias = Ov; }
 	P.bOverride_AutoExposureApplyPhysicalCameraExposure = true; P.AutoExposureApplyPhysicalCameraExposure = false;
 	P.bOverride_BloomIntensity = true; P.BloomIntensity = 1.35f;
 	P.bOverride_BloomThreshold = true; P.BloomThreshold = 1.2f;
@@ -278,7 +285,7 @@ void ATwEnvironment::UpdateEmbers(float Dt)
 			if (D[a] > Box) P[a] -= 2.f * Box; else if (D[a] < -Box) P[a] += 2.f * Box;
 		}
 		FVector W = P;
-		if (W.Z < 60.f) W.Z = 60.f + FMath::Abs(W.Z);
+		if (W.Z < EmberFloorZ) W.Z = EmberFloorZ + (EmberFloorZ - W.Z);
 		const float Flick = 0.75f + 0.25f * FMath::Sin(T * (3.f + (i % 5)) + i);
 		Tr[i] = FTransform(FRotator::ZeroRotator, W, FVector(EmberSize[i] * Flick));
 	}

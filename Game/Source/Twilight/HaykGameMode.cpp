@@ -120,7 +120,12 @@ void AHaykGameMode::StartPlay()
 	{
 		PC->SetViewTarget(Cam);
 	}
-	if (UGameplayStatics::HasOption(OptionsString, TEXT("TwStart")))
+	if (Test.Init())
+	{
+		bAutoBoth = true;
+		StartDuel(true);
+	}
+	else if (UGameplayStatics::HasOption(OptionsString, TEXT("TwStart")))
 	{
 		StartDuel(UGameplayStatics::GetIntOption(OptionsString, TEXT("TwStart"), 1) == 1);
 	}
@@ -152,7 +157,8 @@ void AHaykGameMode::StartDuel(bool bInVsBot)
 	bBelTurn = true; // BeginTurn flips to Hayk first
 	State = EHaykState::Intro;
 	StateTime = 0.f;
-	if (World) World->PlayMusic(TEXT("music_battle"));
+	if (World) World->PlayMusic(TEXT("music_hayk"));
+	TwFx::Sound2D(GetWorld(), TEXT("sfx_war_drums_loop"), 0.5f);
 	Announce(LOCTEXT("Intro", "Հայոց ձոր"), LOCTEXT("IntroSub", "Հայկը կանգնեց Բելի դեմ։ Մեկ նետ կարող է որոշել ազգի ճակատագիրը։"));
 	if (AHaykPlayerController* PC = Cast<AHaykPlayerController>(UGameplayStatics::GetPlayerController(this, 0))) PC->OnDuelStarted();
 }
@@ -224,6 +230,7 @@ void AHaykGameMode::DrawStart()
 	if (State != EHaykState::Aim || !IsHumanTurn()) return;
 	bDrawing = true;
 	Power = 0.f;
+	if (Shooter()) TwFx::Sound(GetWorld(), TEXT("sfx_bow_draw"), Shooter()->GetArrowSpawn(), 0.9f);
 }
 
 void AHaykGameMode::DrawRelease()
@@ -232,6 +239,14 @@ void AHaykGameMode::DrawRelease()
 	bDrawing = false;
 	if (Power < 0.12f) { Power = 0.f; if (Shooter()) Shooter()->SetDraw(0.f); return; }
 	Shoot(Power);
+}
+
+void AHaykGameMode::CancelDraw()
+{
+	if (State != EHaykState::Aim || !IsHumanTurn()) return;
+	bDrawing = false;
+	Power = 0.f;
+	if (AHaykArcher* S = Shooter()) S->SetDraw(0.f);
 }
 
 void AHaykGameMode::ToggleSpecial()
@@ -281,7 +296,7 @@ void AHaykGameMode::Shoot(float InPower)
 void AHaykGameMode::FinishImpact()
 {
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
-	if (Hayk && Hayk->IsDead() || Bel && Bel->IsDead())
+	if ((Hayk && Hayk->IsDead()) || (Bel && Bel->IsDead()))
 	{
 		bHaykWon = Bel && Bel->IsDead();
 		State = EHaykState::End;
@@ -300,8 +315,8 @@ void AHaykGameMode::FinishImpact()
 void AHaykGameMode::SolveBot()
 {
 	// search pitch/yaw/power that brings the arrow closest to Hayk's chest, then add human-like error
-	AHaykArcher* S = Bel;
-	AHaykArcher* T = Hayk;
+	AHaykArcher* S = Shooter();
+	AHaykArcher* T = Target();
 	if (!S || !T) return;
 	const FVector Start = S->GetArrowSpawn();
 	const FVector Aim = FMath::FRand() < 0.18f + 0.1f * Difficulty ? T->GetHeadTarget() : T->GetChestTarget();
@@ -322,7 +337,7 @@ void AHaykGameMode::SolveBot()
 		}
 	}
 	// error shrinks after misses (Bel "learns" the wind)
-	const float Sigma[3] = { 2.4f, 1.25f, 0.55f };
+	const float Sigma[3] = { 1.3f, 0.7f, 0.32f };
 	const float Err = Sigma[Difficulty] * FMath::Pow(0.72f, (float)BotMisses);
 	BotPitch += FMath::FRandRange(-1.f, 1.f) * Err;
 	BotYaw += FMath::FRandRange(-1.f, 1.f) * Err;
@@ -331,24 +346,26 @@ void AHaykGameMode::SolveBot()
 
 void AHaykGameMode::ThinkBot(float Dt)
 {
-	if (!Bel) return;
+	AHaykArcher* Me = Shooter();
+	if (!Me) return;
 	BotTimer += Dt;
 	if (!bBotSolved && BotTimer > 0.6f) SolveBot();
 	if (!bBotSolved) return;
 	// smooth aim toward the solution, then draw and release
 	const float A = FMath::Clamp((BotTimer - 0.6f) / 1.3f, 0.f, 1.f);
 	const float Sm = A * A * (3.f - 2.f * A);
-	const float Yaw = FMath::Lerp(BaseYawFor(Bel), BotYaw, Sm);
+	const float Yaw = FMath::Lerp(BaseYawFor(Me), BotYaw, Sm);
 	const float Pitch = FMath::Lerp(5.f, BotPitch, Sm);
-	Bel->SetAim(Yaw, Pitch);
+	Me->SetAim(Yaw, Pitch);
 	if (BotTimer > 1.9f)
 	{
 		Power = FMath::Clamp((BotTimer - 1.9f) / 0.9f, 0.f, 1.f) * BotPower;
-		Bel->SetDraw(Power);
+		Me->SetDraw(Power);
 		if (BotTimer > 2.9f)
 		{
 			// Bel uses his special when he is losing
-			bSpecialArmed = SpecialsBel > 0 && Bel->GetHealth() < Bel->GetMaxHealth() * 0.45f && FMath::FRand() < 0.6f;
+			int32& Spec = bBelTurn ? SpecialsBel : SpecialsHayk;
+			bSpecialArmed = Spec > 0 && Me->GetHealth() < Me->GetMaxHealth() * 0.45f && FMath::FRand() < 0.6f;
 			Shoot(BotPower);
 		}
 	}
@@ -379,6 +396,11 @@ void AHaykGameMode::Tick(float Dt)
 	Super::Tick(Dt);
 	StateTime += Dt;
 	const float RealDt = FApp::GetDeltaTime();
+	if (Test.IsActive())
+	{
+		Test.Tick(GetWorld(), RealDt, FString::Printf(TEXT("state=%d turn=%d hayk=%.0f bel=%.0f hits=%d/%d"), (int32)State, Turn, Hayk ? Hayk->GetHealth() : -1.f, Bel ? Bel->GetHealth() : -1.f, HitsHayk, HitsBel), TEXT("Hayk"));
+		if (State == EHaykState::End && StateTime > 6.f) StartDuel(true);
+	}
 
 	switch (State)
 	{
@@ -429,13 +451,22 @@ void AHaykGameMode::Tick(float Dt)
 				UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.22f);
 			}
 		}
+		else if (bSlowMo && A->GetResult() == EArrowResult::Flying && Target())
+		{
+			// the arrow flew past: back to normal speed
+			if (FVector::DotProduct(Target()->GetChestTarget() - A->GetActorLocation(), A->GetVelocity()) < 0.f)
+			{
+				bSlowMo = false;
+				UGameplayStatics::SetGlobalTimeDilation(GetWorld(), A->IsSpecial() && IsHumanTurn() ? 0.4f : 1.f);
+			}
+		}
 		if (A->GetResult() != EArrowResult::Flying)
 		{
 			State = EHaykState::Impact;
 			StateTime = 0.f;
 			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), A->GetResult() == EArrowResult::HitArcher ? 0.35f : 1.f);
 			const bool bByBel = bBelTurn;
-			if (A->GetResult() == EArrowResult::HitArcher)
+			if (A->GetResult() == EArrowResult::HitArcher && A->GetHitArcher() == Target())
 			{
 				int32& Hits = bByBel ? HitsBel : HitsHayk;
 				int32& Heads = bByBel ? HeadsBel : HeadsHayk;
@@ -445,6 +476,7 @@ void AHaykGameMode::Tick(float Dt)
 				if (A->WasHeadshot()) ++Heads;
 				if (Streak % 2 == 0) Spec = FMath::Min(2, Spec + 1);
 				if (bByBel) BotMisses = 0;
+				TwFx::Sound2D(GetWorld(), TEXT("sfx_crowd_cheer"), 0.55f, bByBel ? 0.85f : 1.f);
 				Announce(A->WasHeadshot() ? LOCTEXT("Head", "Գլխին") : LOCTEXT("Hit", "Դիպուկ է"), FText::Format(LOCTEXT("Dmg", "−{0}"), FText::AsNumber(FMath::RoundToInt(A->GetDamageDealt()))));
 			}
 			else
@@ -471,6 +503,7 @@ void AHaykGameMode::UpdateCamera(float Dt)
 	FVector WantPos = CamPos;
 	FRotator WantRot = CamRot;
 	float Speed = 4.f;
+	float WantFov = 72.f;
 	Orbit += Dt;
 
 	auto OverShoulder = [](AHaykArcher* S, float Back, float Side, float Up, FVector& OutPos, FRotator& OutRot)
@@ -501,12 +534,14 @@ void AHaykGameMode::UpdateCamera(float Dt)
 		break;
 	}
 	case EHaykState::Aim:
-		if (AHaykArcher* S = Shooter()) OverShoulder(S, 330.f, 85.f, 185.f, WantPos, WantRot);
+		if (AHaykArcher* S = Shooter()) OverShoulder(S, 300.f, 80.f, 175.f, WantPos, WantRot);
 		Speed = 6.f;
+		WantFov = 52.f;
 		break;
 	case EHaykState::Flight:
 		if (AHaykArrow* A = Arrow.Get())
 		{
+			if (FMath::Abs(A->GetActorLocation().X) > AHaykWorld::BelX + 900.f) { WantPos = CamPos; WantRot = (A->GetActorLocation() - CamPos).Rotation(); Speed = 6.f; break; }
 			const FVector V = A->GetVelocity().GetSafeNormal();
 			const FVector Side = FVector::CrossProduct(FVector::UpVector, V).GetSafeNormal();
 			WantPos = A->GetActorLocation() - V * 380.f + FVector(0, 0, 70.f) + Side * 40.f;
@@ -540,6 +575,8 @@ void AHaykGameMode::UpdateCamera(float Dt)
 	}
 	}
 	if (CamPos.IsNearlyZero()) { CamPos = WantPos; CamRot = WantRot; }
+	CamFov = FMath::FInterpTo(CamFov, WantFov, Dt, 3.f);
+	Cam->GetCameraComponent()->SetFieldOfView(CamFov);
 	CamPos = FMath::VInterpTo(CamPos, WantPos, Dt, Speed);
 	CamRot = FMath::RInterpTo(CamRot, WantRot, Dt, Speed);
 	Cam->SetActorLocationAndRotation(CamPos, CamRot);

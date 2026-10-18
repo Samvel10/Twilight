@@ -151,8 +151,7 @@ void AVahagnPlayerController::BeginPlay()
 	SetScreen(bMenu ? EVahagnScreen::Menu : EVahagnScreen::None);
 	if (bMenu)
 	{
-		if (AVahagnCharacter* H = Hero()) H->SetControlEnabled(false);
-		if (GM && GetWorld()) {}
+		if (AVahagnCharacter* H = Hero()) { H->SetControlEnabled(false); H->SetMenuFraming(true); }
 	}
 }
 
@@ -194,11 +193,12 @@ void AVahagnPlayerController::PlayerTick(float Dt)
 	if (Screen == EVahagnScreen::Menu || Screen == EVahagnScreen::Controls)
 	{
 		MenuOrbit += Dt * 6.f;
+		if (AVahagnCharacter* H = Hero()) { H->SetMenuFraming(true); H->SetControlEnabled(false); }
 		SetControlRotation(FRotator(-8.f + 4.f * FMath::Sin(MenuOrbit * 0.05f), 200.f + MenuOrbit, 0.f));
 	}
 }
 
-void AVahagnPlayerController::OnMatchStarted() { SetScreen(EVahagnScreen::None); }
+void AVahagnPlayerController::OnMatchStarted() { SetScreen(EVahagnScreen::None); if (AVahagnCharacter* H = Hero()) H->SetMenuFraming(false); }
 void AVahagnPlayerController::OnMatchEnded(bool bWin) { bVictory = bWin; SetScreen(EVahagnScreen::End); }
 
 void AVahagnPlayerController::UiPlay()

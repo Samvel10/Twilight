@@ -1,0 +1,274 @@
+Opening shared memory
+Shared memory doesn't exist, checking legacy lock file
+Checking for a '/tmp/UnrealTraceServer.pid' lock file
+Forking process
+Wait until we know the daemon has started.
+Parent received signal 10
+Daemon signalled successful start
+Forked complete (ret=0)
+- Existing per-process limit (soft=1048576, hard=1048576) is enough for us (need only 1048576)
+Increasing per-process limit of core file size to infinity.
+LogInit: Display: Running engine for game: TwilightAssets
+LogCore: Display: Requested channels: 'cpu,gpu,frame,log,bookmark,screenshot,region'
+LogTrace: Display: Control listening on port 1985
+LogCsvProfiler: Display: Metadata set : platform="Linux"
+LogCsvProfiler: Display: Metadata set : config="Development"
+LogCsvProfiler: Display: Metadata set : buildversion="UE5-CL-0"
+LogCsvProfiler: Display: Metadata set : engineversion="5.8.2-0+UE5"
+LogCsvProfiler: Display: Metadata set : enginereleaseversion="5.8.2"
+LogCsvProfiler: Display: Metadata set : os="Ubuntu 24.04.2 LTS 7.0.0-38-generic"
+LogCsvProfiler: Display: Metadata set : cpu="GenuineIntel|13th Gen Intel(R) Core(TM) i7-13700H"
+LogCsvProfiler: Display: Metadata set : pgoenabled="0"
+LogCsvProfiler: Display: Metadata set : pgoprofilingenabled="0"
+LogCsvProfiler: Display: Metadata set : ltoenabled="0"
+LogCsvProfiler: Display: Metadata set : asan="0"
+LogCsvProfiler: Display: Metadata set : mergedmodules="0"
+LogCsvProfiler: Display: Metadata set : compacttset="0"
+LogCsvProfiler: Display: Metadata set : commandline="" /var/www/html/Twilight/Game/TwilightAssets.uproject -run=pythonscript -script=/var/www/html/Twilight/Game/Tools/build_assets.py -unattended -nop4 -nosplash -nosound -stdout""
+LogCsvProfiler: Display: Metadata set : loginid="b08793d2f1ca41aabefbcd2eb084d5a9-000003e8"
+LogCsvProfiler: Display: Metadata set : llm="0"
+Failed to find game directory: /home/samo/UnrealEngine-5.8/TwilightAssets/Binaries
+LogCsvProfiler: Display: Metadata set : zenstreaming="0"
+LogCsvProfiler: Display: Metadata set : systemresolution.resx="1280"
+LogCsvProfiler: Display: Metadata set : systemresolution.resy="720"
+LogAudio: Display: Audio Device Manager not initializing due to all audio being disabled. If this is not intentional, please check command line arguments for "-nosound".
+Setting up bundled DotNet SDK
+Running command : dotnet Engine/Binaries/DotNET/UnrealBuildTool/UnrealBuildTool.dll -Mode=ValidatePlatforms -OutputSDKs -AllPlatforms -project=/var/www/html/Twilight/Game/TwilightAssets.uproject -log=/var/www/html/Twilight/Game/Saved/Logs/AutoSDKInfo.txt -verbose -timestamps -progress
+Starting shared memory files at 1
+Log file: /var/www/html/Twilight/Game/Saved/Logs/AutoSDKInfo.txt
+A conflicting instance of Global\UnrealBuildTool_Mutex_adc198323a1461be19c57abad85e2c5c4efa2509 is already running.
+Trace written to file /home/samo/UnrealEngine-5.8/Engine/Programs/UnrealBuildTool/Trace.uba with size 302b
+LogConfig: Display: Loading IOS ini files took 0.33 seconds
+LogConfig: Display: Loading Mac ini files took 0.36 seconds
+LogConfig: Display: Loading VulkanPC ini files took 0.39 seconds
+LogConfig: Display: Loading Android ini files took 0.47 seconds
+LogConfig: Display: Loading Unix ini files took 0.51 seconds
+LogConfig: Display: Loading VisionOS ini files took 0.60 seconds
+LogConfig: Display: Loading TVOS ini files took 0.66 seconds
+LogConfig: Display: Loading Windows ini files took 0.67 seconds
+LogConfig: Display: Loading LinuxArm64 ini files took 0.80 seconds
+LogConfig: Display: Loading Linux ini files took 0.84 seconds
+RenderDocPlugin: Display: RenderDoc plugin will not be loaded. Use '-AttachRenderDoc' on the cmd line or enable 'renderdoc.AutoAttach' in the plugin settings.
+Shutdown handler: initialize.
+LogAsyncCompilation: Display: MemorySharingInfo: UsedMemory=5338MiB, MaxMemoryAvailable=39906MiB
+LogAnalytics: Display: Provider StudioTelemetry.Provider.Log is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.CSV is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.Horde is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.Log is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.CSV is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.Horde is disabled for this application
+LogStreaming: Display: AsyncLoading2 - Created: Async Loading Thread: false, Async Post Load: false, Multithreaded: false
+[2026.10.18-17.39.45:513][  0]LogHAL: Display: Platform has ~ 31 GB [33254993920 / 34359738368 / 31], which maps to Larger [LargestMinGB=32, LargerMinGB=12, DefaultMinGB=8, SmallerMinGB=6, SmallestMinGB=0)
+[2026.10.18-17.39.45:517][  0]LogCsvProfiler: Display: Metadata set : extradevelopmentmemorymb="0"
+[2026.10.18-17.39.45:536][  0]LogObj: Display: Attempting to load config data for Default__DownlinkBandwidthManagerConfig before the Class has been constructed/registered/linked (likely during module loading or early startup). This will result in the load silently failing and should be fixed.
+[2026.10.18-17.39.46:508][  0]LogObj: Display: Attempting to load config data for Default__SlateThemeManager before the Class has been constructed/registered/linked (likely during module loading or early startup). This will result in the load silently failing and should be fixed.
+[2026.10.18-17.39.47:381][  0]LogCsvProfiler: Display: Metadata set : verbatimrhiname="Null"
+[2026.10.18-17.39.47:381][  0]LogCsvProfiler: Display: Metadata set : rhiname="Null"
+[2026.10.18-17.39.47:381][  0]LogCsvProfiler: Display: Metadata set : rhifeaturelevel="SM6"
+[2026.10.18-17.39.47:381][  0]LogCsvProfiler: Display: Metadata set : shaderplatform="VULKAN_SM6"
+[2026.10.18-17.39.47:381][  0]LogCsvProfiler: Display: Metadata set : gpu=""
+[2026.10.18-17.39.47:381][  0]LogCsvProfiler: Display: Metadata set : gpudriver=""
+[2026.10.18-17.39.47:406][  0]LogTextureFormatASTC: Display: ASTCEnc version 5.0.1 library loaded
+[2026.10.18-17.39.47:406][  0]LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatASTC
+[2026.10.18-17.39.47:406][  0]LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatDXT
+[2026.10.18-17.39.47:406][  0]LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatETC2
+[2026.10.18-17.39.47:406][  0]LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatIntelISPCTexComp
+[2026.10.18-17.39.47:406][  0]LogTextureFormatOodle: Display: Oodle Texture TFO init; latest sdk version = 2.9.16
+[2026.10.18-17.39.47:406][  0]LogTextureFormatOodle: Display: Oodle Texture loading DLL: liboo2texlinux64.2.9.16.so
+[2026.10.18-17.39.47:407][  0]LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatOodle
+[2026.10.18-17.39.47:407][  0]LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatUncompressed
+[2026.10.18-17.39.47:472][  0]LogTargetPlatformManager: Display: Loaded TargetPlatform 'Linux'
+[2026.10.18-17.39.47:472][  0]LogTargetPlatformManager: Display: Loaded TargetPlatform 'LinuxEditor'
+[2026.10.18-17.39.47:472][  0]LogTargetPlatformManager: Display: Loaded TargetPlatform 'LinuxServer'
+[2026.10.18-17.39.47:472][  0]LogTargetPlatformManager: Display: Loaded TargetPlatform 'LinuxClient'
+[2026.10.18-17.39.47:492][  0]LogTargetPlatformManager: Display: Failed to SetupSDK for platform 'Android'
+[2026.10.18-17.39.47:512][  0]LogTargetPlatformManager: Display: Failed to SetupSDK for platform 'LinuxArm64'
+[2026.10.18-17.39.47:512][  0]LogTargetPlatformManager: Display: Building Assets For LinuxEditor
+[2026.10.18-17.39.47:577][  0]LogZenServiceInstance: Display: Launching zen utility '/home/samo/UnrealEngine-5.8/Engine/Binaries/Linux/zen service status'.
+[2026.10.18-17.39.47:841][  0]LogZenServiceInstance: Display: Writing plugin version info to '/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install/zen_plugin_versions.json'
+[2026.10.18-17.39.47:842][  0]LogZenServiceInstance: Display: Read zen version cache file from '/home/samo/UnrealEngine-5.8/Engine/Saved/Zen/zen.version', version: '5.8.13-202605190912-linux-x86_64-release-094f62c2'
+[2026.10.18-17.39.47:842][  0]LogZenServiceInstance: Display: Read zen version cache file from '/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install/zen.version', version: '5.8.13-202605190912-linux-x86_64-release-094f62c2'
+[2026.10.18-17.39.47:842][  0]LogZenServiceInstance: Display: Installed service at '/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install/zenserver' is up to date
+[2026.10.18-17.39.47:844][  0]LogZenServiceInstance: Display: Launching executable '/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install/zenserver', working dir '/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install', data dir '/home/samo/.config/Epic/UnrealEngine/Common/Zen/Data', args '--port 8558 --data-dir /home/samo/.config/Epic/UnrealEngine/Common/Zen/Data --http asio --gc-cache-duration-seconds 1209600 --gc-interval-seconds 21600 --gc-low-diskspace-threshold 2147483648 --cache-bucket-limit-overwrites --quiet --restrict-content-types --allow-external-oidctoken-exe=false --plugins-config "/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install/zen_plugins_v1.json" --security-config-path "/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install/security-config.json" --owner-pid 2601094  --child-id Zen_2601094_Startup --detach'
+[2026.10.18-17.39.47:919][  0]LogZenServiceInstance: Display: Unreal Zen Storage Server HTTP service at http://[::1]:8558 status: OK!.
+[2026.10.18-17.39.47:921][  0]LogDerivedDataCache: Display: ZenLocal: Using ZenServer HTTP service at [::1] with namespace ue.ddc. Status: OK!.
+[2026.10.18-17.39.47:931][  0]LogDerivedDataCache: Display: ../../../Engine/DerivedDataCache: Performance: Latency=0.02ms. RandomReadSpeed=152.50MBs, RandomWriteSpeed=506.22MBs. Assigned SpeedClass 'Local'
+[2026.10.18-17.39.47:935][  0]LogUbaHorde: Display: UBA/Horde Configuration [Uba.Provider.Horde]: Not Enabled
+[2026.10.18-17.39.47:935][  0]LogShaderCompilers: Display: No distributed shader compiler controller found
+[2026.10.18-17.39.47:935][  0]LogShaderCompilers: Display: Using 17 local workers for shader compilation
+[2026.10.18-17.39.47:936][  0]LogShaderCompilers: Display: Compiling shader autogen file: ../../../../../../var/www/html/Twilight/Game/Intermediate/ShaderAutogen/VULKAN_SM6/AutogenShaderHeaders.ush
+[2026.10.18-17.39.47:937][  0]LogShaderCompilers: Display: Autogen file is unchanged, skipping write.
+[2026.10.18-17.39.49:368][  0]LogEditorDomain: Display: EditorDomain is Disabled
+[2026.10.18-17.39.49:769][  0]LogDeviceProfileManager: Display: Deviceprofile LinuxArm64Editor not found.
+[2026.10.18-17.39.49:769][  0]LogDeviceProfileManager: Display: Deviceprofile LinuxArm64 not found.
+[2026.10.18-17.39.49:834][  0]LogCsvProfiler: Display: Metadata set : deviceprofile="LinuxEditor"
+[2026.10.18-17.39.49:842][  0]LogStreaming: Display: FlushAsyncLoading(1): 1 QueuedPackages, 0 AsyncPackages
+[2026.10.18-17.39.49:874][  0]LogTextureEncodingSettings: Display: Texture Encode Speed: Final (cook).
+[2026.10.18-17.39.49:874][  0]LogTextureEncodingSettings: Display: Oodle Texture Encode Speed settings: Fast: RDO Off Lambda=0, Effort=Normal Final: RDO Off Lambda=0, Effort=Normal
+[2026.10.18-17.39.49:874][  0]LogTextureEncodingSettings: Display: Shared linear texture encoding: Disabled
+[2026.10.18-17.39.49:947][  0]LogMeshReduction: Display: HLOD mesh reduction module (r.ProxyLODMeshReductionModule) set to "ProxyLODMeshReduction" which doesn't exist.
+[2026.10.18-17.39.49:966][  0]LogMeshReduction: Display: Using QuadricMeshReduction for automatic static mesh reduction
+[2026.10.18-17.39.49:966][  0]LogMeshReduction: Display: Using SkeletalMeshReduction for automatic skeletal mesh reduction
+[2026.10.18-17.39.49:966][  0]LogMeshReduction: Display: No automatic mesh merging module available
+[2026.10.18-17.39.49:966][  0]LogMeshReduction: Display: No distributed automatic mesh merging module available
+[2026.10.18-17.39.50:403][  0]LogShaderCompilers: Display: Compiling shader autogen file: ../../../../../../var/www/html/Twilight/Game/Intermediate/ShaderAutogen/VULKAN_SM5/AutogenShaderHeaders.ush
+[2026.10.18-17.39.50:412][  0]LogShaderCompilers: Display: Failed to delete old shader autogen file: ../../../../../../var/www/html/Twilight/Game/Intermediate/ShaderAutogen/VULKAN_SM5/AutogenShaderHeaders.ush
+[2026.10.18-17.39.50:412][  0]LogShaderCompilers: Display: Shader autogen file written: ../../../../../../var/www/html/Twilight/Game/Intermediate/ShaderAutogen/VULKAN_SM5/AutogenShaderHeaders.ush
+[2026.10.18-17.39.50:412][  0]LogVirtualization: Display: VirtualizationSystem name found in ini file: None
+[2026.10.18-17.39.50:412][  0]LogVirtualization: Display: FNullVirtualizationSystem mounted, virtualization will be disabled
+[2026.10.18-17.39.51:008][  0]LogWorldPartition: Display: FWorldPartitionClassDescRegistry::Initialize started...
+[2026.10.18-17.39.51:012][  0]LogWorldPartition: Display: FWorldPartitionClassDescRegistry::Initialize took 3.645 ms
+[2026.10.18-17.39.52:647][  0]LogMetaSound: Display: MetaSound Page Target Initialized to 'Default'
+[2026.10.18-17.39.52:660][  0]LogAudio: Display: Registering Engine Module Parameter Interfaces...
+[2026.10.18-17.39.55:659][  0]LogAudioCaptureCore: Display: No Audio Capture implementations found. Audio input will be silent.
+[2026.10.18-17.39.55:659][  0]LogAudioCaptureCore: Display: No Audio Capture implementations found. Audio input will be silent.
+[2026.10.18-17.39.57:606][  0]LogAssetRegistry: Display: CleanupOrphanedCacheFiles (PreLoad): 0 .ref files found, 0 referenced binaries
+[2026.10.18-17.39.57:606][  0]LogAssetRegistry: Display: CleanupOrphanedCacheFiles: 0 total binaries, 0 referenced (kept), 0 old-style pre-migration (kept), 0 orphans deleted, 0 orphans locked (kept)
+[2026.10.18-17.39.57:606][  0]LogAssetRegistry: Display: FindShardedCacheFiles: 0 via .ref, 0 via migration fallback, 0 total
+[2026.10.18-17.39.57:606][  0]LogAssetRegistry: Display: AssetDataGatherer spent 0.001s loading caches from ../../../../../../var/www/html/Twilight/Game/Intermediate/CachedAssetRegistry.
+[2026.10.18-17.39.58:011][  0]LogCsvProfiler: Display: Metadata set : largeworldcoordinates="1"
+[2026.10.18-17.39.58:388][  0]LogPython: Display: No pip-enabled plugins with python dependencies found, skipping
+[2026.10.18-17.39.58:979][  0]LogCsvProfiler: Display: Metadata set : raytracing="0"
+[2026.10.18-17.39.59:612][  0]LogPython: Display: Running start-up script /home/samo/UnrealEngine-5.8/Engine/Plugins/Animation/ControlRig/Content/Python/init_unreal.py... started...
+[2026.10.18-17.39.59:664][  0]LogPython: Display: Running start-up script /home/samo/UnrealEngine-5.8/Engine/Plugins/Animation/ControlRig/Content/Python/init_unreal.py... took 51.838 ms
+[2026.10.18-17.39.59:664][  0]LogPython: Display: Running start-up script /home/samo/UnrealEngine-5.8/Engine/Plugins/Animation/IKRig/Content/Python/init_unreal.py... started...
+[2026.10.18-17.39.59:668][  0]LogPython: Display: Running start-up script /home/samo/UnrealEngine-5.8/Engine/Plugins/Animation/IKRig/Content/Python/init_unreal.py... took 3.975 ms (total: 55.814 ms)
+[2026.10.18-17.39.59:670][  0]LogPythonScriptCommandlet: Display: Running Python script: /var/www/html/Twilight/Game/Tools/build_assets.py
+[2026.10.18-17.40.00:017][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave music_aralez...
+[2026.10.18-17.40.00:809][  0]LogAudioDerivedData: Display: music_aralez compressed to 17.38% (from 13,500KB to 2,346KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.00:821][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/music_aralez.music_aralez: Duration=72.00 secs, Channels=2), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=11, Chunk0=28 bytes, Chunk1=261155 bytes, ChunkN=261191)
+[2026.10.18-17.40.00:935][  0]LogSourceControl: Display: Uncontrolled Changelist persistency file loaded ../../../../../../var/www/html/Twilight/Game/Saved/SourceControl/UncontrolledChangelists.json
+[2026.10.18-17.40.01:109][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave music_battle...
+[2026.10.18-17.40.02:206][  0]LogAudioDerivedData: Display: music_battle compressed to 17.98% (from 15,000KB to 2,697KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.02:217][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/music_battle.music_battle: Duration=80.00 secs, Channels=2), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=12, Chunk0=28 bytes, Chunk1=261039 bytes, ChunkN=260761)
+[2026.10.18-17.40.02:482][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave music_boss...
+[2026.10.18-17.40.03:353][  0]LogAudioDerivedData: Display: music_boss compressed to 18.41% (from 11,250KB to 2,071KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.03:362][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/music_boss.music_boss: Duration=60.00 secs, Channels=2), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=10, Chunk0=28 bytes, Chunk1=261853 bytes, ChunkN=261709)
+[2026.10.18-17.40.03:636][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave music_hayk...
+[2026.10.18-17.40.04:565][  0]LogAudioDerivedData: Display: music_hayk compressed to 17.01% (from 13,500KB to 2,295KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.04:576][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/music_hayk.music_hayk: Duration=72.00 secs, Channels=2), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=10, Chunk0=28 bytes, Chunk1=261005 bytes, ChunkN=262043)
+[2026.10.18-17.40.04:772][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave music_menu...
+[2026.10.18-17.40.05:291][  0]LogAudioDerivedData: Display: music_menu compressed to 16.17% (from 13,500KB to 2,183KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:303][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/music_menu.music_menu: Duration=72.00 secs, Channels=2), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=10, Chunk0=28 bytes, Chunk1=261941 bytes, ChunkN=260851)
+[2026.10.18-17.40.05:399][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_aralez_howl...
+[2026.10.18-17.40.05:412][  0]LogAudioDerivedData: Display: sfx_aralez_howl compressed to 15.01% (from 187KB to 28KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:412][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_aralez_howl.sfx_aralez_howl: Duration=2.00 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=28819 bytes, ChunkN=0)
+[2026.10.18-17.40.05:425][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_arrow_hit_flesh...
+[2026.10.18-17.40.05:429][  0]LogAudioDerivedData: Display: sfx_arrow_hit_flesh compressed to 10.28% (from 56KB to 5KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:429][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_arrow_hit_flesh.sfx_arrow_hit_flesh: Duration=0.60 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=5913 bytes, ChunkN=0)
+[2026.10.18-17.40.05:438][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_arrow_hit_ground...
+[2026.10.18-17.40.05:440][  0]LogAudioDerivedData: Display: sfx_arrow_hit_ground compressed to 11.81% (from 37KB to 4KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:440][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_arrow_hit_ground.sfx_arrow_hit_ground: Duration=0.40 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=4527 bytes, ChunkN=0)
+[2026.10.18-17.40.05:448][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_arrow_hit_wood...
+[2026.10.18-17.40.05:450][  0]LogAudioDerivedData: Display: sfx_arrow_hit_wood compressed to 11.59% (from 46KB to 5KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:450][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_arrow_hit_wood.sfx_arrow_hit_wood: Duration=0.50 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=5557 bytes, ChunkN=0)
+[2026.10.18-17.40.05:459][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_arrow_whoosh...
+[2026.10.18-17.40.05:468][  0]LogAudioDerivedData: Display: sfx_arrow_whoosh compressed to 16.47% (from 112KB to 18KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:468][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_arrow_whoosh.sfx_arrow_whoosh: Duration=1.20 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=18967 bytes, ChunkN=0)
+[2026.10.18-17.40.05:482][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_big_explosion...
+[2026.10.18-17.40.05:504][  0]LogAudioDerivedData: Display: sfx_big_explosion compressed to 15.31% (from 468KB to 71KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:505][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_big_explosion.sfx_big_explosion: Duration=5.00 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=73469 bytes, ChunkN=0)
+[2026.10.18-17.40.05:522][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_boost...
+[2026.10.18-17.40.05:531][  0]LogAudioDerivedData: Display: sfx_boost compressed to 18.37% (from 187KB to 34KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:532][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_boost.sfx_boost: Duration=2.00 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=35259 bytes, ChunkN=0)
+[2026.10.18-17.40.05:545][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_bow_draw...
+[2026.10.18-17.40.05:549][  0]LogAudioDerivedData: Display: sfx_bow_draw compressed to 17.63% (from 84KB to 14KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:550][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_bow_draw.sfx_bow_draw: Duration=0.90 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=15229 bytes, ChunkN=0)
+[2026.10.18-17.40.05:559][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_bow_release...
+[2026.10.18-17.40.05:563][  0]LogAudioDerivedData: Display: sfx_bow_release compressed to 14.28% (from 46KB to 6KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:563][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_bow_release.sfx_bow_release: Duration=0.50 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=6849 bytes, ChunkN=0)
+[2026.10.18-17.40.05:591][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_cave_ambience_loop...
+[2026.10.18-17.40.05:729][  0]LogAudioDerivedData: Display: sfx_cave_ambience_loop compressed to 13.00% (from 2,250KB to 292KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:732][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_cave_ambience_loop.sfx_cave_ambience_loop: Duration=12.00 secs, Channels=2), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=3, Chunk0=28 bytes, Chunk1=261333 bytes, ChunkN=38181)
+[2026.10.18-17.40.05:756][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_crowd_cheer...
+[2026.10.18-17.40.05:774][  0]LogAudioDerivedData: Display: sfx_crowd_cheer compressed to 13.11% (from 281KB to 36KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:774][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_crowd_cheer.sfx_crowd_cheer: Duration=3.00 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=37741 bytes, ChunkN=0)
+[2026.10.18-17.40.05:795][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_defeat...
+[2026.10.18-17.40.05:833][  0]LogAudioDerivedData: Display: sfx_defeat compressed to 14.16% (from 609KB to 86KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:834][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_defeat.sfx_defeat: Duration=6.50 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=88325 bytes, ChunkN=0)
+[2026.10.18-17.40.05:856][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_fire_breath...
+[2026.10.18-17.40.05:871][  0]LogAudioDerivedData: Display: sfx_fire_breath compressed to 18.79% (from 187KB to 35KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:871][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_fire_breath.sfx_fire_breath: Duration=2.00 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=36063 bytes, ChunkN=0)
+[2026.10.18-17.40.05:887][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_fireball_cast...
+[2026.10.18-17.40.05:897][  0]LogAudioDerivedData: Display: sfx_fireball_cast compressed to 16.62% (from 131KB to 21KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:898][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_fireball_cast.sfx_fireball_cast: Duration=1.40 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=22325 bytes, ChunkN=0)
+[2026.10.18-17.40.05:910][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_fireball_impact...
+[2026.10.18-17.40.05:922][  0]LogAudioDerivedData: Display: sfx_fireball_impact compressed to 15.62% (from 187KB to 29KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:923][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_fireball_impact.sfx_fireball_impact: Duration=2.00 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=29975 bytes, ChunkN=0)
+[2026.10.18-17.40.05:937][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_flame_aura_loop...
+[2026.10.18-17.40.05:958][  0]LogAudioDerivedData: Display: sfx_flame_aura_loop compressed to 18.29% (from 562KB to 102KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.05:959][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_flame_aura_loop.sfx_flame_aura_loop: Duration=6.00 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=105335 bytes, ChunkN=0)
+[2026.10.18-17.40.05:982][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_gate_open...
+[2026.10.18-17.40.06:002][  0]LogAudioDerivedData: Display: sfx_gate_open compressed to 16.25% (from 281KB to 45KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:003][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_gate_open.sfx_gate_open: Duration=3.00 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=46789 bytes, ChunkN=0)
+[2026.10.18-17.40.06:016][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_player_hurt...
+[2026.10.18-17.40.06:021][  0]LogAudioDerivedData: Display: sfx_player_hurt compressed to 15.50% (from 93KB to 14KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:022][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_player_hurt.sfx_player_hurt: Duration=1.00 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=14877 bytes, ChunkN=0)
+[2026.10.18-17.40.06:033][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_soul_chime...
+[2026.10.18-17.40.06:037][  0]LogAudioDerivedData: Display: sfx_soul_chime compressed to 12.79% (from 56KB to 7KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:038][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_soul_chime.sfx_soul_chime: Duration=0.60 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=7361 bytes, ChunkN=0)
+[2026.10.18-17.40.06:051][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_special_nova...
+[2026.10.18-17.40.06:089][  0]LogAudioDerivedData: Display: sfx_special_nova compressed to 16.33% (from 506KB to 82KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:089][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_special_nova.sfx_special_nova: Duration=5.40 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=84653 bytes, ChunkN=0)
+[2026.10.18-17.40.06:105][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_ui_click...
+[2026.10.18-17.40.06:106][  0]LogAudioDerivedData: Display: sfx_ui_click compressed to 10.90% (from 18KB to 2KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:106][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_ui_click.sfx_ui_click: Duration=0.20 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=2085 bytes, ChunkN=0)
+[2026.10.18-17.40.06:113][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_ui_hover...
+[2026.10.18-17.40.06:114][  0]LogAudioDerivedData: Display: sfx_ui_hover compressed to 12.93% (from 13KB to 1KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:114][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_ui_hover.sfx_ui_hover: Duration=0.14 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=1731 bytes, ChunkN=0)
+[2026.10.18-17.40.06:127][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_victory...
+[2026.10.18-17.40.06:149][  0]LogAudioDerivedData: Display: sfx_victory compressed to 15.00% (from 562KB to 84KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:149][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_victory.sfx_victory: Duration=6.00 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=86379 bytes, ChunkN=0)
+[2026.10.18-17.40.06:168][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_vishap_death...
+[2026.10.18-17.40.06:187][  0]LogAudioDerivedData: Display: sfx_vishap_death compressed to 15.19% (from 487KB to 74KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:188][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_vishap_death.sfx_vishap_death: Duration=5.20 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=75843 bytes, ChunkN=0)
+[2026.10.18-17.40.06:201][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_vishap_hit...
+[2026.10.18-17.40.06:208][  0]LogAudioDerivedData: Display: sfx_vishap_hit compressed to 14.63% (from 103KB to 15KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:208][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_vishap_hit.sfx_vishap_hit: Duration=1.10 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=15447 bytes, ChunkN=0)
+[2026.10.18-17.40.06:217][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_vishap_roar...
+[2026.10.18-17.40.06:237][  0]LogAudioDerivedData: Display: sfx_vishap_roar compressed to 15.61% (from 412KB to 64KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:237][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_vishap_roar.sfx_vishap_roar: Duration=4.40 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=65939 bytes, ChunkN=0)
+[2026.10.18-17.40.06:258][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_war_drums_loop...
+[2026.10.18-17.40.06:301][  0]LogAudioDerivedData: Display: sfx_war_drums_loop compressed to 11.53% (from 750KB to 86KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:302][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_war_drums_loop.sfx_war_drums_loop: Duration=8.00 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=88523 bytes, ChunkN=0)
+[2026.10.18-17.40.06:320][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_wave_start...
+[2026.10.18-17.40.06:350][  0]LogAudioDerivedData: Display: sfx_wave_start compressed to 12.89% (from 515KB to 66KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:351][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_wave_start.sfx_wave_start: Duration=5.50 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=68051 bytes, ChunkN=0)
+[2026.10.18-17.40.06:369][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_wind_loop...
+[2026.10.18-17.40.06:404][  0]LogAudioDerivedData: Display: sfx_wind_loop compressed to 16.50% (from 750KB to 123KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:405][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_wind_loop.sfx_wind_loop: Duration=8.00 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=126703 bytes, ChunkN=0)
+[2026.10.18-17.40.06:423][  0]LogAudioDerivedData: Display: Building compressed audio format BINKA hash BINKA_SCVER_5028_R4DV_false_SR0_48000.000000_SR1_32000.000000_SR2_24000.000000_SR3_12000.000000_SR4_8000.000000_QMOD_1.000000_CQLT_-1_ASTH_0.000000_INLC_false_LCK1_0.000000_CSZE_65536_LCF_false_ZCS_256_MCSO_-1_END wave sfx_wraith_hiss...
+[2026.10.18-17.40.06:431][  0]LogAudioDerivedData: Display: sfx_wraith_hiss compressed to 16.96% (from 112KB to 19KB) with BINKA at Quality 80 with Quality Modifier 1.00
+[2026.10.18-17.40.06:431][  0]LogAudio: Display: Chunk stats for (SoundWave /Game/Twilight/Audio/sfx_wraith_hiss.sfx_wraith_hiss: Duration=1.20 secs, Channels=1), Settings(FirstChunkSize=4294967295 frames, InlineFirst=false, MaxChunkSize=262144), Chunks=2, Chunk0=28 bytes, Chunk1=19535 bytes, ChunkN=0)
+[2026.10.18-17.40.07:165][  0]LogPythonScriptCommandlet: Display: Python script executed successfully
+[2026.10.18-17.40.07:165][  0]LogInit: Display: 
+[2026.10.18-17.40.07:165][  0]LogInit: Display: Success - 0 error(s), 0 warning(s)
+[2026.10.18-17.40.07:166][  0]LogInit: Display: 
+Execution of commandlet took:  7.55 seconds, PeakPhysMemoryMB=2092 MB, PeakVirtMemoryMB=8722 MB
+[2026.10.18-17.40.07:406][  0]LogAssetRegistry: Display: CleanupOrphanedCacheFiles (PostWrite): 0 .ref files found, 0 referenced binaries
+[2026.10.18-17.40.07:406][  0]LogAssetRegistry: Display: CleanupOrphanedCacheFiles: 0 total binaries, 0 referenced (kept), 0 old-style pre-migration (kept), 0 orphans deleted, 0 orphans locked (kept)
+[2026.10.18-17.40.07:682][  0]LogShaderCompilers: Display: Exiting ShaderCompilingThread
+[2026.10.18-17.40.07:701][  0]LogSourceControl: Display: Uncontrolled Changelist persistency file saved ../../../../../../var/www/html/Twilight/Game/Saved/SourceControl/UncontrolledChangelists.json
+Shutdown handler: cleanup.
+Opening shared memory
+Shared memory doesn't exist, checking legacy lock file
+Checking for a '/tmp/UnrealTraceServer.pid' lock file
+Forking process
+Opening shared memory
+Starting the store
+Reading settings from '/home/samo/UnrealEngine/UnrealTrace/Settings.ini'
+
+Unable to open settings file /home/samo/UnrealEngine/UnrealTrace/Settings.ini.
+
+Store settings (/home/samo/UnrealEngine/UnrealTrace/Settings.ini):
+ - Store port: 1989
+ - Recorder port: 1981
+ - Thread count: 0
+ - Sponsored mode: 1
+ - Directory: '/home/samo/UnrealEngine/UnrealTrace/Store/001'
+Signalling parent 2601115
+Terminating server, no sponsors or connections active.
+Listening cancelled, closing port...
+Listening cancelled, closing port...
+Received signal 15
+Daemon is exiting without errors.

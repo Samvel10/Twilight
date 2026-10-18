@@ -76,6 +76,7 @@ private:
 	UPROPERTY() TObjectPtr<UAudioComponent> BreathAudio;
 
 	TArray<float> SegRadius;
+	TArray<float> SegDist; // distance along the body from the head
 	TArray<FVector> Trail;      // head positions, newest first
 	float TrailStep = 40.f;
 	float Spacing = 120.f;
@@ -98,6 +99,7 @@ private:
 	float StateDur = 0.f;
 	float AttackCooldown = 2.f;
 	float BreathTick = 0.f;
+	float BreathFxTick = 0.f;
 	float JawOpen = 0.f;
 	float HitFlash = 0.f;
 	float Wobble = 0.f;

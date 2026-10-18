@@ -87,3 +87,19 @@
 - **Հաբ** (TwHub). «ԾԻՐԱՆԻ» գլխավոր մենյու, 3 քարտ, Դիցարան (11 կերպար՝ հունական զուգահեռներով)։
 - **Config.** map-prefix GameMode-ներ, GameDefaultMap=L_Menu, SM6+SM5, DefaultGameUserSettings.ini։
 - **Workflow «games23-code-review»** գործարկված նոր կոդի համար։ Շարժիչի հավաքումը՝ ~1050/2694։
+
+## 2026-10-18 21:40 — Chapter 2 «Hayk» + chapter 3 «Aralez» audio (audio subagent)
+- **What:** 13 new mono SFX plus a stereo cave ambience, and 2 stereo music loops (`music_hayk`, 72 s; `music_aralez`, 72 s) in `art/audio/{sfx,music}`. The generator is `art/audio/src/gen_chapters23.py`, which reuses `dsp.py`, `gen_sfx.py` and `gen_music.py`. It is deterministic and needs no downloads.
+- **How:** `cd art/audio/src && OMP_NUM_THREADS=1 nice -n 15 python3 gen_chapters23.py`. The SFX take about 10 s and the music about 2.5 min. Verify with `python3 gen_chapters23.py --verify` or `python3 analyze.py`.
+- **Result:** ALL CHECKS PASSED. That means 48 kHz/16-bit, peaks at -1 dBFS or lower, 0 clipped samples, DC under 3e-4, exact durations and seamless loops. Music is at -14.0 LUFS, confirmed with ffmpeg ebur128. Details are in `art/audio/SETUP_LOG.md` steps 12–19 and the README table. Nothing under `Game/` was touched, and UE was not launched.
+
+## 2026-10-18 (գիշեր) — Քայլ 10. Առաջին գործարկումներ, արագություն, տեսողական ուղղումներ
+- **Շարժիչ.** UBT-ն վերակառուցեց 2694 action (77 րոպե, 10 զուգահեռ՝ RAM-ի սահմանափակում)։ Մոդուլը հավաքվեց 1 ուղղումից հետո (`*/` մեկնաբանության մեջ)։
+- **Workflow «games23-code-review»** (20 գործակալ). 15 հաստատված խնդիր (unity-ում `using namespace` բախումներ → `bUseUnity=false`, `&&`/`||` փակագծեր, նետի ղեկ, pause-ի ժամանակ լարում, նետը ոսկորին, slow-mo վերականգնում, ինքնահարված, Արալեզի արդյունքների սառեցում, ռոբոտներ, պատի շառավիղ, կայծերի Z, SoulLight perf)։ Կիրառված են։
+- **Ձայներ.** գործակալը ստեղծեց 15 նոր WAV (Հայկ, Արալեզ), ներմուծված են (ընդամենը 35)։
+- **Առաջին run (Vahagn, autopilot).** ամբողջ ցիկլը աշխատում է (ալիքներ → բոս → հաղթանակ/պարտություն), HUD-ը և հայերեն տառատեսակները՝ ճիշտ։ Խնդիրներ՝ սպիտակ էկրան (ձեռքով էքսպոզիցիա 11.5 → 0, `-TwExposure=` override), 14 FPS։
+- **Պրոֆիլավորում (CSV + `r.GPUCsvStatsEnabled`).** TSR-ը՝ 26 մվ GPU → `r.AntiAliasingMethod=2` (TAA). մարտում CPU-bound (render thread 12 մվ) → կրակե գնդակի պոչ 5→3, կյանք 4→2.4 վ, պայթյունների փոխարեն `ATwFlash` (1 պրիմիտիվ), շնչի FX throttling, վիշապի հատվածներ 26→21, փշեր 1/3։ GPU-ն throttling է անում «balanced» ռեժիմում → `powerprofilesctl set performance` (play.sh-ն նույնն է անում)։
+- **Արդյունք.** Vahagn 300 վրկ թեստ՝ միջին 95 FPS, p99 67 FPS։ Հայկ՝ 80–88 FPS, Արալեզ՝ 114 FPS։
+- **Հավասարակշռում.** վիշապների կյանքը ×2, բոսը 460, ալիքներ 4/5/6 → ավտոպիլոտը հաղթում է ~4.5 րոպեում։
+- **Տեսողական.** երակների/ճաքերի sharpness (noise≈0.5 ամբողջ մակերեսը լուսավորում էր), hit flash-ի նվազեցում, վիշապի մարմնի հեռավորություն ըստ շառավղի, մենյուում հերոսը աջ կողմում, gradient վնասի vignette, Հայկ՝ մենամարտի հեռավորություն 76→54 մ, FOV 52, լավ զինվորներ, ռոբոտի ճշգրտություն, Արալեզ՝ փետրավոր թևեր, մուգ ստվերներ, երկար թունել, `M_Additive`-ին ISM usage (սև գնդերի պատճառը)։
+- **Գործիքներ.** `Tools/run_test.sh` (տեսագրում + կադրեր), `Tools/perf_probe.sh`, `Tools/shot.sh`, `TwTestHarness` (Hayk/Aralez autoplay)։

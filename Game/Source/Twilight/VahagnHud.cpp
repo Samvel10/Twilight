@@ -4,6 +4,7 @@
 #include "VahagnGameMode.h"
 #include "Vishap.h"
 #include "TwAssets.h"
+#include "TwUi.h"
 
 #include "Widgets/SOverlay.h"
 #include "Widgets/SBoxPanel.h"
@@ -325,17 +326,12 @@ void SVahagnHud::PaintGameplay(const FGeometry& Geo, FSlateWindowElementList& Ou
 	// damage vignette
 	if (H->GetDamageFlash() > 0.01f)
 	{
-		const float A = H->GetDamageFlash() * 0.45f;
-		const float E = 140.f * S;
-		Box(Out, L, Geo, FVector2D(0, 0), FVector2D(Size.X, E), FLinearColor(0.8f, 0.05f, 0.02f, A));
-		Box(Out, L, Geo, FVector2D(0, Size.Y - E), FVector2D(Size.X, E), FLinearColor(0.8f, 0.05f, 0.02f, A));
-		Box(Out, L, Geo, FVector2D(0, 0), FVector2D(E, Size.Y), FLinearColor(0.8f, 0.05f, 0.02f, A));
-		Box(Out, L, Geo, FVector2D(Size.X - E, 0), FVector2D(E, Size.Y), FLinearColor(0.8f, 0.05f, 0.02f, A));
+		TwUi::EdgeGlow(Out, L, Geo, Size, FLinearColor(0.85f, 0.05f, 0.02f, H->GetDamageFlash() * 0.6f), 260.f * S);
 	}
 	if (H->GetHealth() < 30.f && !H->IsDead())
 	{
-		const float A = (0.12f + 0.08f * FMath::Sin(Now * 6.f)) * (1.f - H->GetHealth() / 30.f);
-		Box(Out, L, Geo, FVector2D(0, 0), Size, FLinearColor(0.6f, 0.f, 0.f, A));
+		const float A = (0.35f + 0.2f * FMath::Sin(Now * 6.f)) * (1.f - H->GetHealth() / 30.f);
+		TwUi::EdgeGlow(Out, L, Geo, Size, FLinearColor(0.6f, 0.f, 0.f, A), 380.f * S);
 	}
 	if (bEnded) return;
 

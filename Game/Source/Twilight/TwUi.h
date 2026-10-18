@@ -20,6 +20,9 @@ namespace TwUi
 	void Lines(FSlateWindowElementList& Out, int32 Layer, const FGeometry& Geo, const TArray<FVector2f>& Pts, const FLinearColor& C, float Thick);
 	void Bar(FSlateWindowElementList& Out, int32 Layer, const FGeometry& Geo, const FVector2D& Pos, const FVector2D& Size, float Frac, const FLinearColor& A, const FLinearColor& B, bool bRightToLeft = false);
 
+	/** Soft coloured vignette fading in from all four screen edges. */
+	void EdgeGlow(FSlateWindowElementList& Out, int32 Layer, const FGeometry& Geo, const FVector2D& Size, const FLinearColor& C, float Width);
+
 	TSharedRef<SWidget> Button(const TAttribute<FText>& Label, TFunction<void()> OnClick, bool bPrimary = false, float Width = 440.f);
 	TSharedRef<SWidget> Title(const FText& Main, const FText& Sub, const FText& Blurb, const FLinearColor& Color);
 }

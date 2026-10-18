@@ -22,10 +22,10 @@ AAralezWorld::AAralezWorld() {}
 FVector AAralezWorld::PathPoint(float T)
 {
 	T = FMath::Clamp(T, 0.f, 1.f);
-	const float Turns = 2.4f;
+	const float Turns = 3.4f;
 	const float A = T * Turns * 2.f * PI;
 	const float R = 6500.f + 1500.f * FMath::Sin(T * 7.f);
-	const float Z = 2000.f - T * 58000.f + 900.f * FMath::Sin(T * 23.f);
+	const float Z = 2000.f - T * 80000.f + 900.f * FMath::Sin(T * 31.f);
 	return FVector(FMath::Cos(A) * R, FMath::Sin(A) * R, Z);
 }
 
@@ -71,7 +71,7 @@ FTwSkyPreset AAralezWorld::GetSkyPreset() const
 	P.FogDensity = 0.06f;
 	P.FogFalloff = 0.0001f;
 	P.FogStart = 600.f;
-	P.Exposure = 13.2f;
+	P.Exposure = 1.7f;
 	P.SkyLightIntensity = 0.25f;
 	P.SkyLightColor = FLinearColor(0.4f, 0.6f, 1.f);
 	P.EmberColor = FLinearColor(0.5f, 0.85f, 1.f);
@@ -94,8 +94,8 @@ void AAralezWorld::BuildTunnel()
 	if (Rock) { Rock->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.22f, 0.24f, 0.3f)); Rock->SetScalarParameterValue(TEXT("TopAmount"), 0.f); }
 
 	// split into a few sections so culling works
-	const int32 Sections = 6;
-	const int32 RingsPerSection = 46;
+	const int32 Sections = 8;
+	const int32 RingsPerSection = 52;
 	const int32 Sides = 26;
 	for (int32 Sec = 0; Sec < Sections; ++Sec)
 	{
@@ -162,7 +162,7 @@ void AAralezWorld::BuildCrystals()
 		CrystalSets.Add(Ism);
 	}
 	// crystals grow from the walls, pointing inward
-	for (int32 i = 0; i < 900; ++i)
+	for (int32 i = 0; i < 1250; ++i)
 	{
 		const float T = R.FRand();
 		const int32 Z = ZoneAt(T);
@@ -178,9 +178,9 @@ void AAralezWorld::BuildCrystals()
 		CrystalSets[Z]->AddInstance(FTransform(Rot, Base, FVector(0.35f * S, 0.35f * S, 1.6f * S)), true);
 	}
 	// a few real lights per zone so the walls catch colour
-	for (int32 i = 0; i < 14; ++i)
+	for (int32 i = 0; i < 20; ++i)
 	{
-		const float T = (i + 0.5f) / 14.f;
+		const float T = (i + 0.5f) / 20.f;
 		UPointLightComponent* L = NewObject<UPointLightComponent>(this);
 		L->SetupAttachment(RootComponent);
 		L->RegisterComponent();
@@ -225,7 +225,7 @@ void AAralezWorld::Tick(float Dt)
 	// fog colour follows the player's depth
 	APlayerCameraManager* Cam = UGameplayStatics::GetPlayerCameraManager(this, 0);
 	if (!Cam || !Fog) return;
-	const float T = NearestT(Cam->GetCameraLocation(), FMath::Clamp((2000.f - Cam->GetCameraLocation().Z) / 58000.f, 0.f, 1.f));
+	const float T = NearestT(Cam->GetCameraLocation(), FMath::Clamp((2000.f - Cam->GetCameraLocation().Z) / 80000.f, 0.f, 1.f));
 	const float Zf = FMath::Clamp(T / 0.36f, 0.f, 1.f);
 	FLinearColor Col = ZoneFog[0];
 	if (T >= 0.36f && T < 0.7f) Col = FMath::Lerp(ZoneFog[0], ZoneFog[1], FMath::Clamp((T - 0.33f) / 0.06f, 0.f, 1.f));

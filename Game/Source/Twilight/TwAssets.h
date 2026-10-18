@@ -47,6 +47,6 @@ namespace TwAssets
 	UAnimSequence* Anim(const TCHAR* Path);
 	USkeletalMesh* Manny();
 
-	/** Armenian-capable fonts (Noto) loaded straight from Content/Fonts/*.ttf. */
+	/** Armenian-capable fonts (Noto) loaded straight from the TTF files in Content/Fonts. */
 	FSlateFontInfo Font(float Size, bool bSerif = false, bool bBold = true);
 }

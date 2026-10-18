@@ -445,7 +445,7 @@ def build_fire_body(noise_tex):
     mat = get_or_create_material("M_FireBody")
     setup_material(mat, shading="MSM_UNLIT" if FIREBODY_UNLIT else "MSM_DEFAULT_LIT",
                    usages=("MATUSAGE_SKELETAL_MESH", "MATUSAGE_NIAGARA_MESH_PARTICLES",
-                           "MATUSAGE_SPLINE_MESH"))
+                           "MATUSAGE_SPLINE_MESH", "MATUSAGE_INSTANCED_STATIC_MESHES"))
     g = G(mat)
     t = g.time()
     uv = g.texcoord()
@@ -459,8 +459,8 @@ def build_fire_body(noise_tex):
     n2 = g.sample(noise, noise_tex, g.panner(uv2, -0.05, 0.035, tflow), "R")
     n = g.mul(g.add(n1, n2), 0.5)
     ridge = g.one_minus(g.absx(g.sub(g.mul(n, 2.0), 1.0)))         # 1 at noise mid-level -> vein lines
-    cracks = g.power(ridge, g.scalar("CrackSharpness", 6.0, "Cracks"))
-    cracks_i = g.sat(g.mul(cracks, g.scalar("CrackAmount", 1.6, "Cracks")))
+    cracks = g.power(ridge, g.scalar("CrackSharpness", 40.0, "Cracks"))
+    cracks_i = g.sat(g.mul(cracks, g.scalar("CrackAmount", 1.3, "Cracks")))
 
     deep = g.vec("CrackColorDeep", (1.0, 0.18, 0.02))
     hot = g.vec("CrackColorHot", (1.0, 0.75, 0.25))
@@ -515,7 +515,8 @@ def build_additive():
     setup_material(mat, shading="MSM_UNLIT", blend="BLEND_ADDITIVE", two_sided=False,
                    usages=("MATUSAGE_NIAGARA_SPRITES", "MATUSAGE_NIAGARA_MESH_PARTICLES",
                            "MATUSAGE_NIAGARA_RIBBONS", "MATUSAGE_PARTICLE_SPRITES",
-                           "MATUSAGE_MESH_PARTICLES", "MATUSAGE_SKELETAL_MESH"))
+                           "MATUSAGE_MESH_PARTICLES", "MATUSAGE_SKELETAL_MESH",
+                           "MATUSAGE_INSTANCED_STATIC_MESHES"))
     g = G(mat)
     falloff = g.scalar("Falloff", 2.0)
     sm = g.new(unreal.MaterialExpressionSphereMask, attenuation_radius=0.5, hardness_percent=0.0)
@@ -627,13 +628,13 @@ def build_vishap(noise_tex, scales_n):
         sn = g.tex_param("ScaleNormal", scales_n, g.mul(uv, g.scalar("ScaleTiling", 8.0, "Scales")))
         g.out("MP_NORMAL", g.lerp(g.c3(0.0, 0.0, 1.0), sn, g.scalar("ScaleNormalStrength", 0.8, "Scales")))
     nobj = g.tex_param_obj("NoiseTex", noise_tex)
-    nuv = g.mul(uv, g.scalar("VeinTiling", 3.0, "Veins"))
+    nuv = g.mul(uv, g.scalar("VeinTiling", 5.0, "Veins"))
     tflow = g.mul(t, g.scalar("VeinFlow", 1.0, "Veins"))
     n1 = g.sample(nobj, noise_tex, g.panner(nuv, 0.01, 0.02, tflow), "R")
     n2 = g.sample(nobj, noise_tex, g.panner(g.mul(nuv, 2.1), -0.015, 0.01, tflow), "R")
     n = g.mul(g.add(n1, n2), 0.5)
     ridge = g.one_minus(g.absx(g.sub(g.mul(n, 2.0), 1.0)))
-    veins = g.power(ridge, g.scalar("VeinSharpness", 10.0, "Veins"))
+    veins = g.power(ridge, g.scalar("VeinSharpness", 70.0, "Veins"))
     pulse = g.add(g.mul(g.sine(g.mul(t, g.scalar("PulseSpeed", 0.8, "Veins"))), 0.35), 1.0)
     vein_e = g.mul(g.mul(g.vec("VeinColor", (0.25, 1.0, 0.35)), veins),
                    g.mul(g.scalar("VeinIntensity", 6.0, "Veins"), pulse))

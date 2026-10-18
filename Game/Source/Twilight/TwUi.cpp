@@ -8,6 +8,7 @@
 #include "Widgets/Text/STextBlock.h"
 #include "Styling/CoreStyle.h"
 #include "Rendering/DrawElements.h"
+#include "Rendering/DrawElementTypes.h"
 #include "Rendering/SlateRenderer.h"
 #include "Fonts/FontMeasure.h"
 #include "Framework/Application/SlateApplication.h"
@@ -54,6 +55,22 @@ namespace TwUi
 			Box(Out, Layer + 2, Geo, P, FVector2D(W, Size.Y), A);
 			Box(Out, Layer + 3, Geo, P, FVector2D(W, Size.Y * 0.38f), B);
 		}
+	}
+
+	void EdgeGlow(FSlateWindowElementList& Out, int32 Layer, const FGeometry& Geo, const FVector2D& Size, const FLinearColor& C, float W)
+	{
+		const FLinearColor Z(C.R, C.G, C.B, 0.f);
+		auto G = [&](const FVector2D& Pos, const FVector2D& Sz, const FLinearColor& A, const FLinearColor& B, EOrientation O, float Len)
+		{
+			TArray<FSlateGradientStop> Stops;
+			Stops.Add(FSlateGradientStop(FVector2D(0, 0), A));
+			Stops.Add(FSlateGradientStop(O == Orient_Vertical ? FVector2D(Len, 0) : FVector2D(0, Len), B));
+			FSlateDrawElement::MakeGradient(Out, Layer, Geo.ToPaintGeometry(FVector2f(Sz), FSlateLayoutTransform(FVector2f(Pos))), Stops, O);
+		};
+		G(FVector2D(0, 0), FVector2D(W, Size.Y), C, Z, Orient_Vertical, W);
+		G(FVector2D(Size.X - W, 0), FVector2D(W, Size.Y), Z, C, Orient_Vertical, W);
+		G(FVector2D(0, 0), FVector2D(Size.X, W), C, Z, Orient_Horizontal, W);
+		G(FVector2D(0, Size.Y - W), FVector2D(Size.X, W), Z, C, Orient_Horizontal, W);
 	}
 
 	TSharedRef<SWidget> Button(const TAttribute<FText>& Label, TFunction<void()> OnClick, bool bPrimary, float Width)

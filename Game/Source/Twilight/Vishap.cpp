@@ -22,8 +22,8 @@ namespace
 	const FLinearColor SkinNormal(0.035f, 0.028f, 0.05f);
 	const FLinearColor SkinElite(0.12f, 0.02f, 0.02f);
 	const FLinearColor SkinBoss(0.02f, 0.03f, 0.035f);
-	const FLinearColor VeinNormal(1.f, 0.25f, 0.05f);
-	const FLinearColor VeinBoss(1.f, 0.12f, 0.02f);
+	const FLinearColor VeinNormal(1.f, 0.14f, 0.03f);
+	const FLinearColor VeinBoss(1.f, 0.06f, 0.02f);
 }
 
 AVishap::AVishap()
@@ -41,12 +41,12 @@ void AVishap::Setup(bool bInBoss, int32 InTier, float HealthMult)
 	if (bBoss)
 	{
 		NumSeg = 44; R0 = 190.f; Spacing = 250.f; BaseSpeed = 2200.f; TurnRate = 55.f;
-		MaxHealth = 170.f * HealthMult;
+		MaxHealth = 460.f * HealthMult;
 	}
 	else
 	{
-		NumSeg = 26; R0 = Tier ? 95.f : 82.f; Spacing = R0 * 1.35f; BaseSpeed = Tier ? 2900.f : 2400.f; TurnRate = Tier ? 120.f : 95.f;
-		MaxHealth = (Tier ? 16.f : 10.f) * HealthMult;
+		NumSeg = 21; R0 = Tier ? 100.f : 88.f; Spacing = R0 * 1.35f; BaseSpeed = Tier ? 2900.f : 2400.f; TurnRate = Tier ? 120.f : 95.f;
+		MaxHealth = (Tier ? 34.f : 20.f) * HealthMult;
 	}
 	Health = MaxHealth;
 	TrailStep = Spacing / 3.f;
@@ -81,14 +81,19 @@ void AVishap::Build()
 	{
 		SkinMat->SetVectorParameterValue(TEXT("SkinColor"), Skin);
 		SkinMat->SetVectorParameterValue(TEXT("VeinColor"), Vein);
-		SkinMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBoss ? 9.f : 6.f);
+		SkinMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBoss ? 2.6f : 1.8f);
+		SkinMat->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(1.f, 0.22f, 0.05f));
+		SkinMat->SetScalarParameterValue(TEXT("RimIntensity"), 0.7f);
+		SkinMat->SetVectorParameterValue(TEXT("SkinColor2"), Skin * 2.2f);
 	}
 	BoneMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_VishapSkin")), this);
 	if (BoneMat)
 	{
 		BoneMat->SetVectorParameterValue(TEXT("SkinColor"), FLinearColor(0.09f, 0.07f, 0.06f));
 		BoneMat->SetVectorParameterValue(TEXT("VeinColor"), Vein);
-		BoneMat->SetScalarParameterValue(TEXT("VeinIntensity"), 2.f);
+		BoneMat->SetScalarParameterValue(TEXT("VeinIntensity"), 0.8f);
+		BoneMat->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(1.f, 0.3f, 0.08f));
+		BoneMat->SetScalarParameterValue(TEXT("RimIntensity"), 0.4f);
 	}
 	EyeMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
 	if (EyeMat)
@@ -138,7 +143,7 @@ void AVishap::Build()
 		Segments.Add(S);
 
 		// dorsal spikes, longer near the head
-		if (i >= 2 && i % 2 == 0 && i < NumSeg - 2)
+		if (i >= 2 && i % 3 == 0 && i < NumSeg - 3)
 		{
 			UStaticMeshComponent* Sp = MakePart(ConeMesh, S, BoneMat, false);
 			const float L = FMath::Lerp(1.4f, 0.5f, T);
@@ -147,7 +152,7 @@ void AVishap::Build()
 			Sp->SetRelativeScale3D(FVector(0.32f, 0.32f, 0.7f * L));
 		}
 		// side fins on a few segments
-		if (i == 4 || i == 9)
+		if (bBoss && (i == 4 || i == 9))
 		{
 			for (int32 s = -1; s <= 1; s += 2)
 			{
@@ -158,6 +163,10 @@ void AVishap::Build()
 			}
 		}
 	}
+
+	SegDist.SetNum(NumSeg);
+	SegDist[0] = 0.f;
+	for (int32 i = 1; i < NumSeg; ++i) SegDist[i] = SegDist[i - 1] + (SegRadius[i - 1] + SegRadius[i]) * 0.62f;
 
 	// head: skull, snout, jaw, horns, eyes (attached to segment 0)
 	USceneComponent* H = Segments[0];
@@ -380,6 +389,7 @@ void AVishap::Think(float Dt)
 		JawOpen = FMath::FInterpTo(JawOpen, 1.f, Dt, 10.f);
 		BreathTick -= Dt;
 		if (BreathTick <= 0.f) { BreathTick = 0.12f; DoBreathTick(); }
+		BreathFxTick -= Dt;
 		if (StateTime > StateDur) { AttackCooldown = (bBoss ? 2.2f : 3.2f) / Enrage; BeginState(EVishapState::Retreat); }
 		break;
 	}
@@ -446,8 +456,12 @@ void AVishap::DoBreathTick()
 	{
 		UGameplayStatics::ApplyDamage(P, bBoss ? 4.5f : 3.f, nullptr, this, nullptr);
 	}
-	// visible fire puffs along the cone
-	TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, M + Fwd * FMath::FRandRange(0.3f, 0.9f) * Range * 0.8f, bBoss ? 1.3f : 0.7f);
+	// visible fire puffs along the cone (throttled: particles are expensive)
+	if (BreathFxTick <= 0.f)
+	{
+		BreathFxTick = 0.3f;
+		TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, M + Fwd * FMath::FRandRange(0.3f, 0.9f) * Range * 0.8f, bBoss ? 1.6f : 1.25f);
+	}
 }
 
 void AVishap::DoSpit()
@@ -486,7 +500,7 @@ void AVishap::ApplyHit(float Damage, const FVector& Where, AVahagnCharacter* Her
 	if (State == EVishapState::Emerge && StateTime < 0.6f) Damage *= 0.5f;
 	Health -= Damage;
 	HitFlash = 1.f;
-	TwFx::Burst(GetWorld(), TwFx::EFx::Sparks, Where, bBoss ? 1.5f : 1.f);
+	TwFx::Burst(GetWorld(), TwFx::EFx::Sparks, Where, bBoss ? 0.75f : 0.6f);
 	TwFx::Sound(GetWorld(), TEXT("sfx_vishap_hit"), Where, 0.6f, FMath::FRandRange(0.85f, 1.15f) * (bBoss ? 0.7f : 1.f));
 
 	if (bBoss)
@@ -561,7 +575,7 @@ void AVishap::Tick(float Dt)
 		{
 			Trail.Insert(Trail[0] + Dir * TrailStep, 0);
 		}
-		const int32 Need = FMath::CeilToInt((NumSeg + 2) * Spacing / TrailStep) + 4;
+		const int32 Need = FMath::CeilToInt((SegDist.Num() ? SegDist.Last() + 2.f * Spacing : (NumSeg + 2) * Spacing) / TrailStep) + 4;
 		if (Trail.Num() > Need) Trail.SetNum(Need);
 	}
 	UpdateBody(Dt);
@@ -574,7 +588,7 @@ void AVishap::UpdateBody(float Dt)
 	for (int32 i = 0; i < Segments.Num(); ++i)
 	{
 		FVector Tan;
-		const float DistAlong = FMath::Max(0.f, i * Spacing - Lag);
+		const float DistAlong = FMath::Max(0.f, SegDist[i] - Lag);
 		FVector P = i == 0 ? HeadPos : SampleTrail(DistAlong + Lag * 0.f, &Tan);
 		if (i == 0) Tan = HeadVel.GetSafeNormal().IsNearlyZero() ? FVector::ForwardVector : HeadVel.GetSafeNormal();
 		// gentle undulation travelling down the body
@@ -589,7 +603,7 @@ void AVishap::UpdateBody(float Dt)
 		Jaw->SetRelativeRotation(FRotator(-JawOpen * 32.f, 0.f, 0.f));
 		Jaw->SetRelativeLocation(FVector(60.f - JawOpen * 6.f, 0.f, -22.f - JawOpen * 10.f));
 	}
-	if (SkinMat) SkinMat->SetScalarParameterValue(TEXT("HitFlash"), HitFlash);
+	if (SkinMat) SkinMat->SetScalarParameterValue(TEXT("HitFlash"), HitFlash * 0.18f);
 	if (EyeLight)
 	{
 		const bool bAngry = State == EVishapState::BreathWindup || State == EVishapState::Breath || State == EVishapState::DashWindup;

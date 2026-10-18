@@ -27,6 +27,7 @@ public:
 	void InUp(float V) { UpIn = V; }
 	void InDash();
 	void InHowl();
+	void SetBotDriven(bool b) { bBot = b; }
 	void SetControlEnabled(bool b) { bControl = b; if (!b) { MoveIn = FVector2D::ZeroVector; UpIn = 0.f; } }
 
 	// race state
@@ -46,7 +47,7 @@ public:
 	void Stunned(float Secs) { Stun = FMath::Max(Stun, Secs); }
 	FVector GetVel() const { return Vel; }
 
-	static constexpr float Speed = 2600.f;
+	static constexpr float Speed = 2100.f;
 
 protected:
 	virtual void BeginPlay() override;

@@ -25,7 +25,7 @@ public:
 	static int32 ZoneAt(float T) { return T < 0.36f ? 0 : (T < 0.7f ? 1 : 2); }
 	/** Local search for the path parameter nearest to P, starting from Hint. */
 	static float NearestT(const FVector& P, float Hint);
-	static constexpr float PathLength = 110000.f; // approx. cm
+	static constexpr float PathLength = 160000.f; // approx. cm
 
 	FVector GetGate() const { return PathPoint(1.f); }
 

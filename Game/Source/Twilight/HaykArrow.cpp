@@ -8,6 +8,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Components/PointLightComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/World.h"
 
@@ -49,7 +50,7 @@ void AHaykArrow::Launch(AHaykArcher* InShooter, const FVector& Dir, float Power0
 	const float S = InShooter && InShooter->IsBel() ? 1.45f : 1.f;
 
 	UMaterialInstanceDynamic* Wood = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_VishapSkin")), this);
-	if (Wood) { Wood->SetVectorParameterValue(TEXT("SkinColor"), FLinearColor(0.25f, 0.12f, 0.05f)); Wood->SetScalarParameterValue(TEXT("VeinIntensity"), 0.5f); }
+	if (Wood) { Wood->SetVectorParameterValue(TEXT("SkinColor"), FLinearColor(0.25f, 0.12f, 0.05f)); Wood->SetScalarParameterValue(TEXT("VeinIntensity"), 0.5f); Wood->SetScalarParameterValue(TEXT("RimIntensity"), 0.35f); Wood->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(1.f, 0.55f, 0.25f)); }
 	UMaterialInstanceDynamic* Glow = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
 	const FLinearColor GlowCol = bSpecial ? FLinearColor(1.f, 0.82f, 0.35f) : (InShooter && InShooter->IsBel() ? FLinearColor(1.f, 0.2f, 0.05f) : FLinearColor(1.f, 0.55f, 0.2f));
 	if (Glow) { Glow->SetVectorParameterValue(TEXT("Color"), GlowCol); Glow->SetScalarParameterValue(TEXT("GlowMode"), 1.f); Glow->SetScalarParameterValue(TEXT("Intensity"), bSpecial ? 30.f : 10.f); }
@@ -139,6 +140,7 @@ void AHaykArrow::Tick(float Dt)
 			const FVector Up = FVector::CrossProduct(Fwd, Right).GetSafeNormal();
 			Acc += (Right * SteerInput.X + Up * SteerInput.Y) * 2600.f;
 		}
+		SteerInput = FVector2D::ZeroVector; // one frame of input; held input re-sends every frame
 		Vel += Acc * Dt;
 		const FVector P0 = GetActorLocation();
 		const FVector P1 = P0 + Vel * Dt;
@@ -192,7 +194,18 @@ void AHaykArrow::Resolve(const FHitResult& Hit)
 		HitArcher = A;
 		Result = EArrowResult::HitArcher;
 		// stick into the body
-		AttachToComponent(A->GetBody(), FAttachmentTransformRules::KeepWorldTransform);
+		{
+			USkeletalMeshComponent* BodyMesh = A->GetBody();
+			const FName Bones[6] = { TEXT("head"), TEXT("spine_03"), TEXT("spine_01"), TEXT("pelvis"), TEXT("thigh_l"), TEXT("thigh_r") };
+			FName Best = NAME_None; float BestD = TNumericLimits<float>::Max();
+			for (const FName& B : Bones)
+			{
+				const float D = FVector::DistSquared(BodyMesh->GetBoneLocation(B), Impact);
+				if (D < BestD) { BestD = D; Best = B; }
+			}
+			AttachToComponent(BodyMesh, FAttachmentTransformRules::KeepWorldTransform, Best);
+		}
+		TwFx::Sound(GetWorld(), TEXT("sfx_arrow_hit_flesh"), Impact, 1.f);
 		TwFx::LightFlash(GetWorld(), Impact, FLinearColor(1.f, 0.4f, 0.1f), bSpecial ? 80000.f : 25000.f, 900.f, 0.4f);
 	}
 	else if (AHaykShield* S = Cast<AHaykShield>(Other))
@@ -200,13 +213,13 @@ void AHaykArrow::Resolve(const FHitResult& Hit)
 		S->TakeArrow(Impact, bSpecial);
 		Result = EArrowResult::HitShield;
 		AttachToActor(S, FAttachmentTransformRules::KeepWorldTransform);
-		TwFx::Sound(GetWorld(), TEXT("sfx_ui_click"), Impact, 1.f, 0.5f);
+		TwFx::Sound(GetWorld(), TEXT("sfx_arrow_hit_wood"), Impact, 1.f);
 	}
 	else
 	{
 		Result = EArrowResult::HitGround;
 		TwFx::Burst(GetWorld(), TwFx::EFx::Smoke, Impact, 0.6f);
-		TwFx::Sound(GetWorld(), TEXT("sfx_ui_click"), Impact, 0.8f, 0.4f);
+		TwFx::Sound(GetWorld(), TEXT("sfx_arrow_hit_ground"), Impact, 0.9f);
 	}
 	if (bSpecial) TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, Impact, 1.2f);
 	Light->SetIntensity(Light->Intensity * 0.3f);

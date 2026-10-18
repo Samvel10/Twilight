@@ -12,18 +12,20 @@ LOG="$OUT/game.log"
   -ResX=$RESX -ResY=$RESY -WinX=0 -WinY=0 -NoSplash -nosound -unattended -log=TwTest.log \
   -TwAutoPlay=$SECS "$@" > "$LOG" 2>&1 &
 PID=$!
-# wait for the window
-for i in $(seq 1 240); do
-  WID=$( (xdotool search --onlyvisible --pid $PID 2>/dev/null; xdotool search --onlyvisible --name 'SF_VULKAN' 2>/dev/null) | head -1)
-  [ -n "$WID" ] && grep -q "\[TwTest\] t=" "$LOG" 2>/dev/null && break
+# wait for the window, then record until the game exits
+WID=""
+for i in $(seq 1 300); do
+  WID=$(xdotool search --onlyvisible --name 'SF_VULKAN' 2>/dev/null | tail -1)
+  [ -n "$WID" ] && break
   kill -0 $PID 2>/dev/null || break
   sleep 1
 done
-if [ -n "${WID:-}" ]; then
+if [ -n "$WID" ]; then
+  sleep 2
   eval "$(xdotool getwindowgeometry --shell "$WID")"
   W=$(( WIDTH / 2 * 2 )); H=$(( HEIGHT / 2 * 2 ))
   ffmpeg -hide_banner -loglevel error -y -f x11grab -draw_mouse 0 -framerate 20 -video_size ${W}x${H} -i :0.0+${X},${Y} \
-    -t "$SECS" -c:v libx264 -preset ultrafast -crf 23 -pix_fmt yuv420p "$OUT/run.mp4" &
+    -t $((SECS + 120)) -c:v libx264 -preset ultrafast -crf 23 -pix_fmt yuv420p "$OUT/run.mp4" < /dev/null &
   FF=$!
 fi
 wait $PID

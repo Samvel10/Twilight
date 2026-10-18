@@ -55,7 +55,7 @@ AFireball::AFireball()
 	Move->bSweepCollision = true;
 	Move->bAutoActivate = false;
 
-	InitialLifeSpan = 4.f;
+	InitialLifeSpan = 2.4f;
 }
 
 void AFireball::Launch(const FVector& Dir, float InDamage, float InAoe, float Scale, bool bInHostile, float SpeedOverride)
@@ -98,7 +98,7 @@ void AFireball::Launch(const FVector& Dir, float InDamage, float InAoe, float Sc
 	{
 		Light->SetVisibility(false);
 	}
-	for (int32 i = 0; i < 5; ++i)
+	for (int32 i = 0; i < 3; ++i)
 	{
 		UStaticMeshComponent* T = NewObject<UStaticMeshComponent>(this);
 		T->SetStaticMesh(TwAssets::Sphere());
@@ -106,8 +106,8 @@ void AFireball::Launch(const FVector& Dir, float InDamage, float InAoe, float Sc
 		T->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		T->SetCastShadow(false);
 		T->SetMaterial(0, CoreMat);
-		const float K = 1.f - (i + 1) / 6.f;
-		T->SetRelativeLocation(FVector(-(i + 1) * 34.f * Scale, 0.f, 0.f));
+		const float K = 1.f - (i + 1) / 4.f;
+		T->SetRelativeLocation(FVector(-(i + 1) * 46.f * Scale, 0.f, 0.f));
 		T->SetRelativeScale3D(FVector(0.62f * K, 0.34f * K, 0.34f * K) * Scale);
 		T->RegisterComponent();
 		Tail.Add(T);

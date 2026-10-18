@@ -149,12 +149,12 @@ void AHaykPlayerController::OnSteerKeys(const FInputActionValue& V)
 }
 
 void AHaykPlayerController::OnDraw(const FInputActionValue& V) { if (Screen == EHaykScreen::None) if (AHaykGameMode* GM = Mode()) GM->DrawStart(); }
-void AHaykPlayerController::OnDrawDone(const FInputActionValue& V) { if (AHaykGameMode* GM = Mode()) GM->DrawRelease(); }
+void AHaykPlayerController::OnDrawDone(const FInputActionValue& V) { if (Screen == EHaykScreen::None) if (AHaykGameMode* GM = Mode()) GM->DrawRelease(); }
 void AHaykPlayerController::OnSpecial(const FInputActionValue& V) { if (Screen == EHaykScreen::None) if (AHaykGameMode* GM = Mode()) GM->ToggleSpecial(); }
 void AHaykPlayerController::OnPause(const FInputActionValue& V)
 {
-	const AHaykGameMode* GM = Mode();
+	AHaykGameMode* GM = Mode();
 	if (Screen == EHaykScreen::Pause) { UiResume(); return; }
 	if (Screen == EHaykScreen::Controls) { UiBack(); return; }
-	if (Screen == EHaykScreen::None && GM && GM->GetState() != EHaykState::End) SetScreen(EHaykScreen::Pause);
+	if (Screen == EHaykScreen::None && GM && GM->GetState() != EHaykState::End) { GM->CancelDraw(); SetScreen(EHaykScreen::Pause); }
 }
