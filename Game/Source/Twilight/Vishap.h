@@ -31,6 +31,7 @@ public:
 	virtual void Tick(float Dt) override;
 
 	bool IsAlive() const { return State != EVishapState::Dying; }
+	bool IsAttacking() const { return State == EVishapState::BreathWindup || State == EVishapState::Breath || State == EVishapState::DashWindup || State == EVishapState::Dash || State == EVishapState::Spit; }
 	bool IsBoss() const { return bBoss; }
 	float GetHealth() const { return Health; }
 	float GetMaxHealth() const { return MaxHealth; }

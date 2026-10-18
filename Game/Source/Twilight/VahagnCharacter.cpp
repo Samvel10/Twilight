@@ -229,7 +229,7 @@ void AVahagnCharacter::Tick(float Dt)
 
 		// regen
 		const float Now = GetWorld()->GetTimeSeconds();
-		if (Now - LastDamageTime > 4.f) Health = FMath::Min(MaxHealth, Health + 3.f * Dt);
+		if (Now - LastDamageTime > 3.f) Health = FMath::Min(MaxHealth, Health + 6.f * Dt);
 	}
 	UpdateVisuals(Dt);
 	DamageFlash = FMath::Max(0.f, DamageFlash - Dt * 2.2f);
@@ -497,6 +497,7 @@ float AVahagnCharacter::TakeDamage(float Damage, const FDamageEvent& Event, ACon
 	float Mult = 1.f;
 	if (const AVahagnGameMode* GM = GetWorld()->GetAuthGameMode<AVahagnGameMode>()) Mult = GM->DamageToPlayerMultiplier();
 	const float D = Damage * Mult;
+	UE_LOG(LogTwilight, Display, TEXT("[TwDmg] %.1f from %s (hp %.0f)"), D, Causer ? *Causer->GetName() : TEXT("?"), Health);
 	Health -= D;
 	LastDamageTime = GetWorld()->GetTimeSeconds();
 	DamageFlash = FMath::Min(1.f, DamageFlash + 0.6f);
@@ -509,6 +510,7 @@ float AVahagnCharacter::TakeDamage(float Damage, const FDamageEvent& Event, ACon
 void AVahagnCharacter::Die()
 {
 	if (bDead) return;
+	UE_LOG(LogTwilight, Display, TEXT("[TwDmg] DIED at %s"), *GetActorLocation().ToString());
 	bDead = true;
 	SetControlEnabled(false);
 	GetCharacterMovement()->StopMovementImmediately();

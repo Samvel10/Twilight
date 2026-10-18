@@ -203,6 +203,7 @@ void AVahagnPlayerController::OnMatchEnded(bool bWin) { bVictory = bWin; SetScre
 
 void AVahagnPlayerController::UiPlay()
 {
+	UE_LOG(LogTwilight, Display, TEXT("[TwUi] Play clicked"));
 	TwFx::Sound2D(GetWorld(), TEXT("sfx_ui_click"));
 	if (AVahagnGameMode* GM = Mode()) GM->StartMatch();
 }

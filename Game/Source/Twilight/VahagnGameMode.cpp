@@ -72,7 +72,7 @@ AVahagnCharacter* AVahagnGameMode::Hero() const
 
 float AVahagnGameMode::DamageToPlayerMultiplier() const
 {
-	switch (Difficulty) { case EVahagnDifficulty::Easy: return 0.55f; case EVahagnDifficulty::Hard: return 1.4f; default: return 1.f; }
+	switch (Difficulty) { case EVahagnDifficulty::Easy: return 0.5f; case EVahagnDifficulty::Hard: return 1.25f; default: return 0.8f; }
 }
 
 float AVahagnGameMode::HealthMultiplier() const

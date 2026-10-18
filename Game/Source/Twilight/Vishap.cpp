@@ -63,6 +63,7 @@ void AVishap::BeginPlay()
 	Trail.Reset();
 	for (int32 i = 0; i < N; ++i) Trail.Add(HeadPos - FVector(0, 0, i * TrailStep));
 	CircleAxisSeed = FVector(FMath::FRandRange(-1.f, 1.f), FMath::FRandRange(-1.f, 1.f), 0.f).GetSafeNormal();
+	AttackCooldown = bBoss ? 4.f : FMath::FRandRange(5.f, 8.f); // let the player see them coming
 	Wobble = FMath::FRandRange(0.f, 10.f);
 	BeginState(EVishapState::Emerge);
 	TwFx::Burst(GetWorld(), TwFx::EFx::Splash, FVector(HeadPos.X, HeadPos.Y, 20.f), bBoss ? 6.f : 2.5f);
@@ -356,7 +357,12 @@ void AVishap::Think(float Dt)
 	{
 		Steer(PL + WobbleOff + FVector(0, 0, 400.f), BaseSpeed * Enrage, TurnRate, Dt);
 		const float Range = bBoss ? 6500.f : 4200.f;
-		if (P && !P->IsDead() && Dist < Range && AttackCooldown <= 0.f)
+		// attack tokens: never more than a couple of vishaps attack at the same time
+		int32 Attackers = 0;
+		for (TActorIterator<AVishap> It(GetWorld()); It; ++It) if (*It != this && It->IsAttacking()) ++Attackers;
+		int32 MaxAttackers = 2;
+		if (const AVahagnGameMode* GM = GetWorld()->GetAuthGameMode<AVahagnGameMode>()) MaxAttackers = GM->GetWave() <= 1 ? 1 : 2;
+		if (P && !P->IsDead() && Dist < Range && AttackCooldown <= 0.f && (bBoss || Attackers < MaxAttackers))
 		{
 			const float R = FMath::FRand();
 			if (Dist > 2600.f && R < 0.3f) BeginState(EVishapState::Spit);
@@ -454,7 +460,7 @@ void AVishap::DoBreathTick()
 	const float Ang = FMath::RadiansToDegrees(FMath::Acos(FMath::Clamp(FVector::DotProduct(To / FMath::Max(D, 1.f), Fwd), -1.f, 1.f)));
 	if (D < Range && Ang < Cone)
 	{
-		UGameplayStatics::ApplyDamage(P, bBoss ? 4.5f : 3.f, nullptr, this, nullptr);
+		UGameplayStatics::ApplyDamage(P, bBoss ? 2.6f : 1.6f, nullptr, this, nullptr);
 	}
 	// visible fire puffs along the cone (throttled: particles are expensive)
 	if (BreathFxTick <= 0.f)

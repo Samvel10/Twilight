@@ -477,7 +477,7 @@ void AHaykGameMode::Tick(float Dt)
 				if (Streak % 2 == 0) Spec = FMath::Min(2, Spec + 1);
 				if (bByBel) BotMisses = 0;
 				TwFx::Sound2D(GetWorld(), TEXT("sfx_crowd_cheer"), 0.55f, bByBel ? 0.85f : 1.f);
-				Announce(A->WasHeadshot() ? LOCTEXT("Head", "Գլխին") : LOCTEXT("Hit", "Դիպուկ է"), FText::Format(LOCTEXT("Dmg", "−{0}"), FText::AsNumber(FMath::RoundToInt(A->GetDamageDealt()))));
+				Announce(A->WasHeadshot() ? LOCTEXT("Head", "Գլխին") : LOCTEXT("Hit", "Դիպուկ է"), FText::Format(LOCTEXT("Dmg", "-{0}"), FText::AsNumber(FMath::RoundToInt(A->GetDamageDealt()))));
 			}
 			else
 			{

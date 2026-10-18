@@ -464,7 +464,8 @@ void SVahagnHud::PaintGameplay(const FGeometry& Geo, FSlateWindowElementList& Ou
 	{
 		const float A = FMath::Clamp(Age / 0.25f, 0.f, 1.f) * FMath::Clamp((3.2f - Age) / 0.6f, 0.f, 1.f);
 		const float Y = C.Y - 300 * S + (1.f - FMath::Clamp(Age / 0.25f, 0.f, 1.f)) * 20 * S;
-		Text(Out, L + 8, Geo, FVector2D(C.X, Y), At, TwAssets::Font(56 * S, true, true), FLinearColor(Gold.R, Gold.G, Gold.B, A), 0.5f);
+		const float TitleSize = At.ToString().Len() > 26 ? 30.f : 56.f; // long quotes must fit the screen
+		Text(Out, L + 8, Geo, FVector2D(C.X, Y), At, TwAssets::Font(TitleSize * S, true, true), FLinearColor(Gold.R, Gold.G, Gold.B, A), 0.5f);
 		if (!As.IsEmpty()) Text(Out, L + 8, Geo, FVector2D(C.X, Y + 80 * S), As, TwAssets::Font(22 * S, false, false), FLinearColor(Cream.R, Cream.G, Cream.B, A * 0.9f), 0.5f);
 	}
 
