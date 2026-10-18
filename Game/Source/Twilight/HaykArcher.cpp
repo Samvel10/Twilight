@@ -106,6 +106,7 @@ void AHaykArcher::BeginPlay()
 		BodyMat->SetVectorParameterValue(TEXT("VeinColor"), bBel ? FLinearColor(1.f, 0.08f, 0.02f) : FLinearColor(1.f, 0.7f, 0.25f));
 		BodyMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBel ? 4.f : 1.2f); BodyMat->SetScalarParameterValue(TEXT("RimIntensity"), 0.35f); BodyMat->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(1.f, 0.55f, 0.25f));
 		BodyMat->SetScalarParameterValue(TEXT("Metallic"), 0.6f);
+		BodyMat->SetVectorParameterValue(TEXT("FlashColor"), FLinearColor(1.f, 0.22f, 0.04f)); // a red-hot hit, not a cream wash
 		for (int32 i = 0; i < Body->GetNumMaterials(); ++i) Body->SetMaterial(i, BodyMat);
 	}
 
@@ -310,7 +311,7 @@ void AHaykArcher::Tick(float Dt)
 	Super::Tick(Dt);
 	UpdateBowAndZones();
 	HurtFlash = FMath::Max(0.f, HurtFlash - Dt * 2.f);
-	if (BodyMat) BodyMat->SetScalarParameterValue(TEXT("HitFlash"), HurtFlash);
+	if (BodyMat) BodyMat->SetScalarParameterValue(TEXT("HitFlash"), HurtFlash * 0.45f);
 }
 
 EArcherZone AHaykArcher::ZoneOf(const UPrimitiveComponent* C) const

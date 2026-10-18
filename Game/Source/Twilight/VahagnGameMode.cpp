@@ -118,7 +118,7 @@ void AVahagnGameMode::StartMatch()
 	if (AVahagnPlayerController* PC = Cast<AVahagnPlayerController>(UGameplayStatics::GetPlayerController(this, 0))) PC->OnMatchStarted();
 	IntroLeft = 4.2f;
 	if (AVahagnCharacter* H = Hero()) { if (AutoTestSeconds > 0.f) { IntroLeft = 1.f; H->SetControlEnabled(true); } else H->BeginBirth(FVector(0.f, 0.f, 700.f), IntroLeft); }
-	if (World) World->PlayMusic(TEXT("music_battle"));
+	if (World) { World->PlayMusic(TEXT("music_battle")); World->SetStorm(false); }
 	Announce(LOCTEXT("Ready", "«Երկնէր երկին, երկնէր երկիր, երկնէր և ծովն ծիրանի…»"), LOCTEXT("ReadySub", "Ծիրանի ծովի եղեգից ծնվում է Վահագնը"));
 }
 
@@ -254,7 +254,13 @@ void AVahagnGameMode::Tick(float Dt)
 	{
 	case EVahagnMatch::Intro:
 		IntroLeft -= Dt;
-		if (IntroLeft <= 0.f) { MatchState = EVahagnMatch::Playing; if (AVahagnCharacter* H = Hero()) H->SetControlEnabled(true); BeginWave(1); }
+		if (IntroLeft <= 0.f)
+		{
+			MatchState = EVahagnMatch::Playing;
+			if (AVahagnCharacter* H = Hero()) H->SetControlEnabled(true);
+			// -TwBossTest (testing only): skip the three waves, the boss rises after the usual 3.5 s pause
+			if (FParse::Param(FCommandLine::Get(), TEXT("TwBossTest"))) Wave = 3; else BeginWave(1);
+		}
 		break;
 	case EVahagnMatch::Playing:
 	{
@@ -284,7 +290,7 @@ void AVahagnGameMode::Tick(float Dt)
 						Wave = 4;
 						Announce(LOCTEXT("Boss", "Մեծ վիշապը"), LOCTEXT("BossSub", "Արթնացավ ծովի ամենախոր հատակից"));
 						SpawnVishap(true, 0, 11000.f, H ? H->GetControlRotation().Yaw : 0.f);
-						if (World) World->PlayMusic(TEXT("music_boss"));
+						if (World) { World->PlayMusic(TEXT("music_boss")); World->SetStorm(true); }
 						TwFx::Sound2D(GetWorld(), TEXT("sfx_vishap_roar"), 1.f, 0.55f);
 					}
 				}

@@ -564,8 +564,8 @@ def build_water(water_n, noise_tex=None):
     warp = None
     if noise_tex is not None:
         wobj = g.tex_param_obj("WarpNoise", noise_tex)
-        warp = g.sample(wobj, noise_tex, g.panner(g.mul(xyb, 0.13), 0.004, -0.003), out="R")
-        warp = g.mul(warp, g.scalar("WarpAmount", 1.0, "Surface"))
+        warp = g.sample(wobj, noise_tex, g.panner(g.mul(xyb, 0.37), 0.004, -0.003), out="R")
+        warp = g.mul(warp, g.scalar("WarpAmount", 1.6, "Surface"))
     ripples = [  # (angle deg, wavelength factor, slope weight, phase offset, warp gain)
         (12, 1.00, 0.22, 0.13, 0.6), (77, 0.71, 0.18, 0.61, 0.9), (141, 0.53, 0.15, 0.27, 1.2),
         (203, 0.39, 0.13, 0.88, 1.5), (251, 0.29, 0.11, 0.44, 1.8), (318, 0.21, 0.09, 0.07, 2.1),

@@ -13,6 +13,9 @@ class TWILIGHT_API AVahagnWorld : public ATwEnvironment
 	GENERATED_BODY()
 public:
 	AVahagnWorld();
+	virtual void Tick(float Dt) override;
+	/** 0 = calm sunset, 1 = crimson storm with lightning (the Great Vishap's world). Blends over a few seconds. */
+	void SetStorm(bool bOn) { StormTarget = bOn ? 1.f : 0.f; }
 
 protected:
 	virtual void BuildLevel() override;
@@ -23,5 +26,18 @@ private:
 	void BuildIslands();
 	void BuildVishapakar(const FVector& Base, float Yaw, float Scale);
 
+	void ApplyStorm(float K);
+	void StrikeLightning();
+	void UpdateBolt(float Dt);
+
 	UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> Sea;
+	UPROPERTY() TObjectPtr<class UMaterialInstanceDynamic> SeaMat;
+	UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> BoltSegs;
+	UPROPERTY() TObjectPtr<class UMaterialInstanceDynamic> BoltMat;
+	float Storm = 0.f;
+	float StormTarget = 0.f;
+	float LastApplied = -1.f;
+	float NextStrike = 3.f;
+	float BoltAge = 10.f;
+	float CapturedAt = 0.f;
 };
