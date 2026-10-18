@@ -2,7 +2,8 @@
 
 **Engine:** `/home/samo/UnrealEngine-5.8` (`$E` below). I checked every claim against the source on disk on 2026-10-18. Anything I could not prove from source is marked **UNVERIFIED**.
 **Script:** `/var/www/html/Twilight/docs/research/materials_build.py`. It is complete and re-runnable. It builds 7 materials and 13 MIs under `/Game/Twilight/Materials`.
-**Testing so far:** `python3 -m py_compile` passes. A full mock run against a stub `unreal` module also passes: every helper call, pin and tuple path ran, and it reported 0 errors. It has **not** been run in the real editor yet, because I was told not to launch UE. The first real run is the final check (§5).
+**CRITIC FIX (status):** the script **has already run for real** in the 5.8 editor commandlet. `Game/Saved/Logs/TwilightAssets.log:1609-1779` (2026-10-18 16:58:59) shows all 7 `M_*` and 13 `MI_*` built and saved, and `=== done: 7 materials, 0 errors ===`. `Content/Twilight/Materials/` holds all 20 `.uasset` files. What is still unproven is **HLSL shader compilation** (see §4.1), because the commandlet runs with no RHI shader compile. In particular, the LWC `WorldPosition` paths in `M_Water_Purple` (Dot → Divide → Sine → WPO) and `M_Rock` (WorldPosition / scalar → ComponentMask → TextureSample UVs) have not been compiled yet. Check the first `-game` log for `Failed to compile Material`.
+**Testing so far (original note):** `python3 -m py_compile` passes. A full mock run against a stub `unreal` module also passes: every helper call, pin and tuple path ran, and it reported 0 errors. It has **not** been run in the real editor yet, because I was told not to launch UE. The first real run is the final check (§5).
 
 ---
 
@@ -91,7 +92,7 @@ Implementation facts that matter:
 
 ### 1.4 UMaterial properties used (`$E/Engine/Source/Runtime/Engine/Public/Materials/Material.h`)
 - `material_domain` :482, `blend_mode` :486, `shading_model` :511 (private but `EditAnywhere`, so Python can set it), `two_sided` :561, `is_sky` :1090.
-- The `bUsedWith*` fields are `UE_DEPRECATED(5.8, "Always use the GetUsageByFlag() accessor.")` (:701-911). Use `set_base_material_usage` instead.
+- The `bUsedWith*` fields are `UE_DEPRECATED(5.8, "Always use the GetUsageByFlag() accessor.")` (:701-911). Use `set_base_material_usage` instead. (CRITIC: they are still `UPROPERTY(EditAnywhere, BlueprintReadOnly)`, so `set_editor_property("used_with_…")` does still work. The deprecation is C++-only. But it bypasses `MarkUsageFlagDirty` in `UMaterial::SetUsageByFlag`, `Material.cpp:1748-1751`, so prefer `set_base_material_usage` as the script does.)
 - The `EMaterialUsage` list is in `.../Materials/MaterialInterface.h:75-110`.
 - **Substrate:** the `r.Substrate` default is **0** (`$E/Engine/Source/Runtime/RenderCore/Private/RenderUtils.cpp:2069-2072`), and the project's `DefaultEngine.ini` does not set it, so Substrate is OFF. Even if someone turns it on, `IsHiddenMaterialAssetConversionEnabled()` is hard-wired to true (`RenderUtils.cpp:2564-2569`). Legacy root pins and `ShadingModel` keep working and are converted on the fly (`Material.cpp:5223-5227`, `:5374-5381`).
 
@@ -162,7 +163,11 @@ I identified the compression settings by grepping each `.uasset` for its `TC_*` 
   - It executes the file with `EPythonCommandFlags::Unattended`.
   - It returns **-1** if the script raised. The script raises at the end if any error was collected, so CI-style checks work: `echo $?` gives a non-zero result on failure.
 - A first run on a fresh project also builds the DDC and compiles the shaders of the default materials. Expect **several minutes** on this laptop.
-- I could not find an `-ExecutePythonScript` handler in the 5.8 plugin source. A grep only found `K2Node_ExecutePythonScript`, so that switch is **UNVERIFIED** for 5.8. To run the script inside a full GUI editor, use `-ExecCmds="py /abs/path/materials_build.py"`. This is also **UNVERIFIED**, but `py <file>` is the standard console command.
+- ~~I could not find an `-ExecutePythonScript` handler~~ **CRITIC FIX:** the handler exists in 5.8: `$E/Engine/Plugins/Experimental/PythonScriptPlugin/Source/PythonScriptPlugin/Private/EditorUtilities/EditorPythonExecuter.cpp:142-200` (`FEditorPythonExecuter::OnStartupModule`).
+  - It works **only in the GUI editor**. It logs an error and does nothing under a commandlet ("cannot be used by a commandlet. Use -run=PythonScript instead?") or with `-game`.
+  - It runs the script once Python is initialised, then sends **`QUIT_EDITOR`**, so the editor closes on its own (`:120-126`).
+  - `-ScriptErrorsAreFatal` turns script errors into a Fatal.
+  - For this headless pipeline, `-run=pythonscript -script=` (the commandlet) stays the right choice.
 
 ### 3.2 `.uproject` plugins
 Both plugins are `"EnabledByDefault": false`:
@@ -203,9 +208,9 @@ They must be listed in the `.uproject`. The current `/var/www/html/Twilight/Game
 4. If a connect fails, the log names the exact pin list. Fix the pin string in the relevant `build_*` function and re-run. The rebuild is idempotent.
 
 ## 6. UNVERIFIED list
-- That the script works end to end in the real 5.8 editor. Only static checks and a mock run were done (§5).
+- ~~That the script works end to end in the real 5.8 editor.~~ CRITIC FIX: the Python side is verified by a real run with 0 errors (see the top of this report). Only HLSL compilation on first `-game` load remains unverified.
 - Python spellings of enum members that contain digits (not used).
-- The `-ExecutePythonScript` / `-ExecCmds="py ..."` behaviour in 5.8 GUI mode.
+- ~~The `-ExecutePythonScript` behaviour~~ CRITIC FIX: verified (§3.1). `-ExecCmds="py ..."` is still unverified, and not needed.
 - The `delete_all_material_expressions` skip/ensure behaviour. I inferred it from the code and did not reproduce it.
 - Whether this laptop's Iris Xe Vulkan driver supports SM6.
 - The visual tuning of the default colours and intensities. Adjust them through the MIs after the first look.

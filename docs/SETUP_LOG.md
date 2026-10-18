@@ -72,3 +72,18 @@
 - **Հավաքում.** `Build.sh TwilightEditor Linux Development` → UBT-ն վերակառուցում է շարժիչի 2694 action (պատճառը անհայտ, link.rsp-ները փոխվել են)։ Ընթացքի մեջ է։
 - **Ակտիվներ.** `TwilightAssets.uproject` (առանց մոդուլի) + `Tools/build_assets.py` → 7 նյութ, 13 MI, 20 ձայն, 4 մակարդակ, 0 սխալ (`docs/logs/build_assets_1.log`)։
 - **Workflow «vahagn-code-review»** (4 վերանայող + ստուգողներ) գործարկված՝ հավաքումից առաջ սխալներ գտնելու համար։
+
+## 2026-10-18 21:23 — Critic review of research reports 01–04 + materials_build.py (subagent)
+- **What:** verified every API, flag and asset-path claim in docs/research/01–04 and materials_build.py against the UE 5.8 source/content on disk, read-only (no editor launched, nothing changed in Game/).
+- **How:** grep of headers/cpp (MaterialEditingLibrary, MaterialExpression*, PyGenUtil, CsvProfiler, ConfigCacheIni, GameEngine, GameUserSettings, Niagara, EnhancedInput, UMG, SlateCore), `ls`/`fc-query`/`strings` on content, read-only look at Game/Config, Game/Content and Saved/Logs/TwilightAssets.log.
+- **Result:** 19 corrections, marked "CRITIC FIX:" in the reports; full list in docs/research/05_critic.md. Blockers: (1) CSV EndCapture().Wait() deadlocks on the game thread; (2) inline ';' ini comments corrupt +TargetedRHIs; (3) xdotool --name 'Twilight' never matches (window title is "Վահագն (… SF_VULKAN_SM6)"); (4) the composite font expected Roboto but Content/Fonts has NotoSans, so Armenian would render as boxes; (5) [SystemSettings] r.VSync overrides GameUserSettings VSync. materials_build.py: no functional error (it has already run with 0 errors); a verification header comment was added. Still unverified: HLSL compile, DMX user-param types, SM6 on Iris Xe.
+
+## 2026-10-18 (գիշեր) — Քայլ 9. Վերանայում, ուղղումներ, Հայկ, Արալեզ, Հաբ
+- **Workflow «vahagn-code-review»** (4 վերանայող + 17 ստուգող, 21 գործակալ). 13 հաստատված խնդիր, 1 մերժված։ Կարևորները՝ `bExecuteWhenPaused` (հավաքման սխալ → `UInputAction::bTriggerWhenPaused`), `NotifyHit(bool)`-ը թաքցնում էր `AActor::NotifyHit` (-Werror → `RegisterHit`), վիշապի հատվածների overlap-ի ծանրություն (→ `ECC_PhysicsBody` + block, fireball OnHit), avoidance trace-ը by object type, ակտիվների բացակայության քեշ, սլաքներ տեսախցիկի ետևում, gamepad Y/deltaTime, Nova/բոս dilation, միավորների tier։ Բոլորը կիրառված են։
+- **Տառատեսակներ.** Noto Armenian-ում թվանշաններ/լատինատառեր չկան (`fc-query`) → composite font. Noto Sans/Serif (լատինական) + Noto Armenian (U+0530–058F, FB13–FB17)։
+- **Ընդհանուր դասեր.** `ATwEnvironment` (երկինք/մառախուղ/post/երաժշտություն/կայծեր/terrain), `TwUi` (Slate գործիքներ)։
+- **Հայկ** (HaykArcher, HaykArrow, HaykShield, HaykWorld, HaykGameMode+Preview, HaykPlayerController, HaykHud). հերթափոխով մենամարտ, քամի, հետագծի նախադիտում, ռոբոտի բալիստիկ լուծիչ (3 դժվարություն, «սովորում» է), եռաթև նետ (slow-mo + ղեկավարում), վահաններ, 2 խաղացող, գիշերային աշխարհ։
+- **Արալեզ** (AralezWorld, AralezSpirit, AralezActors, AralezGame). պտուտակաձև թունել 3 գոտով, 4 Արալեզ (1 խաղացող + 3 ռոբոտ), հոգու լույսեր, Շամիրամի ստվերներ, պոռթկում/ոռնոց։
+- **Հաբ** (TwHub). «ԾԻՐԱՆԻ» գլխավոր մենյու, 3 քարտ, Դիցարան (11 կերպար՝ հունական զուգահեռներով)։
+- **Config.** map-prefix GameMode-ներ, GameDefaultMap=L_Menu, SM6+SM5, DefaultGameUserSettings.ini։
+- **Workflow «games23-code-review»** գործարկված նոր կոդի համար։ Շարժիչի հավաքումը՝ ~1050/2694։

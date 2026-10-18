@@ -43,7 +43,7 @@ public:
 
 	void AddNova(float Amount) { Nova = FMath::Clamp(Nova + Amount, 0.f, 100.f); }
 	void Heal(float Amount);
-	void NotifyHit(bool bKill);
+	void RegisterHit(bool bKill);
 	void SetControlEnabled(bool bEnabled);
 	/** Autopilot used by the automated play-test (-TwAutoPlay). */
 	void SetAutopilot(bool bOn) { bAutopilot = bOn; }

@@ -147,6 +147,7 @@ TSharedRef<SWidget> SVahagnHud::MakeMenu()
 					}), [O]() { if (O.IsValid()) O->UiCycleDifficulty(); })
 				]
 				+ SVerticalBox::Slot().AutoHeight()[ MakeButton(LOCTEXT("Controls", "ԿԱՌԱՎԱՐՈՒՄ"), [O]() { if (O.IsValid()) O->UiControls(); }) ]
+				+ SVerticalBox::Slot().AutoHeight()[ MakeButton(LOCTEXT("Hub", "ԳԼԽԱՎՈՐ ՄԵՆՅՈՒ"), [O]() { if (O.IsValid()) O->UiHub(); }) ]
 				+ SVerticalBox::Slot().AutoHeight()[ MakeButton(LOCTEXT("Quit", "ԵԼՔ"), [O]() { if (O.IsValid()) O->UiQuit(); }) ]
 				+ SVerticalBox::Slot().AutoHeight().Padding(0, 22, 0, 0)
 				[
@@ -208,7 +209,8 @@ TSharedRef<SWidget> SVahagnHud::MakePause()
 		+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center).Padding(0, 0, 0, 24)[ SNew(STextBlock).Text(LOCTEXT("Paused", "ԴԱԴԱՐ")).Font(TwAssets::Font(64.f, true, true)).ColorAndOpacity(Gold) ]
 		+ SVerticalBox::Slot().AutoHeight()[ MakeButton(LOCTEXT("Resume", "ՇԱՐՈՒՆԱԿԵԼ"), [O]() { if (O.IsValid()) O->UiResume(); }, true) ]
 		+ SVerticalBox::Slot().AutoHeight()[ MakeButton(LOCTEXT("Restart", "ՍԿՍԵԼ ՆՈՐԻՑ"), [O]() { if (O.IsValid()) O->UiRestart(); }) ]
-		+ SVerticalBox::Slot().AutoHeight()[ MakeButton(LOCTEXT("ToMenu", "ԳԼԽԱՎՈՐ ՄԵՆՅՈՒ"), [O]() { if (O.IsValid()) O->UiMenu(); }) ]
+		+ SVerticalBox::Slot().AutoHeight()[ MakeButton(LOCTEXT("ToMenu", "ԽԱՂԻ ՄԵՆՅՈՒ"), [O]() { if (O.IsValid()) O->UiMenu(); }) ]
+		+ SVerticalBox::Slot().AutoHeight()[ MakeButton(LOCTEXT("ToHub", "ԳԼԽԱՎՈՐ ՄԵՆՅՈՒ"), [O]() { if (O.IsValid()) O->UiHub(); }) ]
 		+ SVerticalBox::Slot().AutoHeight()[ MakeButton(LOCTEXT("Quit2", "ԵԼՔ"), [O]() { if (O.IsValid()) O->UiQuit(); }) ]
 	];
 }
@@ -251,7 +253,8 @@ TSharedRef<SWidget> SVahagnHud::MakeEnd()
 			.Font(TwAssets::Font(22.f, false, true)).ColorAndOpacity(Gold)
 		]
 		+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)[ MakeButton(LOCTEXT("Again", "ԿՐԿԻՆ"), [O]() { if (O.IsValid()) O->UiRestart(); }, true) ]
-		+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)[ MakeButton(LOCTEXT("ToMenu2", "ԳԼԽԱՎՈՐ ՄԵՆՅՈՒ"), [O]() { if (O.IsValid()) O->UiMenu(); }) ]
+		+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)[ MakeButton(LOCTEXT("ToMenu2", "ԽԱՂԻ ՄԵՆՅՈՒ"), [O]() { if (O.IsValid()) O->UiMenu(); }) ]
+		+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)[ MakeButton(LOCTEXT("ToHub2", "ԳԼԽԱՎՈՐ ՄԵՆՅՈՒ"), [O]() { if (O.IsValid()) O->UiHub(); }) ]
 		+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)[ MakeButton(LOCTEXT("Quit3", "ԵԼՔ"), [O]() { if (O.IsValid()) O->UiQuit(); }) ]
 	];
 }
@@ -344,7 +347,7 @@ void SVahagnHud::PaintGameplay(const FGeometry& Geo, FSlateWindowElementList& Ou
 		AVishap* V = *It;
 		if (!V->IsAlive()) continue;
 		const FVector W = V->GetHeadLocation();
-		FVector2D Scr;
+		FVector2D Scr = FVector2D::ZeroVector;
 		const bool bOn = PC->ProjectWorldLocationToScreen(W, Scr, true);
 		const float DPI = Geo.GetAccumulatedLayoutTransform().GetScale();
 		Scr /= FMath::Max(DPI, 0.01f);
@@ -362,8 +365,15 @@ void SVahagnHud::PaintGameplay(const FGeometry& Geo, FSlateWindowElementList& Ou
 		else
 		{
 			// edge arrow pointing toward the threat
-			FVector2D Dir = Scr - C;
-			if (!bOn) Dir = -Dir;
+			FVector2D Dir;
+			if (bOn) Dir = Scr - C;
+			else
+			{
+				FVector CamLoc; FRotator CamRot;
+				PC->GetPlayerViewPoint(CamLoc, CamRot);
+				const FVector Lc = CamRot.UnrotateVector(W - CamLoc); // x fwd, y right, z up
+				Dir = FVector2D(Lc.Y, -Lc.Z);
+			}
 			if (Dir.IsNearlyZero()) Dir = FVector2D(0, 1);
 			Dir.Normalize();
 			const float Mx = C.X - 70 * S, My = C.Y - 70 * S;

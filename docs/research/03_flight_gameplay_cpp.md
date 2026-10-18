@@ -20,7 +20,7 @@ Anything not checked against the source is marked **UNVERIFIED**.
 | Vishap body | N `UStaticMeshComponent`s (engine `/Engine/BasicShapes/Sphere` and `Cone`) with `NoCollision`. They follow a breadcrumb trail left by the head. The head runs steering AI inside the actor (no AIController). | This is robust and needs no assets or navmesh. |
 | Game flow | An `AGameModeBase` subclass ticks a phase machine (Intro → Waves → BossIntro → Boss → Victory/Defeat). The timer uses dilated time. Slow motion is timed in real time: `Dt / GetEffectiveTimeDilation()`. | Verified APIs. Timers driven by `FTimerManager` would be stretched by the slow motion. |
 | HUD | Text and bars: a **UMG `UUserWidget` built in C++ inside `RebuildWidget()`** (**not** in `NativeConstruct`, see §5.3). Crosshair and off-screen markers: `AHUD::DrawHUD` canvas drawing. | `NativeConstruct` runs **after** the Slate tree has already been built. A tree built there shows nothing until the next rebuild. |
-| Armenian font | Build a **runtime `FStandaloneCompositeFont`** in C++. The default typeface is Roboto (Latin and digits). A sub-typeface with Noto Sans Armenian covers U+0530–058F and U+FB13–FB17. | **Noto Sans Armenian has no digits or Latin letters.** `fc-query` shows only `20 2d a0 308 531-556 559-58a 58d-58f 2010 25cc fb13-fb17`, so a timer like "05:32" would render as boxes with Noto alone. The Python import (§5.5) creates a UFont with only one typeface. |
+| Armenian font | Build a **runtime `FStandaloneCompositeFont`** in C++. The default typeface is ~~Roboto~~ **NotoSans-Regular/Bold.ttf** (Latin and digits; CRITIC FIX: it is already in `Content/Fonts`, Roboto is not). A sub-typeface with Noto Sans Armenian covers U+0530–058F and U+FB13–FB17. | **Noto Sans Armenian has no digits or Latin letters.** `fc-query` shows only `20 2d a0 308 531-556 559-58a 58d-58f 2010 25cc fb13-fb17`, so a timer like "05:32" would render as boxes with Noto alone. The Python import (§5.5) creates a UFont with only one typeface. |
 
 ---------------------------------------------------------------------------------------------------
 
@@ -1242,8 +1242,9 @@ void AVishap::LayoutSegments(float Dt)
 		const FRotator Rot = FRotationMatrix::MakeFromXZ(Tan, FVector::UpVector).Rotator();
 		FVector S3(Scale * 1.25f, Scale, Scale);                         // slightly elongated beads
 		if (i == NumSegments - 1) { S3 = FVector(Scale, Scale, Scale * 2.f); }   // cone tail; rotate the cone in Rot if needed
-		Segments[i]->SetWorldLocationAndRotation(Pos, Rot);
-		Segments[i]->SetWorldScale3D(S3);
+		// CRITIC FIX (perf): one transform update instead of two. Each Set* call re-runs UpdateComponentToWorld + MarkRenderTransformDirty,
+		// and ~220 segments x 2 updates per frame is measurable game-thread time on the demo laptop.
+		Segments[i]->SetWorldTransform(FTransform(Rot, Pos, S3));
 		SegCenter[i] = Pos;
 		SegRadius[i] = 50.f * Scale * 0.9f;
 	}
@@ -1593,6 +1594,8 @@ void AVahagnGameMode::NotifyBossKilled()
 	SlowMoReal = 2.5f;                                      // real seconds, then Victory
 }
 ```
+(CRITIC: the brace initialisation of `TArray<FWaveDef>` compiles. A 5.8 UHT USTRUCT `GENERATED_BODY` only adds a `friend` and a `static StaticStruct()`, for example `Engine/Intermediate/.../UHT/ActiveStateMachineScope.generated.h:24-26`, so `FWaveDef` stays an aggregate.)
+
 `SpawnWave` picks spawn points on a ring of radius 0.8·ArenaRadius, ±60° around the player's heading (in front, so the player sees them arrive), at altitude 2000–6000 above the floor. It uses `GetWorld()->SpawnActor<AVishap>(...)` with `SpawnCollisionHandlingOverride = AlwaysSpawn`, then applies the `SpeedMul`/`HPMul` values.
 
 Restart (R key or a button on the result screen): `UGameplayStatics::OpenLevel(this, FName(*UGameplayStatics::GetCurrentLevelName(this)))`.
@@ -1601,9 +1604,10 @@ Config (`DefaultEngine.ini`):
 ```ini
 [/Script/EngineSettings.GameMapsSettings]
 GlobalDefaultGameMode=/Script/Twilight.VahagnGameMode
-GameDefaultMap=/Game/Maps/L_Arena.L_Arena
-EditorStartupMap=/Game/Maps/L_Arena.L_Arena
+GameDefaultMap=/Game/Twilight/Maps/L_Vahagn.L_Vahagn
+EditorStartupMap=/Game/Twilight/Maps/L_Vahagn.L_Vahagn
 ```
+**CRITIC FIX:** the map path was `/Game/Maps/L_Arena`, which does not exist. The project's real map is `Content/Twilight/Maps/L_Vahagn.umap`, and `Config/DefaultEngine.ini` already holds exactly these three lines. Do not overwrite them.
 Format reference: `Templates/TP_ThirdPerson/Config/DefaultEngine.ini:4`. The engine default is at `E/Config/BaseEngine.ini:17`.
 
 ### 5.2 HUD split
@@ -1799,7 +1803,9 @@ namespace
 	TSharedPtr<FStandaloneCompositeFont> Build(bool bBold)
 	{
 		const FString Dir   = FPaths::ProjectContentDir() / TEXT("Fonts");
-		const FString Latin = Dir / (bBold ? TEXT("Roboto-Bold.ttf") : TEXT("Roboto-Regular.ttf"));
+		// CRITIC FIX: Content/Fonts contains NotoSans-{Regular,Bold}.ttf (Latin+digits: U+0020-007E, checked with fc-query), NOT Roboto.
+		// With the Roboto names, Build() returned nullptr and the HUD silently fell back to a font with NO Armenian glyphs.
+		const FString Latin = Dir / (bBold ? TEXT("NotoSans-Bold.ttf") : TEXT("NotoSans-Regular.ttf"));
 		const FString Arm   = Dir / (bBold ? TEXT("NotoSansArmenian-Bold.ttf") : TEXT("NotoSansArmenian-Regular.ttf"));
 		if (!FPaths::FileExists(Latin) || !FPaths::FileExists(Arm)) { return nullptr; }
 		TSharedPtr<FStandaloneCompositeFont> F = MakeShared<FStandaloneCompositeFont>();
@@ -1829,6 +1835,7 @@ mkdir -p Game/Content/Fonts
 cp /usr/share/fonts/truetype/noto/NotoSansArmenian-{Regular,Bold}.ttf Game/Content/Fonts/
 cp /home/samo/UnrealEngine-5.8/Engine/Content/Slate/Fonts/Roboto-{Regular,Bold}.ttf Game/Content/Fonts/
 ```
+**CRITIC FIX:** as of 2026-10-18, `Game/Content/Fonts/` already has `NotoSansArmenian-{Regular,Bold}.ttf` and `NotoSans-{Regular,Bold}.ttf`, but **no Roboto**. The code above now uses NotoSans for Latin and digits. Copying Roboto is no longer required, and is harmless if done. Engine Roboto exists at `Engine/Content/Slate/Fonts/Roboto-{Regular,Bold}.ttf`. The project's `DefaultGame.ini` already stages the folder with `+DirectoriesToAlwaysStageAsNonUFS=(Path="Fonts")` (loose files). `FPaths::FileExists` works with either UFS or NonUFS, so leave it as it is.
 Packaged build: `DefaultGame.ini`, key verified in `Developer/DeveloperToolSettings/Classes/Settings/ProjectPackagingSettings.h:591`:
 ```ini
 [/Script/UnrealEd.ProjectPackagingSettings]
@@ -1869,7 +1876,7 @@ unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks(tasks)
 unreal.EditorAssetLibrary.save_directory("/Game/UI/Fonts")   # the *_Font UFont package is only dirtied, not saved
 ```
 Caveats:
-- Python strips the leading `E` of enum names, so the enum is most likely `unreal.BatchCreateFontAsset.YES`. If that fails, try `unreal.EBatchCreateFontAsset.YES`. Both are **UNVERIFIED**.
+- CRITIC FIX (now VERIFIED): `unreal.BatchCreateFontAsset.YES` is correct. `GetFieldPythonNameImpl` strips a leading `E` + uppercase from UEnum names (`PythonScriptPlugin/Private/PyGenUtil.cpp:2893-2895`), and entries are upper-snake-cased (`:3160`). The enum is `UENUM(BlueprintType) enum class EBatchCreateFontAsset { Unknown, Cancel, Yes, No, CreateIfNoFontExists }` (`FontFileImportFactory.h:15-27`), and the property is `UPROPERTY(BlueprintReadWrite) BatchCreateFontAsset` (`:47-48`). `unreal.EditorAssetLibrary.save_directory` exists (`EditorAssetLibrary.h:292`).
 - The created UFont contains **only Noto Armenian**, so digits and Latin would be missing. `FCompositeFont`/`FTypeface` are plain `USTRUCT()` without `BlueprintType`, so editing the sub-typefaces from Python is **UNVERIFIED** and probably not possible.
 - **Use §5.4 for the HUD.** Use the asset only where a `UFont*` is strictly needed.
 
@@ -1914,6 +1921,8 @@ public class Twilight : ModuleRules
 }
 ```
 `AnimGraphRuntime` is only needed for the optional proxy blending in §2.5(b), and even that is **UNVERIFIED**. `FAnimationRuntime` lives in the Engine module.
+
+**CRITIC FIX:** do **not** replace the project's existing `Game/Source/Twilight/Twilight.Build.cs` with the one above. The real file already lists `"AIModule", "ProceduralMeshComponent", "ApplicationCore"` in addition to the modules above, and existing project code (`TwEnvironment`, `Hayk*`, …) depends on them. The real project source is also **flat** (`Source/Twilight/*.cpp`, no `Player/`, `Enemies/` subfolders). Either keep the files flat and change the `#include "Player/VahagnPawn.h"` style includes to `#include "VahagnPawn.h"`, or add `PublicIncludePaths.Add(ModuleDirectory);` to the existing Build.cs. Note too that the project already has `VahagnCharacter`, `VahagnGameMode`, `VahagnHud`, `VahagnPlayerController` and `Vishap` classes. Merge into them; do not duplicate the class names (a UCLASS name clash, for example two `AVishap`, breaks UHT).
 
 `.uproject` plugins: EnhancedInput (`"EnabledByDefault": true`, `E/Plugins/EnhancedInput/EnhancedInput.uplugin:13`) and Niagara are on by default. Add them explicitly anyway:
 `{"Name":"EnhancedInput","Enabled":true},{"Name":"Niagara","Enabled":true}`

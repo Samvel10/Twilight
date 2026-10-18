@@ -38,6 +38,7 @@ public:
 	void UiRestart();
 	void UiMenu();
 	void UiQuit();
+	void UiHub();
 	void UiCycleDifficulty();
 
 	EVahagnScreen GetScreen() const { return Screen; }

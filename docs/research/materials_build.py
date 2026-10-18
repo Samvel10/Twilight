@@ -23,6 +23,22 @@ Run (editor must NOT be open on the same project):
 
 Requires PythonScriptPlugin (+ EditorScriptingUtilities recommended) enabled in the .uproject.
 Re-runnable: existing materials are cleared and rebuilt in place (references from levels/MIs stay valid).
+
+CRITIC REVIEW (2026-10-18, against the UE 5.8 source; no functional change was needed):
+  * Every MaterialEditingLibrary call used here exists with this exact Python signature
+    (Engine/Source/Editor/MaterialEditor/Public/MaterialEditingLibrary.h:140-490).
+  * Every expression property name exists (Engine/Source/Runtime/Engine/Public/Materials/MaterialExpression*.h):
+    const_a/const_b/const_alpha, const_exponent, r/g (Constant*), constant (Constant3Vector), r/g/b/a (ComponentMask),
+    speed_x/speed_y (Panner), exponent/base_reflect_fraction (Fresnel), attenuation_radius/hardness_percent (SphereMask),
+    parameter_name/group/default_value, texture.
+  * Pin names: "Exp" (Power, from Exponent), "UVs"/"Tex" (TextureSample), "ExponentIn", "Coordinate"/"Time", "FadeDistance",
+    "A"/"B"/"Alpha". "" = first input (the only way to reach OneMinus/Saturate/Abs/Sine/Mask, and Normalize's 'VectorInput').
+    See MaterialGraphNode.cpp:597-640 and MaterialEditingLibrary.cpp:46-75.
+  * Output names XYZ/XY/Z (WorldPosition, MaterialExpressions.cpp:12253-12256) and RGB/R/G/B/A (VectorParameter/ParticleColor).
+  * Enum spellings: PyGenUtil.cpp:3108-3160 (MP_EMISSIVE_COLOR, BLEND_ADDITIVE, MSM_DEFAULT_LIT, MATUSAGE_NIAGARA_SPRITES ...).
+  * A real run on 2026-10-18 16:58:59 built 7 M_ + 13 MI_ with 0 errors (Game/Saved/Logs/TwilightAssets.log:1609-1779).
+  * NOT verified: HLSL compilation. The commandlet does not compile the shaders. Watch the first -game log for
+    "Failed to compile Material", especially the LWC WorldPosition paths in M_Water_Purple and M_Rock.
 """
 
 import os

@@ -75,6 +75,7 @@ void AVahagnPlayerController::BuildInput()
 	IA_Boost = MakeAction(this, TEXT("IA_Boost"), EInputActionValueType::Boolean);
 	IA_Nova = MakeAction(this, TEXT("IA_Nova"), EInputActionValueType::Boolean);
 	IA_Pause = MakeAction(this, TEXT("IA_Pause"), EInputActionValueType::Boolean);
+	IA_Pause->bTriggerWhenPaused = true;
 
 	// move: W/S -> Y, A/D -> X
 	{ FEnhancedActionKeyMapping& M = Context->MapKey(IA_Move, EKeys::W); AddSwizzle(M, this); }
@@ -85,7 +86,7 @@ void AVahagnPlayerController::BuildInput()
 
 	// look: mouse (y inverted to screen convention), right stick
 	{ FEnhancedActionKeyMapping& M = Context->MapKey(IA_Look, EKeys::Mouse2D); AddNegate(M, false, true, false, this); }
-	{ FEnhancedActionKeyMapping& M = Context->MapKey(IA_Look, EKeys::Gamepad_Right2D); AddDeadZone(M, this); AddScale(M, FVector(2.2f, 1.6f, 1.f), this); }
+	{ FEnhancedActionKeyMapping& M = Context->MapKey(IA_Look, EKeys::Gamepad_Right2D); AddDeadZone(M, this); AddNegate(M, false, true, false, this); M.Modifiers.Add(NewObject<UInputModifierScaleByDeltaTime>(this)); AddScale(M, FVector(130.f, 90.f, 1.f), this); }
 
 	// up/down
 	Context->MapKey(IA_UpDown, EKeys::SpaceBar);
@@ -126,8 +127,7 @@ void AVahagnPlayerController::SetupInputComponent()
 	EI->BindAction(IA_Boost, ETriggerEvent::Started, this, &AVahagnPlayerController::OnBoost);
 	EI->BindAction(IA_Boost, ETriggerEvent::Completed, this, &AVahagnPlayerController::OnBoostDone);
 	EI->BindAction(IA_Nova, ETriggerEvent::Started, this, &AVahagnPlayerController::OnNova);
-	FEnhancedInputActionEventBinding& PauseBinding = EI->BindAction(IA_Pause, ETriggerEvent::Started, this, &AVahagnPlayerController::OnPause);
-	PauseBinding.bExecuteWhenPaused = true;
+	EI->BindAction(IA_Pause, ETriggerEvent::Started, this, &AVahagnPlayerController::OnPause);
 }
 
 void AVahagnPlayerController::BeginPlay()
@@ -211,6 +211,7 @@ void AVahagnPlayerController::UiBack() { TwFx::Sound2D(GetWorld(), TEXT("sfx_ui_
 void AVahagnPlayerController::UiResume() { TwFx::Sound2D(GetWorld(), TEXT("sfx_ui_click")); SetScreen(EVahagnScreen::None); }
 void AVahagnPlayerController::UiRestart() { SetPause(false); if (AVahagnGameMode* GM = Mode()) GM->RestartMatch(); }
 void AVahagnPlayerController::UiMenu() { SetPause(false); if (AVahagnGameMode* GM = Mode()) GM->ReturnToMenu(); }
+void AVahagnPlayerController::UiHub() { SetPause(false); UGameplayStatics::SetGlobalTimeDilation(this, 1.f); UGameplayStatics::OpenLevel(this, TEXT("/Game/Twilight/Maps/L_Menu")); }
 void AVahagnPlayerController::UiQuit() { UKismetSystemLibrary::QuitGame(this, this, EQuitPreference::Quit, false); }
 void AVahagnPlayerController::UiCycleDifficulty()
 {

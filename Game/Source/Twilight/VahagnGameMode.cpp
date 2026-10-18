@@ -186,7 +186,7 @@ void AVahagnGameMode::OnVishapKilled(AVishap* V)
 {
 	if (MatchState != EVahagnMatch::Playing) return;
 	++Kills;
-	Score += V->IsBoss() ? 3000 : (V->GetMaxHealth() > 12.f ? 250 : 150);
+	Score += V->IsBoss() ? 3000 : (V->GetTier() > 0 ? 250 : 150);
 	if (V->IsBoss())
 	{
 		// slow-motion finale

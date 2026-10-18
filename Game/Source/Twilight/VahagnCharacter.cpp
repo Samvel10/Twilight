@@ -82,7 +82,7 @@ AVahagnCharacter::AVahagnCharacter()
 	Glow->SetIntensityUnits(ELightUnits::Unitless);
 	Glow->SetIntensity(9000.f);
 	Glow->SetLightColor(FLinearColor(1.f, 0.42f, 0.12f));
-	Glow->SetAttenuationRadius(2200.f);
+	Glow->SetAttenuationRadius(1500.f);
 	Glow->SetCastShadows(false);
 
 	FlameLoop = CreateDefaultSubobject<UAudioComponent>(TEXT("FlameLoop"));
@@ -434,10 +434,11 @@ void AVahagnCharacter::InNova()
 		}
 	}
 	// a short, dramatic slow-motion beat
+	if (!FMath::IsNearlyEqual(UGameplayStatics::GetGlobalTimeDilation(this), 1.f, 0.01f)) { DamageFlash = 0.3f; return; }
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.3f);
 	FTimerHandle H;
 	TWeakObjectPtr<UWorld> W(GetWorld());
-	GetWorldTimerManager().SetTimer(H, FTimerDelegate::CreateLambda([W]() { if (W.IsValid()) UGameplayStatics::SetGlobalTimeDilation(W.Get(), 1.f); }), 0.12f, false);
+	GetWorldTimerManager().SetTimer(H, FTimerDelegate::CreateLambda([W]() { if (W.IsValid() && FMath::IsNearlyEqual(UGameplayStatics::GetGlobalTimeDilation(W.Get()), 0.3f, 0.01f)) UGameplayStatics::SetGlobalTimeDilation(W.Get(), 1.f); }), 0.12f, false);
 	DamageFlash = 0.3f;
 }
 
@@ -446,7 +447,7 @@ void AVahagnCharacter::Heal(float Amount)
 	Health = FMath::Min(MaxHealth, Health + Amount);
 }
 
-void AVahagnCharacter::NotifyHit(bool bKill)
+void AVahagnCharacter::RegisterHit(bool bKill)
 {
 	HitMarker = bKill ? 1.6f : 1.f;
 	AddNova(bKill ? 10.f : 1.5f);

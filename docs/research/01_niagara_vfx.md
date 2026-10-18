@@ -13,6 +13,8 @@ Engine root below is `E=/home/samo/UnrealEngine-5.8`. Every claim was checked ag
 | **C. C++-driven lights + emissive meshes** (`UPointLightComponent`, `/Engine/BasicShapes/Sphere` + a Python-generated unlit additive material) | The fireball core, glow, shockwave ring and breath cone. | Works with no particle system at all. This is the guaranteed fallback. |
 | D. Niagara engine templates (`/Niagara/DefaultAssets/Templates/...`) | Last resort only. | They have **no User params** and use grey/white `DefaultSpriteMaterial`, so they look like debug placeholders unless re-authored (see §2). |
 
+> **CRITIC FIX (layer B):** `DMXFixtures` is **not** enabled in the current `/var/www/html/Twilight/Game/Twilight.uproject` (checked 2026-10-18). Its dependency chain is larger than stated in §2: `DMXFixtures` → `DMXEngine` (`.../VirtualProduction/DMX/DMXEngine/DMXEngine.uplugin`), which in turn needs **`DatasmithContent`, `DMXGDTF`, `Takes`** (Takes → `AudioCapture`, `LevelSequenceEditor`, `NamingTokens`), plus `DMXProtocol`, `DMXModularFeatures` and `ProceduralMeshComponent`. The Linux editor `.so` files for all of these exist, so `-game` from the editor binary works. A packaged build must compile all of these runtime modules as well, which adds packaging time and risk. Every `NS_*` call site **must** null-check the loaded system and the spawned component, and fall back to Cascade or meshes. If you are short on time, skip layer B and use A + C.
+
 For lighting the scene, do not rely on particle lights. Engine scalability sets `r.ParticleLightQuality=0` (no particle lights) at EffectsQuality 0/1 (`$E/Engine/Config/BaseScalability.ini:811,840`). Put a real `UPointLightComponent` on the fireball, the hero and the explosions.
 
 ---
@@ -232,6 +234,7 @@ void AFireball::BeginPlay()
     {
         Trail = UNiagaraFunctionLibrary::SpawnSystemAttached(Comet, RootComponent, NAME_None, FVector::ZeroVector,
             FRotator::ZeroRotator, EAttachLocation::SnapToTarget, /*bAutoDestroy*/false, true, ENCPoolMethod::None);
+        if (!Trail) { return; }   // CRITIC FIX: SpawnSystemAttached can return nullptr (pre-cull / invalid system)
         Trail->SetVariableLinearColor(TEXT("PrimColor"),  VFX::FireOrange);   // types UNVERIFIED – check LogUserParams
         Trail->SetVariableLinearColor(TEXT("SecColor"),   VFX::FireGold);
         Trail->SetVariableLinearColor(TEXT("SparkColor"), VFX::FireGold);
@@ -273,10 +276,12 @@ void FX_VishapDeath(UObject* W, const FVector& P, float Size /*1=normal, 3=Great
     {
         UNiagaraComponent* N = UNiagaraFunctionLibrary::SpawnSystemAtLocation(W, Peony, P, FRotator::ZeroRotator,
             FVector(1.f), true, true, ENCPoolMethod::AutoRelease);
+        if (N) {   // CRITIC FIX: SpawnSystemAtLocation returns nullptr when pre-culled (bPreCullCheck=true default, NiagaraFunctionLibrary.h:93)
         N->SetVariableLinearColor(TEXT("PrimColor"),  VFX::FireOrange);
         N->SetVariableLinearColor(TEXT("SecColor"),   VFX::VishapGreen);   // dragon "blood" accent
         N->SetVariableLinearColor(TEXT("SparkColor"), VFX::FireGold);
         N->SetVariableFloat(TEXT("ScaleMod"), 0.2f * Size);
+        }
     }
     UGameplayStatics::SpawnEmitterAtLocation(W, VFX::Load<UParticleSystem>(VFX::P_Smoke), P, FRotator::ZeroRotator, FVector(2.f * Size));
     // + body pieces: hide the serpent mesh, spawn 6–10 sphere/cylinder chunks with emissive MI + physics impulse, LifeSpan 3s
@@ -289,7 +294,7 @@ Use a layered solution. Each layer works on its own, so if one fails the breath 
 1. **Cone mesh**: `/Engine/BasicShapes/Cone`, rotated to point forward from the jaw socket. Use an additive unlit material with panning noise (see §F, `M_FireBreath`), scale X/Y 0.6, Z 6, and animate Z-scale from 0→1 over 0.25 s in Tick. This is the reliable "beam" read.
 2. **Fire puffs**: every 0.06 s spawn `P_Fire` at scale 0.4 at the mouth, as a tiny actor that moves forward at 2500 u/s for 0.5 s with gravity off, then auto-destroys. Fifteen live puffs is cheap, and the motion gives a believable flamethrower.
 3. **Sparks**: `NS_Sparks` (ColdSparks_Stream) attached to the jaw with relative rotation pointing forward, `SetVariableFloat("VelocityScale", 2.f)`, `SetVariableFloat("DensityScale", 0.5f)`. **UNVERIFIED** whether its velocity is local-space (rotatable). If it is not, drop this layer.
-4. A point light on the mouth, orange, 3000 cd, radius 1200, pulsing.
+4. A point light on the mouth, orange, ~~3000 cd~~ **150–300 cd** (CRITIC FIX), radius 1200, pulsing. Unit math from `LocalLightComponent.cpp:186-221`: 1 cd = 10000 internal, 1 unitless = 16 internal. So the engine default point light (5000 unitless, `LocalLightComponent.cpp:13-14`) is only **8 cd**. 3000 cd is 375× that, and with AutoExposure off in this project it would blow the whole frame to white. Note also that a `UPointLightComponent` created in C++ defaults to **Unitless** units (`LocalLightComponent.cpp:14`), so `SetIntensity(5000)` in §B means 8 cd and `SetIntensity(50000*Scale)` in §C means 80 cd·Scale. Those are sane values. Only call `SetIntensityUnits(ELightUnits::Candelas)` (`LocalLightComponent.h:57`) when you really mean candelas.
 Damage uses a capsule sweep along the cone axis and does not depend on the particles.
 
 ### F. Ambient embers / sparks in the air
@@ -319,9 +324,12 @@ def make_glow(name, color=(4.0, 1.2, 0.15), fresnel=True, panning_noise=False):
     m.set_editor_property("blend_mode", unreal.BlendMode.BLEND_ADDITIVE)
     m.set_editor_property("shading_model", unreal.MaterialShadingModel.MSM_UNLIT)
     m.set_editor_property("two_sided", True)
-    for flag in ("used_with_niagara_sprites", "used_with_niagara_ribbons", "used_with_niagara_mesh_particles",
-                 "used_with_particle_sprites", "used_with_mesh_particles", "used_with_instanced_static_meshes"):
-        m.set_editor_property(flag, True)
+    # CRITIC FIX: the bUsedWith* fields are UE_DEPRECATED(5.8) (Material.h:701-911). set_editor_property still
+    # works on them, because they remain UPROPERTY(EditAnywhere), but it skips MarkUsageFlagDirty (Material.cpp:1748-1751).
+    # Use the supported API instead (MaterialEditingLibrary.h:204-205):
+    for u in ("MATUSAGE_NIAGARA_SPRITES", "MATUSAGE_NIAGARA_RIBBONS", "MATUSAGE_NIAGARA_MESH_PARTICLES",
+              "MATUSAGE_PARTICLE_SPRITES", "MATUSAGE_MESH_PARTICLES", "MATUSAGE_INSTANCED_STATIC_MESHES"):
+        mel.set_base_material_usage(m, getattr(unreal.MaterialUsage, u), True)
     col = mel.create_material_expression(m, unreal.MaterialExpressionVectorParameter, -800, 0)
     col.set_editor_property("parameter_name", "Color")
     col.set_editor_property("default_value", unreal.LinearColor(*color, 1.0))
@@ -350,7 +358,9 @@ make_glow("M_VishapGlow", color=(0.4, 3.0, 0.8))          # enemy eyes / death c
 make_glow("M_FireBreath", fresnel=False)                  # breath cone (add Panner+Noise later if time)
 unreal.log("FX materials done")
 ```
-(Pin names `""` select the first output or input, per `MaterialEditingLibrary.h:236-242`. The expression class Python names follow UE's `MaterialExpressionX` rule. **UNVERIFIED** at runtime: `MaterialExpressionOneMinus` input pin name `""`. If the connect fails, use `"Input"`.)
+(Pin names `""` select the first output or input, per `MaterialEditingLibrary.h:236-242`. The expression class Python names follow UE's `MaterialExpressionX` rule. **CRITIC FIX:** `""` is the **only** name that works for OneMinus. `GetShortenPinName` maps `Input` to `NAME_None` (`Editor/UnrealEd/Private/MaterialGraphNode.cpp:610-613`), so passing `"Input"` **always fails**. Do not use the old fallback hint.)
+
+> **CRITIC NOTE:** `materials_build.py` has already built `/Game/Twilight/Materials/M_Additive`, `M_FireSprite` and their MIs (`MI_Additive_Glow`, `MI_Additive_FireballCore`, `MI_FireSprite_*`) with the correct usage flags. The real run was on 2026-10-18 16:59 with 0 errors (`Game/Saved/Logs/TwilightAssets.log:1609-1779`). Use those instead of running `make_fx_materials.py`. The `Color`/`Intensity` parameter names match the MID snippet below (`M_Additive` has `Color`, `Intensity`, `GlowMode`, `Falloff`, `FadeDistance`).
 
 Runtime colour and animation through a dynamic material instance (Engine module only, no plugin):
 ```cpp
@@ -392,7 +402,7 @@ This is **UNVERIFIED** end to end. The particle colour would still come from the
   - `r.ParticleLightQuality` (0 none / 1 simple / 2 HQ, `ParticleModules.cpp:3079-3081`). Use **1**, and do the important lights with real `UPointLightComponent`s without shadows.
   - `r.SeparateTranslucencyScreenPercentage` (default 100, `TranslucentRendering.cpp:90-94`). Setting it to **50** renders translucency at half resolution and is a big overdraw saving on an iGPU, with a slight softness that is invisible on fire.
   - `r.ParticleLODBias` (`ParticleSystemComponent.cpp`).
-  Put these in `Config/DefaultEngine.ini` under `[SystemSettings]` or `[ConsoleVariables]`, or run them via `GetWorld()->Exec`.
+  ~~Put these in `Config/DefaultEngine.ini` under `[SystemSettings]` or `[ConsoleVariables]`~~ **CRITIC FIX:** all of these are scalability-group cvars (`BaseScalability.ini [EffectsQuality@N]`, lines 798-949). `[SystemSettings]` is applied at `ECVF_SetBySystemSettingsIni` (0x05, `SystemSettings.cpp:80`), which outranks `ECVF_SetByScalability` (0x02, `IConsoleManager.h:158-165`). Putting them there silently freezes them and breaks every quality toggle. Put them into `Config/DefaultScalability.ini` under `[EffectsQuality@2]` / `[EffectsQuality@3]`, as in report 04 §4.3. Also set **`r.RefractionQuality=0` in both of those sections** while `P_Fire` (with `M_Heat_Distortion`) is in use. Report 04 currently has 1 and 2 there; it is corrected too. For a one-off test, `-ExecCmds="r.EmitterSpawnRateScale 0.6"` (console priority) is fine.
 - **GPU vs CPU sim:** Iris Xe on Vulkan (SM5/SM6) supports compute, so GPU sims (StarterContent `TypeDataGpu`, DMX fireworks) are fine and take load off the CPU, which is shared with game logic. GPU emitters need fixed bounds. The authored assets have them, but if they pop out at screen edges, raise `bFixedBounds` / reduce `fx.Niagara.Scalability.DistanceCulling`. Keep **CPU** sims for small counts (smoke puffs, < 100).
 - **Pooling:** use `EPSCPoolMethod::AutoRelease` / `ENCPoolMethod::AutoRelease` for every one-shot (impacts, deaths). That avoids component churn during waves.
 - **Lights:** no more than ~6–8 dynamic point lights at once with **CastShadows=false**. Fade or destroy flash lights within 0.25 s. Lumen on an iGPU is expensive, so the main agent should probably run without Lumen GI (out of scope here). Unshadowed point lights stay cheap.
@@ -408,4 +418,5 @@ This is **UNVERIFIED** end to end. The particle colour would still come from the
 4. Whether `VFX_ColdSparks_Stream` velocity follows component rotation.
 5. Python duplicate + save of a Niagara system compiling cleanly under `-run=pythonscript` (expected to work, because PreSave waits for compile).
 6. Whether the cooker picks up assets referenced only from C++ CDOs (use `DirectoriesToAlwaysCook` anyway).
-7. `MaterialExpressionOneMinus` pin naming in `connect_material_expressions`.
+7. ~~`MaterialExpressionOneMinus` pin naming in `connect_material_expressions`.~~ CRITIC FIX: resolved. Use `""` (see §F).
+8. CRITIC: `P_Fire` name-table strings were re-checked and contain `Flames`, `Smoke`, `Embers`, `Sparks`, `Distortion` and `M_Heat_Distortion`. That `Distortion` is the emitter name is still inferred, not proven.

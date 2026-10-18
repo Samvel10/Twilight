@@ -10,9 +10,12 @@
 #include "Animation/AnimSequence.h"
 #include "Fonts/CompositeFont.h"
 #include "Misc/Paths.h"
+#include "Misc/CoreDelegates.h"
 
 namespace TwAssets
 {
+	TSet<FString>& MissingPaths() { static TSet<FString> S; return S; }
+
 	UStaticMesh* Sphere()   { static TWeakObjectPtr<UStaticMesh> M; if (!M.IsValid()) M = Load<UStaticMesh>(TEXT("/Engine/BasicShapes/Sphere.Sphere")); return M.Get(); }
 	UStaticMesh* Cube()     { static TWeakObjectPtr<UStaticMesh> M; if (!M.IsValid()) M = Load<UStaticMesh>(TEXT("/Engine/BasicShapes/Cube.Cube")); return M.Get(); }
 	UStaticMesh* Cone()     { static TWeakObjectPtr<UStaticMesh> M; if (!M.IsValid()) M = Load<UStaticMesh>(TEXT("/Engine/BasicShapes/Cone.Cone")); return M.Get(); }
@@ -71,14 +74,31 @@ namespace TwAssets
 
 	FSlateFontInfo Font(float Size, bool bSerif, bool bBold)
 	{
+		// Noto Armenian has no digits/Latin/punctuation, so build a composite font:
+		// Latin+digits+punctuation from Noto Sans/Serif, the Armenian block from Noto Armenian.
 		static TSharedPtr<const FCompositeFont> Fonts[4];
+		static bool bHooked = false;
+		if (!bHooked)
+		{
+			bHooked = true;
+			// release the FGCObject-backed fonts before static teardown
+			FCoreDelegates::OnPreExit.AddLambda([]() { for (TSharedPtr<const FCompositeFont>& P : Fonts) P.Reset(); });
+		}
 		const int32 Idx = (bSerif ? 2 : 0) + (bBold ? 1 : 0);
 		if (!Fonts[Idx].IsValid())
 		{
-			const TCHAR* File = bSerif ? (bBold ? TEXT("NotoSerifArmenian-Black.ttf") : TEXT("NotoSerifArmenian-Bold.ttf"))
-			                           : (bBold ? TEXT("NotoSansArmenian-Bold.ttf") : TEXT("NotoSansArmenian-Regular.ttf"));
-			const FString Path = FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / TEXT("Fonts") / File);
-			Fonts[Idx] = MakeShared<FStandaloneCompositeFont>(NAME_None, Path, EFontHinting::Default, EFontLoadingPolicy::LazyLoad);
+			const TCHAR* Arm = bSerif ? (bBold ? TEXT("NotoSerifArmenian-Black.ttf") : TEXT("NotoSerifArmenian-Bold.ttf"))
+			                          : (bBold ? TEXT("NotoSansArmenian-Bold.ttf") : TEXT("NotoSansArmenian-Regular.ttf"));
+			const TCHAR* Lat = bSerif ? (bBold ? TEXT("NotoSerif-Black.ttf") : TEXT("NotoSerif-Bold.ttf"))
+			                          : (bBold ? TEXT("NotoSans-Bold.ttf") : TEXT("NotoSans-Regular.ttf"));
+			const FString Dir = FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / TEXT("Fonts"));
+			TSharedRef<FStandaloneCompositeFont> F = MakeShared<FStandaloneCompositeFont>();
+			F->DefaultTypeface.AppendFont(TEXT("Regular"), Dir / Lat, EFontHinting::Default, EFontLoadingPolicy::LazyLoad);
+			FCompositeSubFont& Sub = F->SubTypefaces.AddDefaulted_GetRef();
+			Sub.CharacterRanges.Add(FInt32Range(FInt32Range::BoundsType::Inclusive(0x0530), FInt32Range::BoundsType::Inclusive(0x058F)));
+			Sub.CharacterRanges.Add(FInt32Range(FInt32Range::BoundsType::Inclusive(0xFB13), FInt32Range::BoundsType::Inclusive(0xFB17)));
+			Sub.Typeface.AppendFont(TEXT("Regular"), Dir / Arm, EFontHinting::Default, EFontLoadingPolicy::LazyLoad);
+			Fonts[Idx] = F;
 		}
 		return FSlateFontInfo(Fonts[Idx], Size);
 	}

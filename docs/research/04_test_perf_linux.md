@@ -169,19 +169,25 @@ void UTwilightAutoTest::Tick(float Dt)
     if (!bExitRequested && Elapsed >= Warmup + Duration)
     {
         bExitRequested = true;
+        UE_LOG(LogTemp, Display, TEXT("[AutoTest] done after %.1fs"), Elapsed);
 #if CSV_PROFILER
         if (FCsvProfiler::IsCapturing())
         {
-            FCsvProfiler::Get()->EndCapture().Wait();          // blocks until the file is written
+            // CRITIC FIX: NEVER call EndCapture().Wait() here: it DEADLOCKS. EndCapture() only queues a Stop command;
+            // the promise is fulfilled in FCsvProfiler::EndFrame -> TryEndCaptureInternal (CsvProfiler.cpp:4207-4216, 4276),
+            // which runs on this same game thread at the end of the frame, so blocking here waits forever.
+            // Instead: let the profiler finish the file and quit by itself (CsvProfiler.cpp:4309-4313).
+            GEngine->Exec(nullptr, TEXT("CsvProfile EXITONCOMPLETION"));
+            GEngine->Exec(nullptr, TEXT("CsvProfile STOP"));
+            return;
         }
 #endif
-        UE_LOG(LogTemp, Display, TEXT("[AutoTest] done after %.1fs"), Elapsed);
         FPlatformMisc::RequestExit(false, TEXT("TwilightAutoTest"));
     }
 #endif
 }
 ```
-*Call `EndCapture()` from the game thread. Blocking on `.Wait()` should work because the processing thread writes the file (`CsvProfiler.cpp:4223-4270`). If it ever hangs, use the alternative `GEngine->Exec(nullptr, TEXT("CsvProfile EXITONCOMPLETION")); GEngine->Exec(nullptr, TEXT("CsvProfile STOP"));`, which exits only after the file is written (`CsvProfiler.cpp:4309-4313`). The `.Wait()` path is UNVERIFIED at runtime.*
+*CRITIC FIX: the original code called `EndCapture().Wait()` on the game thread. Source check: `EndCapture` (`CsvProfiler.cpp:4424-4500`) says "the capture API doesn't end the capture immediately, but at the next end-frame tick (in `EndFrame`)". The completion promise is set only in `TryEndCaptureInternal`, called from `EndFrame` (`:4207-4216`, `:4276`). Blocking the game thread therefore hangs the test forever. The `EXITONCOMPLETION` + `STOP` path is verified, and the `CsvProfile` console command parsing is at `:1050-1087`. Add `#include "Engine/Engine.h"` for `GEngine`.*
 
 Autopilot logic in the pawn or controller (gameplay code): `if (AutoTest->IsAutoPilot())` steer toward the nearest vishap or boss with a slight weave, fire the primary every 0.3 s and the special every 8 s, and do a dodge roll every 5 s. All stages (waves, then the boss, then victory) and every VFX then get exercised and recorded. With `-AutoGod` the run reaches the boss.
 
@@ -195,7 +201,10 @@ Run:
 ### 1.3 Driving real input from outside (xdotool, X11)
 X11 is confirmed, so `xdotool` can send synthetic keys and mouse events to the game window. This tests the real input path, not only the autopilot:
 ```bash
-WID=$(xdotool search --sync --onlyvisible --name 'Twilight' | head -1)   # window title contains the project name (exact title UNVERIFIED)
+WID=$(xdotool search --sync --onlyvisible --name 'SF_VULKAN' | head -1)   # CRITIC FIX: see the note below
+# CRITIC FIX: the title is NOT "Twilight". GameEngine.cpp:487-497 uses ProjectDisplayedTitle from DefaultGame.ini, which is
+# NSLOCTEXT(...,"Վահագն"), followed by the non-Shipping debug suffix "(64-bit Development SF_VULKAN_SM6)". So --name 'Twilight' never
+# matches and `--sync` blocks forever. Use --name 'SF_VULKAN', or better: xdotool search --sync --onlyvisible --pid "$GPID"
 xdotool windowactivate --sync "$WID"
 xdotool keydown w; sleep 3; xdotool keyup w                 # fly forward for 3 s
 xdotool mousemove_relative --sync -- 200 0                   # turn the camera
@@ -294,7 +303,7 @@ The engine's own C# CSV tools are available as an alternative: `Engine/Binaries/
 The window can be located with xdotool. With `-WinX/-WinY/-ResX/-ResY` the region is also known in advance.
 ```bash
 OUT=/var/www/html/Twilight/docs/capture; mkdir -p "$OUT"
-WID=$(xdotool search --sync --onlyvisible --name 'Twilight' | head -1)
+WID=$(xdotool search --sync --onlyvisible --name 'SF_VULKAN' | head -1)   # CRITIC FIX: title is "Վահագն (64-bit Development SF_VULKAN_SM6)", see §1.3
 eval "$(xdotool getwindowgeometry --shell "$WID")"        # sets X Y WIDTH HEIGHT
 W=$(( WIDTH / 2 * 2 )); H=$(( HEIGHT / 2 * 2 ))           # libx264/yuv420p needs even sizes
 # 30 s at 30 fps, low CPU (ultrafast), mouse hidden
@@ -361,31 +370,48 @@ r.DefaultFeature.Bloom=True
 r.AntiAliasingMethod=4
 r.SkinCache.CompileShaders=True
 ; --- add ---
+; CRITIC FIX: UE ini has NO inline comments. ';' only starts a comment at the beginning of a line
+; (ConfigCacheIni.cpp:2027-2030; the value is only whitespace-trimmed, :2133-2143). All comments are on their own lines now.
 r.Lumen.HardwareRayTracing=False
 r.MegaLights.EnableForProject=0
-r.DefaultFeature.LensFlare=False        ; cheap, but looks cheap. Use authored flares/sprites instead
-r.SkyLight.RealTimeReflectionCapture=1  ; dynamic sky ambient without Lumen (verify the look; cost is time-sliced)
-r.DynamicRes.OperationMode=0            ; set to 2 later if the GPU stays near budget (see 4.1)
+; Lens flare is cheap but looks cheap. Use authored flares/sprites instead.
+r.DefaultFeature.LensFlare=False
+; NOTE: this cvar is only a platform gate (default 1, SkyLightComponent.cpp:125-130). Real-time capture also needs
+; SkyLight->bRealTimeCapture=true on the component. Leaving the line out changes nothing.
+r.SkyLight.RealTimeReflectionCapture=1
+; Set to 2 later if the GPU stays near budget (see 4.1).
+r.DynamicRes.OperationMode=0
 r.DynamicRes.MinScreenPercentage=50
 r.DynamicRes.MaxScreenPercentage=100
 r.DynamicRes.FrameTimeBudget=16.6
 
 [/Script/LinuxTargetPlatform.LinuxTargetSettings]
+; exactly one format: one shader set, faster cook (the project already has these two lines)
 -TargetedRHIs=SF_VULKAN_SM5
-+TargetedRHIs=SF_VULKAN_SM6               ; exactly one format → one shader set, faster cook
++TargetedRHIs=SF_VULKAN_SM6
 
 [SystemSettings]
-; Not scalability-controlled (safe here). Presentation values:
+; CRITIC FIX: see the VSync priority note below before adding these.
 r.VSync=1
 t.MaxFPS=60
 ```
+**CRITIC FIX:** the original block had `+TargetedRHIs=SF_VULKAN_SM6               ; exactly one format …` on one line. Because ';' is not an inline comment, that adds the literal string `"SF_VULKAN_SM6               ; exactly one format → …"` as the shader format, which matches no format, so **nothing is cooked or targeted**. The other inline comments only worked by luck: `Atoi` stops at the space.
+
+**CRITIC FIX (VSync priority):** `UGameUserSettings::ApplySettings` writes `r.VSync` with `ECVF_SetByGameSetting` (0x03, `GameUserSettings.cpp:528-529`). `[SystemSettings]` writes with `ECVF_SetBySystemSettingsIni` (0x05, `SystemSettings.cpp:80`; order in `IConsoleManager.h:155-187`). So while `r.VSync` is in `[SystemSettings]`, the §4.4 `S->SetVSyncEnabled(true)` is **silently ignored**. The project today has `r.VSync=0` and `t.MaxFPS=120` there, so VSync can never be turned on from code. Choose **one** of these:
+- (a) keep `r.VSync`/`t.MaxFPS` in `[SystemSettings]` and drop `SetVSyncEnabled` from code;
+- (b) remove them from `[SystemSettings]` and drive them only via `UGameUserSettings`;
+- (c) force them from code with `IConsoleManager::Get().FindConsoleVariable(TEXT("r.VSync"))->Set(1, ECVF_SetByCode)`.
+
+`t.MaxFPS` from `SetFrameRateLimit` goes through `GEngine->SetMaxFPS` (`GameUserSettings.cpp:413-416`) and is not affected. `-ExecCmds="r.VSync 0"` uses Console priority, so test runs still override all of the above.
 Do **not** put `r.Streaming.PoolSize`, `r.ScreenPercentage`, `r.VolumetricFog`, `r.BloomQuality`, shadow cvars and similar into `[SystemSettings]`, because of the priority trap. Linux sets the texture pool to 70 % of the reported VRAM (`Engine/Config/Linux/LinuxEngine.ini [TextureStreaming] PoolSizeVRAMPercentage=70`). `GRHIDeviceIsIntegrated` is detected (`VulkanRHI.cpp:1170`). If textures look blurry, raise `r.Streaming.PoolSize` inside the TextureQuality groups (below).
 
 ### 4.3 Recommended `Config/DefaultScalability.ini` (overrides `Engine/Config/BaseScalability.ini`, same section names)
 The engine default quality level is **3 (Epic)** for every group when no saved user settings exist (`Runtime/Engine/Public/Scalability.h:21`). Epic is therefore what runs on first launch. Make **@3 the tuned "Presentation" preset** for this iGPU and keep @2 as the fallback:
 ```ini
+; CRITIC FIX: no inline ';' comments in UE ini (see 4.2). They are moved onto their own lines below.
 [ScalabilitySettings]
-PerfIndexValues_ResolutionQuality="50 60 67 75 100"   ; used only by auto-detect
+; used only by auto-detect
+PerfIndexValues_ResolutionQuality="50 60 67 75 100"
 
 ;----------------------- Shadows -----------------------
 [ShadowQuality@2]
@@ -459,17 +485,22 @@ r.SceneColorFringeQuality=1
 r.Tonemapper.Quality=3
 
 ;----------------------- Effects (fire) -----------------------
+; CRITIC FIX: RefractionQuality=0 at both levels. StarterContent P_Fire has a M_Heat_Distortion (refraction) emitter, which forces
+; the distortion pass on the iGPU (DistortionRendering.cpp:146-152). Report 01 §5 wants it off. Base @2/@3 = 2.
+; Spawn-rate throttle for Cascade (Base @2=0.5, @3=1.0, BaseScalability.ini:868,900):
 [EffectsQuality@2]
 r.SeparateTranslucencyScreenPercentage=60
 r.TranslucencyLightingVolume.Dim=32
-r.RefractionQuality=1
+r.RefractionQuality=0
+r.EmitterSpawnRateScale=0.5
 r.SSGI.Quality=0
 fx.Niagara.QualityLevel=2
 r.MaterialQualityLevel=1
 [EffectsQuality@3]
 r.SeparateTranslucencyScreenPercentage=75
 r.TranslucencyLightingVolume.Dim=48
-r.RefractionQuality=2
+r.RefractionQuality=0
+r.EmitterSpawnRateScale=0.75
 r.SSGI.Quality=0
 fx.Niagara.QualityLevel=3
 r.MaterialQualityLevel=1
@@ -482,7 +513,8 @@ r.TSR.ShadingRejection.Flickering=1
 r.TSR.RejectionAntiAliasingQuality=1
 r.TSR.ReprojectionField=0
 [AntiAliasingQuality@3]
-r.TSR.History.ScreenPercentage=100     ; Base Epic uses 200: expensive on an iGPU
+; Base Epic uses 200 (verified in BaseScalability.ini [AntiAliasingQuality@3]), which is expensive on an iGPU
+r.TSR.History.ScreenPercentage=100
 r.TSR.History.UpdateQuality=2
 r.TSR.ShadingRejection.Flickering=1
 r.TSR.RejectionAntiAliasingQuality=1
@@ -510,9 +542,11 @@ void ATwPlayerController::SetQualityPreset(int32 Level /*1=Performance, 2=Balanc
     S->SetOverallScalabilityLevel(FMath::Clamp(Level, 0, 3));
     static const float Scale[] = {0.50f, 0.60f, 0.67f, 0.75f};          // normalized resolution scale
     S->SetResolutionScaleNormalized(Scale[FMath::Clamp(Level, 0, 3)]);
-    S->SetVSyncEnabled(true);
+    S->SetVSyncEnabled(true);      // CRITIC FIX: ignored while [SystemSettings] r.VSync exists in DefaultEngine.ini (see 4.2)
     S->SetFrameRateLimit(60.f);
     S->ApplySettings(false);
+    // CRITIC FIX: guaranteed VSync regardless of ini (Code priority 0x0E > SystemSettingsIni 0x05):
+    if (IConsoleVariable* V = IConsoleManager::Get().FindConsoleVariable(TEXT("r.VSync"))) { V->Set(1, ECVF_SetByCode); }
 }
 // Bind to F1/F2/F3 (or a small menu). At first start (e.g. GameInstance::Init) call SetQualityPreset(3)
 // so the result does not depend on a stale Saved/Config file.
@@ -598,7 +632,7 @@ QUAL=${1:-3}; SECS=${2:-300}
   -ExecCmds="r.VSync 0, t.MaxFPS 0, scalability $QUAL" > "$OUT/game.log" 2>&1 &
 GPID=$!
 sleep 40   # skip boot, then record 30 s of video
-WID=$(xdotool search --sync --onlyvisible --name 'Twilight' | head -1)
+WID=$(timeout 60 xdotool search --sync --onlyvisible --pid "$GPID" | head -1)   # CRITIC FIX: was --name 'Twilight' (never matches, hangs)
 eval "$(xdotool getwindowgeometry --shell "$WID")"
 ffmpeg -hide_banner -loglevel error -y -f x11grab -draw_mouse 0 -framerate 30 \
   -video_size $((WIDTH/2*2))x$((HEIGHT/2*2)) -i :0.0+${X},${Y} -t 30 \
@@ -616,9 +650,9 @@ Notes: the FPS from the run with the 30 s recording is a little pessimistic. For
 
 ## 7. Open items / UNVERIFIED list
 1. SM6 profile acceptance on Iris Xe + Mesa 25.2 (check the log line `VulkanRHI.cpp:415`).
-2. The exact UE window title string, needed for `xdotool search --name`.
+2. ~~The exact UE window title string~~ CRITIC FIX: resolved. The title is `Վահագն (64-bit Development SF_VULKAN_SM6)` (`GameEngine.cpp:487-497` + `DefaultGame.ini ProjectDisplayedTitle`). Use `xdotool search --pid` or `--name SF_VULKAN`.
 3. Whether XTest relative mouse motion reaches UE's SDL relative mode.
-4. The `EndCapture().Wait()` pattern on the game thread (the `CsvProfile EXITONCOMPLETION` fallback is verified).
+4. ~~The `EndCapture().Wait()` pattern~~ CRITIC FIX: resolved. It deadlocks (see §1.2) and is replaced by `CsvProfile EXITONCOMPLETION` + `CsvProfile STOP`.
 5. Layering of `DefaultGameUserSettings.ini [ScalabilityGroups]` (the code path is verified, a run is not).
 6. All timing estimates (shader compile, package time, per-pass ms on Iris Xe).
 7. The default Mesa shader-cache size and the exact archive folder layout of 5.8 Linux packaging.

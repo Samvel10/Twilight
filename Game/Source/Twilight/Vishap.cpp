@@ -106,11 +106,12 @@ void AVishap::Build()
 		if (bCollide)
 		{
 			C->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-			C->SetCollisionObjectType(ECC_WorldDynamic);
+			// fireballs sweep into these (block -> OnHit); no overlap bookkeeping while the body teleports every frame
+			C->SetCollisionObjectType(ECC_PhysicsBody);
 			C->SetCollisionResponseToAllChannels(ECR_Ignore);
 			C->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-			C->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
-			C->SetGenerateOverlapEvents(true);
+			C->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+			C->SetGenerateOverlapEvents(false);
 		}
 		else
 		{
@@ -301,7 +302,7 @@ void AVishap::Steer(const FVector& Target, float DesiredSpeed, float TurnDegPerS
 	FHitResult Hit;
 	FCollisionQueryParams Q(SCENE_QUERY_STAT(VishapAvoid), false, this);
 	const FVector Fwd = HeadVel.GetSafeNormal();
-	if (GetWorld()->LineTraceSingleByChannel(Hit, HeadPos, HeadPos + Fwd * 2500.f, ECC_WorldStatic, Q))
+	if (GetWorld()->LineTraceSingleByObjectType(Hit, HeadPos, HeadPos + Fwd * 2500.f, FCollisionObjectQueryParams(ECC_WorldStatic), Q))
 	{
 		ToT += (Hit.ImpactNormal + FVector::UpVector) * 6000.f;
 	}
@@ -503,7 +504,7 @@ void AVishap::ApplyHit(float Damage, const FVector& Where, AVahagnCharacter* Her
 	}
 
 	const bool bKill = Health <= 0.f;
-	if (Hero && bNotify) Hero->NotifyHit(bKill);
+	if (Hero && bNotify) Hero->RegisterHit(bKill);
 	if (bKill) StartDying(Hero);
 }
 
@@ -594,7 +595,6 @@ void AVishap::UpdateBody(float Dt)
 		const bool bAngry = State == EVishapState::BreathWindup || State == EVishapState::Breath || State == EVishapState::DashWindup;
 		EyeLight->SetIntensity((bBoss ? 12000.f : 3500.f) * (bAngry ? 2.5f : 1.f));
 	}
-	SetActorLocation(HeadPos, false, nullptr, ETeleportType::TeleportPhysics);
 }
 
 void AVishap::UpdateDying(float Dt)

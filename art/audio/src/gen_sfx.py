@@ -159,43 +159,39 @@ def whoosh(dur, rng, f_pts, a_pts, res=0.55, gain=1.0):
 
 
 def glottal_roar(dur, f0_pts, rng, amp_pts, formants=(300, 620, 1350, 2300), fscale=1.0,
-                 growl=0.6, rasp=0.6, rough=0.35, jitter=0.03, bright=0.8, sub_oct=0.5, open_pts=None):
-    """Monster vocalisation: band-limited pulse source + period-doubling growl +
-    pulsed (glottal-synchronous) noise rasp, shaped by moving formants."""
+                 growl=0.6, rasp=0.45, rough=0.3, jitter=0.012, bright=0.8, sub_oct=0.4, open_pts=None):
+    """Monster vocalisation.
+    source  : band-limited glottal pulse (k^-0.9) with jitter, period-doubling
+              growl (sub-harmonic AM) and 45 Hz roughness flutter
+    rasp    : glottal-synchronous noise (turbulence in a huge throat)
+    throat  : level-dependent saturation BEFORE the vocal tract (louder = dirtier)
+    tract   : 4 moving resonant formants (TPT SVF band-passes) that follow the
+              mouth-opening envelope, so the roar has a vowel-like "aaa-wr" sweep."""
     n = ns(dur)
-    t = tvec(n)
     f0 = env_points(n, f0_pts, "log")
-    f0 = f0 * (1 + jitter * smooth_noise(n, 28, rng)) * (1 + 0.012 * smooth_noise(n, 4, rng))
+    f0 = f0 * (1 + jitter * smooth_noise(n, 25, rng)) * (1 + 0.01 * smooth_noise(n, 3, rng))
     ph = phase_from_freq(f0)
-    # source: sawtooth-ish glottal spectrum k^-1 up to ~6.5 kHz
-    nh = int(6500 // np.max(f0))
+    nh = int(5000 // np.max(f0))
     src = np.zeros(n)
     for k in range(1, nh + 1):
-        src += (1.0 / k ** (1.15 - 0.35 * bright)) * np.sin(k * ph + rng.uniform(0, 6.28))
+        src += (1.0 / k ** (1.2 - 0.375 * bright)) * np.sin(k * ph + rng.uniform(0, 6.28))
     src /= np.max(np.abs(src)) + 1e-9
-    # period doubling growl (sub-harmonic) + rough AM flutter
     src *= (1 + growl * np.sin(ph / 2 + 0.3))
-    src *= (1 + rough * smooth_noise(n, 38, rng))
-    # glottal-synchronous noise (rasp/hiss of a huge throat)
-    pulse = (0.5 + 0.5 * np.cos(ph)) ** 6
-    nz = lp(white(n, rng), 4500, 2) * (0.25 + pulse) * rasp
-    exc = src + nz
-    # formants: closed vs open mouth, morph by open envelope
-    F = np.array(formants) * fscale
-    closed = resonator_bank(exc, F * 0.8, [4, 5, 6, 7], [1.0, 0.7, 0.35, 0.2])
-    opened = resonator_bank(exc, F * 1.15, [3.5, 4.5, 5.5, 6], [1.0, 0.9, 0.55, 0.35])
+    src *= np.clip(1 + rough * smooth_noise(n, 45, rng), 0, 3)
+    pulse = (0.5 + 0.5 * np.cos(ph)) ** 4
+    nz = lp(white(n, rng), 5000, 2) * (0.2 + pulse) * rasp
+    amp = env_points(n, amp_pts)
+    exc = saturate((src + nz) * (0.5 + 2.5 * amp), 2.0)
     o = env_points(n, open_pts or [(0, 0.2), (dur * 0.35, 1.0), (dur, 0.3)])
-    voice = closed * (1 - o) + opened * o
-    voice += 0.12 * lp(exc, 3000, 2) * o  # a little raw edge
-    # deep body / chest resonance an octave down
-    if sub_oct:
-        sub = np.sin(ph * 0.5) * 0.5 + 0.25 * np.sin(ph)
-        voice += sub_oct * lp(sub, 180)
-    voice *= env_points(n, amp_pts)
-    voice = peak_eq(voice, 850, 4.0, 0.7)
-    voice = saturate(voice / (np.max(np.abs(voice)) + 1e-9) * 2.2, 1.5)
-    voice = lp(voice, 7000, 2)
-    return voice
+    F1 = formants[0] * fscale * (0.8 + 1.4 * o)
+    r = [formants[i] / formants[0] for i in range(1, 4)]
+    v = svf(exc, F1, 0.82, "bp") + 0.8 * svf(exc, F1 * r[0], 0.85, "bp") + \
+        0.45 * svf(exc, F1 * r[1], 0.85, "bp") + 0.25 * svf(exc, F1 * r[2], 0.8, "bp")
+    v += 0.08 * lp(exc, 2500, 2)
+    if sub_oct:  # chest / body resonance an octave down
+        v += sub_oct * lp(np.sin(ph * 0.5) * 0.5 + 0.3 * np.sin(ph), 200) * amp
+    v *= amp
+    return lp(v / (np.max(np.abs(v)) + 1e-9), 7000, 2)
 
 
 def drum_hit(dur=0.8, f_hi=140, f_lo=52, decay=0.35, click=0.5, seed=0, modes=(1.0, 1.58, 2.13), mode_gain=0.25):
@@ -217,7 +213,7 @@ def horn(dur, midi, rng, scoop=-1.5, bright_pts=None, amp_pts=None, detune=(0, -
     n = ns(dur)
     t = tvec(n)
     out = np.zeros(n)
-    b = env_points(n, bright_pts or [(0, 350), (0.25, 2600), (dur * 0.7, 2200), (dur, 700)], "log")
+    b = env_points(n, bright_pts or [(0, 350), (0.25, 2100), (dur * 0.7, 1700), (dur, 600)], "log")
     for i, dc in enumerate(detune):
         f0 = mtof(midi) * 2 ** (dc / 1200)
         pitch = f0 * 2 ** (env_points(n, [(0, scoop), (0.18, -0.15), (0.35, 0), (dur, 0)]) / 12)
@@ -225,7 +221,7 @@ def horn(dur, midi, rng, scoop=-1.5, bright_pts=None, amp_pts=None, detune=(0, -
         pitch *= 2 ** (vib_env * np.sin(2 * np.pi * (5.1 + 0.3 * i) * t) / 12)
         pitch *= 1 + 0.003 * smooth_noise(n, 3, rng)
         w = lambda k, fk: (1.0 / k ** 0.5) * (1 + 1.2 * np.exp(-0.5 * (np.log2(fk / 1100) / 0.6) ** 2))
-        out += additive(pitch, w, rng, fmax=9000, bright=b)
+        out += additive(pitch, w, rng, fmax=6500, bright=b)
     out /= len(detune)
     # lip buzz rasp at the attack
     nz = bp(white(n, rng), 300, 2500) * env_points(n, [(0, 0), (0.05, 1), (0.4, 0.2), (dur, 0.05)]) * rasp
@@ -358,21 +354,23 @@ def sfx_big_explosion():
 def sfx_vishap_roar():
     rng = np.random.default_rng(404)
     dur = 3.2
-    main = glottal_roar(dur, [(0, 48), (0.35, 70), (1.4, 78), (2.3, 60), (dur, 38)], rng,
-                        [(0, 0), (0.18, 0.8), (0.6, 1.0), (2.2, 0.9), (3.0, 0.25), (dur, 0)],
-                        fscale=0.9, growl=0.7, rasp=0.8, rough=0.4)
+    main = glottal_roar(dur, [(0, 55), (0.35, 82), (1.4, 90), (2.3, 68), (dur, 42)], rng,
+                        [(0, 0), (0.15, 0.8), (0.6, 1.0), (2.2, 0.9), (3.0, 0.25), (dur, 0)],
+                        fscale=1.0, growl=0.6, rasp=0.45, rough=0.3,
+                        open_pts=[(0, 0.1), (0.4, 0.75), (1.6, 0.85), (2.6, 0.5), (dur, 0.15)])
     rng2 = np.random.default_rng(405)
-    low = glottal_roar(dur, [(0, 26), (0.4, 36), (1.4, 39), (2.3, 30), (dur, 20)], rng2,
+    low = glottal_roar(dur, [(0, 30), (0.4, 41), (1.4, 44), (2.3, 34), (dur, 24)], rng2,
                        [(0, 0), (0.25, 0.9), (0.7, 1.0), (2.3, 0.9), (dur, 0)],
-                       fscale=0.62, growl=0.9, rasp=0.5, rough=0.5, sub_oct=0.8)
+                       fscale=0.75, growl=0.8, rasp=0.35, rough=0.4, sub_oct=0.7,
+                       open_pts=[(0, 0.1), (0.5, 0.7), (1.6, 0.75), (dur, 0.1)])
     rng3 = np.random.default_rng(406)
     n = ns(dur)
     # reptilian hiss/screech layer
     hiss = svf(white(n, rng3), env_points(n, [(0, 2400), (1.2, 3400), (dur, 2000)], "log"), 0.6, "bp")
     hiss *= env_points(n, [(0, 0), (0.3, 0.5), (1.3, 0.8), (2.4, 0.4), (dur, 0)])
-    y = 0.75 * main + 0.7 * low + 0.18 * hiss
-    y = peak_eq(y, 120, 4.0, 0.9)
-    y = saturate(y * 1.2, 1.3)
+    y = 0.8 * main + 0.6 * low + 0.12 * hiss
+    y = peak_eq(y, 120, 3.0, 0.9)
+    y = saturate(y * 1.1, 1.2)
     return finish(y, -1.0, IR_VALLEY, 0.28, tail=4.4)
 
 
@@ -390,8 +388,8 @@ def sfx_vishap_hit():
     y += crunch * 0.35
     # pained yelp-snarl
     yelp = glottal_roar(0.6, [(0, 95), (0.08, 140), (0.3, 110), (0.6, 70)], rng,
-                        [(0, 0), (0.04, 1), (0.25, 0.7), (0.6, 0)], fscale=1.05, growl=0.5, rasp=0.9,
-                        rough=0.5, sub_oct=0.2, open_pts=[(0, 0.6), (0.1, 1), (0.6, 0.3)])
+                        [(0, 0), (0.04, 1), (0.25, 0.7), (0.6, 0)], fscale=1.1, growl=0.5, rasp=0.6,
+                        rough=0.4, jitter=0.02, sub_oct=0.2, open_pts=[(0, 0.6), (0.1, 1), (0.6, 0.3)])
     mix_at(y, yelp, ns(0.03), 0.8)
     punch = cc0("impactPunch_heavy_000", pitch=0.72)
     if punch is not None:
@@ -406,12 +404,13 @@ def sfx_vishap_death():
     n = ns(dur)
     t = tvec(n)
     cry = glottal_roar(3.0, [(0, 60), (0.3, 95), (0.9, 88), (1.8, 55), (3.0, 28)], rng,
-                       [(0, 0), (0.12, 1), (1.2, 0.9), (2.4, 0.45), (3.0, 0)], fscale=0.95, growl=0.9,
-                       rasp=1.0, rough=0.7, jitter=0.06,
+                       [(0, 0), (0.12, 1), (1.2, 0.9), (2.4, 0.45), (3.0, 0)], fscale=1.0, growl=0.8,
+                       rasp=0.65, rough=0.5, jitter=0.03,
                        open_pts=[(0, 0.4), (0.3, 1.0), (1.5, 0.8), (3.0, 0.1)])
     rng2 = np.random.default_rng(607)
     low = glottal_roar(3.0, [(0, 30), (0.3, 46), (1.5, 30), (3.0, 16)], rng2,
-                       [(0, 0), (0.2, 1), (1.5, 0.8), (3.0, 0)], fscale=0.6, growl=1.0, rasp=0.6, rough=0.8)
+                       [(0, 0), (0.2, 1), (1.5, 0.8), (3.0, 0)], fscale=0.75, growl=0.9, rasp=0.4, rough=0.6, sub_oct=0.6,
+                       open_pts=[(0, 0.3), (0.4, 0.8), (1.6, 0.6), (3.0, 0.05)])
     y = np.zeros(n)
     mix_at(y, 0.8 * cry + 0.6 * low, 0)
     # gurgling death rattle: AM'd low noise

@@ -33,6 +33,7 @@ private:
 	UPROPERTY() TObjectPtr<UFXSystemComponent> Flame;
 	UPROPERTY() TObjectPtr<UFXSystemComponent> Trail;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> CoreMat;
+	UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Tail;
 
 	UFUNCTION() void OnOverlap(UPrimitiveComponent* Comp, AActor* Other, UPrimitiveComponent* OtherComp, int32 BodyIndex, bool bFromSweep, const FHitResult& Sweep);
 	UFUNCTION() void OnHit(UPrimitiveComponent* Comp, AActor* Other, UPrimitiveComponent* OtherComp, FVector Impulse, const FHitResult& Hit);

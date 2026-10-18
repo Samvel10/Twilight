@@ -26,6 +26,7 @@ AFireball::AFireball()
 	Sphere->SetCollisionResponseToAllChannels(ECR_Ignore);
 	Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	Sphere->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+	Sphere->SetCollisionResponseToChannel(ECC_PhysicsBody, ECR_Block);
 	Sphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	Sphere->SetGenerateOverlapEvents(true);
 	Sphere->bReturnMaterialOnMove = false;
@@ -86,14 +87,46 @@ void AFireball::Launch(const FVector& Dir, float InDamage, float InAoe, float Sc
 	Light->SetIntensity(4500.f * Scale);
 	Light->SetAttenuationRadius(800.f * FMath::Sqrt(Scale));
 
-	Flame = TwFx::AttachFlame(Sphere, NAME_None, FVector::ZeroVector, 0.35f * Scale);
-	Trail = TwFx::AttachSparks(Sphere, NAME_None, FVector::ZeroVector, 0.45f * Scale);
+	// heavy particle systems only on big/hostile shots; normal shots use the glowing core + comet tail (cheap on an iGPU)
+	const bool bBig = Scale > 1.2f || bHostile;
+	if (bBig)
+	{
+		Flame = TwFx::AttachFlame(Sphere, NAME_None, FVector::ZeroVector, 0.35f * Scale);
+		Trail = TwFx::AttachSparks(Sphere, NAME_None, FVector::ZeroVector, 0.45f * Scale);
+	}
+	else
+	{
+		Light->SetVisibility(false);
+	}
+	for (int32 i = 0; i < 5; ++i)
+	{
+		UStaticMeshComponent* T = NewObject<UStaticMeshComponent>(this);
+		T->SetStaticMesh(TwAssets::Sphere());
+		T->SetupAttachment(Sphere);
+		T->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		T->SetCastShadow(false);
+		T->SetMaterial(0, CoreMat);
+		const float K = 1.f - (i + 1) / 6.f;
+		T->SetRelativeLocation(FVector(-(i + 1) * 34.f * Scale, 0.f, 0.f));
+		T->SetRelativeScale3D(FVector(0.62f * K, 0.34f * K, 0.34f * K) * Scale);
+		T->RegisterComponent();
+		Tail.Add(T);
+	}
 
 	const float Spd = SpeedOverride > 0.f ? SpeedOverride : Speed;
 	Move->InitialSpeed = Spd;
 	Move->MaxSpeed = Spd;
 	Move->Velocity = Dir.GetSafeNormal() * Spd;
 	Move->Activate(true);
+
+	// overlaps that already existed at spawn time fired before the delegate was bound
+	TArray<UPrimitiveComponent*> Already;
+	Sphere->GetOverlappingComponents(Already);
+	for (UPrimitiveComponent* C : Already)
+	{
+		if (bDone) break;
+		if (C) OnOverlap(Sphere, C->GetOwner(), C, INDEX_NONE, false, FHitResult());
+	}
 }
 
 void AFireball::Tick(float Dt)
@@ -128,6 +161,8 @@ void AFireball::OnOverlap(UPrimitiveComponent* Comp, AActor* Other, UPrimitiveCo
 void AFireball::OnHit(UPrimitiveComponent* Comp, AActor* Other, UPrimitiveComponent* OtherComp, FVector Impulse, const FHitResult& Hit)
 {
 	if (bDone) return;
+	if (!bHostile && Other && Other->IsA<AVishap>()) { Explode(Hit.ImpactPoint, Other, OtherComp); return; }
+	if (bHostile && Other && Other->IsA<AVishap>()) return; // vishap spit never collides with its own kind
 	Explode(Hit.ImpactPoint, nullptr, nullptr);
 }
 
@@ -176,6 +211,7 @@ void AFireball::Explode(const FVector& Where, AActor* DirectActor, UPrimitiveCom
 	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Core->SetVisibility(false);
 	Light->SetVisibility(false);
+	for (UStaticMeshComponent* T : Tail) if (T) T->SetVisibility(false);
 	if (Flame) Flame->Deactivate();
 	if (Trail) Trail->Deactivate();
 	SetLifeSpan(1.5f);

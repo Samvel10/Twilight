@@ -16,10 +16,17 @@ class UObject;
 /** Central place for asset paths + safe loading with fallbacks (so a missing asset never crashes the game). */
 namespace TwAssets
 {
+	/** Paths that already failed once (avoid repeated synchronous LoadPackage + flush). */
+	TSet<FString>& MissingPaths();
+
 	template<typename T>
 	T* Load(const TCHAR* Path)
 	{
-		return LoadObject<T>(nullptr, Path, nullptr, LOAD_NoWarn | LOAD_Quiet);
+		TSet<FString>& Missing = MissingPaths();
+		if (Missing.Contains(Path)) return nullptr;
+		T* Obj = LoadObject<T>(nullptr, Path, nullptr, LOAD_NoWarn | LOAD_Quiet);
+		if (!Obj) Missing.Add(Path);
+		return Obj;
 	}
 
 	UStaticMesh* Sphere();

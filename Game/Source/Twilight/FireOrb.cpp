@@ -19,7 +19,7 @@ AFireOrb::AFireOrb()
 	Light->SetupAttachment(Mesh);
 	Light->SetIntensityUnits(ELightUnits::Unitless);
 	Light->SetIntensity(2500.f);
-	Light->SetAttenuationRadius(700.f);
+	Light->SetAttenuationRadius(350.f);
 	Light->SetLightColor(FLinearColor(1.f, 0.7f, 0.3f));
 	Light->SetCastShadows(false);
 	InitialLifeSpan = 25.f;

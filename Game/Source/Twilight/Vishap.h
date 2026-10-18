@@ -45,6 +45,7 @@ public:
 
 	/** Boss phase index (0..2) for HUD/announcements. */
 	int32 GetPhase() const { return Phase; }
+	int32 GetTier() const { return Tier; }
 
 protected:
 	virtual void BeginPlay() override;
