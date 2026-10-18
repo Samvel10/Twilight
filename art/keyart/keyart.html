@@ -1,0 +1,94 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// Procedural key art for the three games. Usage: keyart.html?scene=vahagn|hayk|aralez
+const W = 1920, H = 1080;
+const cv = document.getElementById('c');
+const g = cv.getContext('2d');
+const scene = new URLSearchParams(location.search).get('scene') || 'vahagn';
+
+// --- helpers ---------------------------------------------------------------
+let seed = 1337;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const R = (a, b) => a + (b - a) * rnd();
+const lerp = (a, b, t) => a + (b - a) * t;
+function hash(x, y) { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); }
+function vnoise(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  return lerp(lerp(hash(xi, yi), hash(xi + 1, yi), u), lerp(hash(xi, yi + 1), hash(xi + 1, yi + 1), u), v);
+}
+function fbm(x, y, o = 5) { let s = 0, a = 0.5, f = 1; for (let i = 0; i < o; i++) { s += a * vnoise(x * f, y * f); f *= 2; a *= 0.5; } return s; }
+function vgrad(stops, y0 = 0, y1 = H) { const gr = g.createLinearGradient(0, y0, 0, y1); stops.forEach(([p, c]) => gr.addColorStop(p, c)); return gr; }
+function glowDot(x, y, r, color, a) {
+  const gr = g.createRadialGradient(x, y, 0, x, y, r);
+  gr.addColorStop(0, color.replace('A', a)); gr.addColorStop(1, color.replace('A', 0));
+  g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+}
+function stars(n, yMax, tint = '255,240,255') {
+  for (let i = 0; i < n; i++) {
+    const x = R(0, W), y = Math.pow(rnd(), 1.4) * yMax, s = Math.pow(rnd(), 6) * 2.2 + 0.4;
+    g.fillStyle = `rgba(${tint},${R(0.25, 0.95) * (1 - y / yMax * 0.7)})`;
+    g.beginPath(); g.arc(x, y, s, 0, Math.PI * 2); g.fill();
+    if (s > 1.8) glowDot(x, y, s * 6, `rgba(${tint},A)`, 0.25);
+  }
+}
+function clouds(y0, y1, color, alpha, scale, n = 2600) {
+  for (let i = 0; i < n; i++) {
+    const x = R(-100, W + 100), y = R(y0, y1);
+    const d = fbm(x * scale, y * scale * 2.4);
+    if (d < 0.5) continue;
+    glowDot(x, y, R(30, 90), color, alpha * (d - 0.5) * 2);
+  }
+}
+function ridge(yBase, amp, freq, color, s0) {
+  g.fillStyle = color; g.beginPath(); g.moveTo(0, H);
+  for (let x = 0; x <= W; x += 6) g.lineTo(x, yBase - fbm(x * freq + s0, s0, 6) * amp);
+  g.lineTo(W, H); g.closePath(); g.fill();
+}
+function title(main, sub, quote, colA, colB, glowCol, y = 905) {
+  g.save(); g.textAlign = 'center';
+  if (quote) {
+    g.font = 'italic 300 30px "Noto Serif Armenian"'; g.fillStyle = 'rgba(255,235,220,0.78)';
+    g.fillText(quote, W / 2, y - 120);
+  }
+  g.font = '800 150px "Noto Serif Armenian"';
+  g.letterSpacing = '22px';
+  g.shadowColor = glowCol; g.shadowBlur = 60;
+  const gr = g.createLinearGradient(0, y - 120, 0, y + 10);
+  gr.addColorStop(0, colA); gr.addColorStop(1, colB);
+  g.fillStyle = gr; g.fillText(main, W / 2 + 11, y);
+  g.shadowBlur = 0; g.letterSpacing = '14px';
+  g.font = '500 34px "Noto Sans Armenian"'; g.fillStyle = 'rgba(255,240,230,0.9)';
+  g.fillText(sub, W / 2 + 7, y + 64);
+  g.restore();
+}
+function vignette(a = 0.75) {
+  const gr = g.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, H * 1.05);
+  gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, `rgba(0,0,0,${a})`);
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+}
+function grain(a = 0.05) {
+  const img = g.getImageData(0, 0, W, H), d = img.data;
+  for (let i = 0; i < d.length; i += 4) { const n = (Math.random() - 0.5) * 255 * a; d[i] += n; d[i + 1] += n; d[i + 2] += n; }
+  g.putImageData(img, 0, 0);
+}
+function badge(text) {
+  g.save(); g.font = '600 22px "Noto Sans Armenian"'; g.letterSpacing = '6px';
+  g.fillStyle = 'rgba(255,255,255,0.55)'; g.textAlign = 'left';
+  g.fillText(text, 60, 70); g.restore();
+}
+
+</script>
+<script src="scenes.js"></script>
+<script>
+document.fonts.load('800 150px "Noto Serif Armenian"').then(() => document.fonts.load('500 34px "Noto Sans Armenian"')).then(() => {
+  ({ vahagn, hayk, aralez })[scene]();
+  grain(0.035);
+  document.title = 'done';
+});
+</script>
+</body></html>
