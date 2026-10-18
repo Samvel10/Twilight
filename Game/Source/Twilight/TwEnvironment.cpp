@@ -13,6 +13,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Sound/SoundBase.h"
+#include "AudioDevice.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/Engine.h"
 #include "Misc/CommandLine.h"
@@ -51,6 +52,8 @@ void ATwEnvironment::BeginPlay()
 {
 	Super::BeginPlay();
 	if (GEngine) GEngine->bEnableOnScreenDebugMessages = false; // no debug text over the presentation
+	// headroom: busy fights summed past full scale and clipped (measured on the packaged build)
+	if (FAudioDeviceHandle Dev = GetWorld()->GetAudioDevice()) Dev->SetTransientPrimaryVolume(0.7f);
 	const FTwSkyPreset P = GetSkyPreset();
 	EmberFloorZ = P.EmberFloorZ;
 	BuildSky(P);
