@@ -83,7 +83,7 @@ void ASoulLight::Tick(float Dt)
 			bTaken = true;
 			It->AddLights(1);
 			if (!It->IsBot()) TwFx::Sound2D(GetWorld(), TEXT("sfx_soul_chime"), 0.7f, 0.9f + FMath::FRand() * 0.3f);
-			TwFx::Burst(GetWorld(), TwFx::EFx::Sparks, P, 0.4f);
+			TwFx::Burst(GetWorld(), TwFx::EFx::Sparks, P, It->IsBot() ? 0.2f : 0.3f);
 			Destroy();
 			return;
 		}

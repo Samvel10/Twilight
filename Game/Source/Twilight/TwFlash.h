@@ -20,4 +20,5 @@ private:
 	UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> Mesh;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> Mat;
 	float Age = 0.f, Dur = 0.25f, Size = 1.f;
+	float PeakIntensity = 5.f;
 };

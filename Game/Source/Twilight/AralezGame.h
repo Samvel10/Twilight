@@ -50,6 +50,10 @@ private:
 	void EndRace();
 	void FinishCinematic();
 	bool bFinishing = false;
+	UPROPERTY() TObjectPtr<class ACameraActor> EndCam;
+	float EndCamAge = 0.f;
+	void StartEndCamera();
+	void TickEndCamera(float Dt);
 	void Announce(const FText& T, const FText& S);
 
 	UPROPERTY() TObjectPtr<AAralezWorld> World;

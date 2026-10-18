@@ -82,7 +82,7 @@ void AFireball::Launch(const FVector& Dir, float InDamage, float InAoe, float Sc
 		CoreMat->SetVectorParameterValue(TEXT("Color"), Col);
 		// big shots: a saturated shell with soft edges (high intensity tonemaps to a flat cream disc)
 		CoreMat->SetScalarParameterValue(TEXT("GlowMode"), 1.f);
-		CoreMat->SetScalarParameterValue(TEXT("Intensity"), bBigShot ? (bHostile ? 5.f : 7.f) : 25.f);
+		CoreMat->SetScalarParameterValue(TEXT("Intensity"), bBigShot ? (bHostile ? 5.f : 7.f) : 12.f);
 		if (bBigShot) CoreMat->SetScalarParameterValue(TEXT("Falloff"), 3.f);
 		Core->SetMaterial(0, CoreMat);
 	}

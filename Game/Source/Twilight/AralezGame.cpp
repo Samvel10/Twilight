@@ -17,6 +17,8 @@
 #include "Engine/GameViewportClient.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
+#include "Camera/CameraActor.h"
+#include "Camera/CameraComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Widgets/SWeakWidget.h"
 #include "Widgets/SOverlay.h"
@@ -194,6 +196,33 @@ void AAralezGameMode::EndRace()
 		TwFx::LightFlash(GetWorld(), G, FLinearColor(1.f, 0.85f, 0.55f), 600000.f, 20000.f, 4.f);
 	}
 	if (AAralezController* PC = Cast<AAralezController>(UGameplayStatics::GetPlayerController(this, 0))) PC->SetScreen(EAralezScreen::End);
+	StartEndCamera();
+}
+
+void AAralezGameMode::StartEndCamera()
+{
+	// results backdrop: look up the last stretch of the tunnel at Ara's gate, slow dolly in
+	if (!World || EndCam) return;
+	EndCamAge = 0.f;
+	EndCam = GetWorld()->SpawnActor<ACameraActor>(AAralezWorld::PathPoint(0.962f), FRotator::ZeroRotator);
+	if (!EndCam) return;
+	EndCam->GetCameraComponent()->SetFieldOfView(75.f);
+	EndCam->GetCameraComponent()->bConstrainAspectRatio = false;
+	TickEndCamera(0.f);
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+		PC->SetViewTargetWithBlend(EndCam, 1.8f, VTBlend_EaseInOut, 2.f);
+}
+
+void AAralezGameMode::TickEndCamera(float Dt)
+{
+	if (!EndCam || !World) return;
+	EndCamAge += Dt;
+	const float T = FMath::Lerp(0.958f, 0.972f, FMath::Clamp(EndCamAge / 20.f, 0.f, 1.f));
+	const FVector Fwd = AAralezWorld::PathTangent(T);
+	const FVector Right = FVector::CrossProduct(FVector::UpVector, Fwd).GetSafeNormal();
+	const float Sway = FMath::Sin(EndCamAge * 0.25f);
+	const FVector Loc = AAralezWorld::PathPoint(T) + FVector(0, 0, 700.f) + Right * (900.f * Sway);
+	EndCam->SetActorLocationAndRotation(Loc, (World->GetGate() - Loc).Rotation());
 }
 
 void AAralezGameMode::Tick(float Dt)
@@ -203,6 +232,7 @@ void AAralezGameMode::Tick(float Dt)
 	{
 		Test.Tick(GetWorld(), FApp::GetDeltaTime(), FString::Printf(TEXT("state=%d time=%.0f zone=%d player_t=%.3f lights=%d rank=%d"), (int32)State, TimeLeft, Zone, PlayerSpirit ? PlayerSpirit->GetProgress() : -1.f, PlayerSpirit ? PlayerSpirit->GetLights() : -1, RankOf(PlayerSpirit)), TEXT("Aralez"));
 	}
+	if (State == EAralezState::End) TickEndCamera(FApp::GetDeltaTime());
 	switch (State)
 	{
 	case EAralezState::Intro:

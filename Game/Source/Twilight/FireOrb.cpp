@@ -34,8 +34,10 @@ void AFireOrb::BeginPlay()
 	Mat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
 	if (Mat)
 	{
-		Mat->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.75f, 0.35f));
-		Mat->SetScalarParameterValue(TEXT("GlowMode"), 1.f); Mat->SetScalarParameterValue(TEXT("Intensity"), 18.f);
+		// golden ember, not a cream disc (high intensity tonemaps to white)
+		Mat->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.55f, 0.15f));
+		Mat->SetScalarParameterValue(TEXT("GlowMode"), 1.f); Mat->SetScalarParameterValue(TEXT("Intensity"), 6.f);
+		Mat->SetScalarParameterValue(TEXT("Falloff"), 2.f);
 		Mesh->SetMaterial(0, Mat);
 	}
 	Mesh->SetWorldScale3D(FVector(0.55f));

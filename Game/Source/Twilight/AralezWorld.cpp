@@ -238,10 +238,47 @@ void AAralezWorld::BuildGate()
 	}
 	if (UMaterialInstanceDynamic* M = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this))
 	{
-		M->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.85f, 0.5f));
+		// saturated golden shell (intensity 12 tonemapped to a flat grey-white disc)
+		M->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.62f, 0.22f));
 		M->SetScalarParameterValue(TEXT("GlowMode"), 1.f);
-		M->SetScalarParameterValue(TEXT("Intensity"), 12.f);
+		M->SetScalarParameterValue(TEXT("Intensity"), 5.5f);
+		M->SetScalarParameterValue(TEXT("Falloff"), 2.5f);
 		GateCore->SetMaterial(0, M);
+	}
+	// white-hot heart of Ara's soul inside the shell
+	UStaticMeshComponent* Heart = NewObject<UStaticMeshComponent>(this);
+	Heart->SetStaticMesh(TwAssets::Sphere());
+	Heart->SetupAttachment(GateCore);
+	Heart->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Heart->SetCastShadow(false);
+	Heart->SetRelativeScale3D(FVector(0.45f));
+	Heart->RegisterComponent();
+	if (UMaterialInstanceDynamic* HM = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this))
+	{
+		HM->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.88f, 0.65f));
+		HM->SetScalarParameterValue(TEXT("GlowMode"), 1.f);
+		HM->SetScalarParameterValue(TEXT("Intensity"), 9.f);
+		Heart->SetMaterial(0, HM);
+	}
+	GateCore->SetCastShadow(false);
+	// the tunnel ends at the gate: close it with a rock wall so the void never shows behind Ara
+	{
+		UStaticMeshComponent* Cap = NewObject<UStaticMeshComponent>(this);
+		Cap->SetStaticMesh(TwAssets::Sphere());
+		Cap->SetupAttachment(RootComponent);
+		Cap->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Cap->SetCastShadow(false);
+		Cap->RegisterComponent();
+		const FVector Tan = PathTangent(1.f);
+		const float R = TunnelRadius(1.f) * 1.6f;
+		Cap->SetWorldLocationAndRotation(PathPoint(1.f) + Tan * 2600.f, FRotationMatrix::MakeFromX(Tan).Rotator());
+		Cap->SetWorldScale3D(FVector(30.f, R / 50.f, R / 50.f));
+		if (UMaterialInstanceDynamic* CapM = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Rock")), this))
+		{
+			CapM->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.3f, 0.22f, 0.16f));
+			CapM->SetScalarParameterValue(TEXT("TopAmount"), 0.f);
+			Cap->SetMaterial(0, CapM);
+		}
 	}
 	GateLight = NewObject<UPointLightComponent>(this);
 	GateLight->SetupAttachment(GateCore);
@@ -264,8 +301,11 @@ void AAralezWorld::Tick(float Dt)
 	FLinearColor Col = ZoneFog[0];
 	if (T >= 0.36f && T < 0.7f) Col = FMath::Lerp(ZoneFog[0], ZoneFog[1], FMath::Clamp((T - 0.33f) / 0.06f, 0.f, 1.f));
 	else if (T >= 0.7f) Col = FMath::Lerp(ZoneFog[1], ZoneFog[2], FMath::Clamp((T - 0.67f) / 0.06f, 0.f, 1.f));
+	// the last stretch before Ara's gate: the red abyss gives way to a thin golden haze so the gate reads
+	const float GateK = FMath::SmoothStep(0.9f, 0.985f, T);
+	Col = FMath::Lerp(Col, FLinearColor(0.07f, 0.045f, 0.015f), GateK);
 	Fog->SetFogInscatteringColor(Col);
-	Fog->SetFogDensity(FMath::Lerp(0.035f, 0.025f, FMath::Clamp(T / 0.7f, 0.f, 1.f)));
+	Fog->SetFogDensity(FMath::Lerp(FMath::Lerp(0.035f, 0.025f, FMath::Clamp(T / 0.7f, 0.f, 1.f)), 0.004f, GateK));
 	if (GateRing) GateRing->AddLocalRotation(FRotator(0.f, 0.f, Dt * 20.f));
 	if (GateCore) GateCore->SetWorldScale3D(FVector(4.f + FMath::Sin(GetWorld()->GetTimeSeconds() * 2.f) * 0.4f));
 	(void)Zf;

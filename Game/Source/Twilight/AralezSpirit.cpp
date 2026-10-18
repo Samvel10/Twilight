@@ -1,4 +1,6 @@
 #include "AralezSpirit.h"
+#include "Camera/PlayerCameraManager.h"
+#include "GameFramework/PlayerController.h"
 #include "Twilight.h"
 #include "TwAssets.h"
 #include "TwFx.h"
@@ -292,13 +294,18 @@ void AAralezSpirit::Animate(float Dt)
 		PrevTrail = Tail;
 		TrailNext = (TrailNext + 1) % SpiritTrail;
 	}
+	FVector CamLoc = FVector(1e9f);
+	if (APlayerController* CPC = GetWorld()->GetFirstPlayerController())
+		if (CPC->PlayerCameraManager) CamLoc = CPC->PlayerCameraManager->GetCameraLocation();
 	for (int32 i = 0; i < SpiritTrail; ++i)
 	{
 		const float A = Now - TrailBirth[i];
 		if (A < 0.f || A > 1.4f) continue;
 		FTransform T;
 		Trail->GetInstanceTransform(i, T, true);
-		const float TW = 0.06f * (1.f - A / 1.4f) + 0.001f;
+		// segments crossing right in front of the lens read as a flat band: thin them out there
+		const float CamK = FMath::SmoothStep(60.f, 450.f, (float)FVector::Dist(T.GetLocation(), CamLoc));
+		const float TW = 0.06f * (1.f - A / 1.4f) * CamK + 0.001f;
 		T.SetScale3D(FVector(TW, TW, TrailLen[i]));
 		Trail->UpdateInstanceTransform(i, T, true, false, true);
 	}

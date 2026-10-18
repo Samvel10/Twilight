@@ -33,7 +33,7 @@ namespace TwFx
 			P.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 			if (ATwFlash* F = World->SpawnActor<ATwFlash>(Loc, FRotator::ZeroRotator, P))
 			{
-				const FLinearColor C = Type == EFx::Sparks ? FLinearColor(1.f, 0.85f, 0.5f) : FLinearColor(1.f, 0.5f, 0.15f);
+				const FLinearColor C = Type == EFx::Sparks ? FLinearColor(1.f, 0.62f, 0.25f) : FLinearColor(1.f, 0.38f, 0.08f);
 				F->Init(C, (Type == EFx::MuzzleFlash ? 1.2f : 3.2f) * Scale, Type == EFx::MuzzleFlash ? 0.12f : 0.3f);
 			}
 			return;
