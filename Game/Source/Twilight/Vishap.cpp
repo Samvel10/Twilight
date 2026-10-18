@@ -12,6 +12,8 @@
 #include "Components/AudioComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerController.h"
+#include "Camera/PlayerCameraManager.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -205,7 +207,7 @@ void AVishap::Build()
 
 	// visible fire-breath cone: the player must see what hurts him
 	BreathMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
-	if (BreathMat) { BreathMat->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.38f, 0.08f)); BreathMat->SetScalarParameterValue(TEXT("GlowMode"), 1.f); BreathMat->SetScalarParameterValue(TEXT("Intensity"), 3.f); }
+	if (BreathMat) { BreathMat->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.28f, 0.05f)); BreathMat->SetScalarParameterValue(TEXT("GlowMode"), 1.f); BreathMat->SetScalarParameterValue(TEXT("Intensity"), 0.4f); }
 	BreathCone = MakePart(ConeMesh, nullptr, BreathMat, false);
 	BreathCone->SetAbsolute(true, true, true);
 	BreathCone->SetVisibility(false);
@@ -634,7 +636,11 @@ void AVishap::UpdateBody(float Dt)
 			const FVector Mouth = MouthLocation();
 			const float Rad = FMath::Tan(Cone) * Range * Jit;
 			BreathCone->SetWorldTransform(FTransform(FRotationMatrix::MakeFromZ(-Fwd).Rotator(), Mouth + Fwd * Range * 0.5f, FVector(Rad / 50.f, Rad / 50.f, Range / 100.f)));
-			if (BreathMat) BreathMat->SetScalarParameterValue(TEXT("Intensity"), bFire ? 3.f + FMath::FRandRange(-0.5f, 0.5f) : 0.8f);
+			// soft: the cone reads as heat haze; also fade it when the camera is inside or right next to it
+			float CamK = 1.f;
+			if (APlayerController* PCc = GetWorld()->GetFirstPlayerController())
+				if (PCc->PlayerCameraManager) CamK = FMath::Clamp((float)FVector::Dist(PCc->PlayerCameraManager->GetCameraLocation(), Mouth) / (Range * 0.8f), 0.15f, 1.f);
+			if (BreathMat) BreathMat->SetScalarParameterValue(TEXT("Intensity"), (bFire ? 0.45f + FMath::FRandRange(-0.08f, 0.08f) : 0.12f) * CamK);
 		}
 	}
 	if (Jaw)

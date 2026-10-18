@@ -61,6 +61,9 @@ void AVahagnWorld::BuildSea()
 	if (M)
 	{
 		M->SetVectorParameterValue(TEXT("DeepColor"), FLinearColor(0.10f, 0.02f, 0.14f));
+		// larger, softer ripples: the hero flies high, small tiles read as a repeating dot pattern
+		M->SetScalarParameterValue(TEXT("NormalTile"), 2800.f);
+		M->SetScalarParameterValue(TEXT("NormalStrength"), 0.45f);
 		Sea->SetMaterial(0, M);
 	}
 }

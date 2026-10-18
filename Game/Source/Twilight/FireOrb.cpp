@@ -6,6 +6,8 @@
 #include "Components/PointLightComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerController.h"
+#include "Camera/PlayerCameraManager.h"
 
 AFireOrb::AFireOrb()
 {
@@ -70,6 +72,9 @@ void AFireOrb::Tick(float Dt)
 	Loc += Vel * Dt;
 	Loc.Z = FMath::Max(Loc.Z, 300.f) + FMath::Sin(Age * 3.f + Phase) * 2.f;
 	SetActorLocation(Loc);
-	const float Pulse = 0.5f + 0.12f * FMath::Sin(Age * 9.f + Phase);
+	float CamFade = 1.f;
+	if (APlayerController* PCc = GetWorld()->GetFirstPlayerController())
+		if (PCc->PlayerCameraManager) CamFade = FMath::SmoothStep(150.f, 800.f, (float)FVector::Dist(Loc, PCc->PlayerCameraManager->GetCameraLocation()));
+	const float Pulse = (0.5f + 0.12f * FMath::Sin(Age * 9.f + Phase)) * CamFade + 0.001f;
 	Mesh->SetWorldScale3D(FVector(Pulse * (Age > 22.f ? (25.f - Age) / 3.f : 1.f)));
 }
