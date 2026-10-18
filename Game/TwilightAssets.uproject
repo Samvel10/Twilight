@@ -1,0 +1,43 @@
+{
+ "FileVersion": 3,
+ "EngineAssociation": "5.8",
+ "Category": "Games",
+ "Description": "Asset-build twin of Twilight.uproject (no C++ module) for headless Python builds.",
+ "Modules": [],
+ "Plugins": [
+  {
+   "Name": "PythonScriptPlugin",
+   "Enabled": true,
+   "TargetAllowList": [
+    "Editor"
+   ]
+  },
+  {
+   "Name": "EditorScriptingUtilities",
+   "Enabled": true,
+   "TargetAllowList": [
+    "Editor"
+   ]
+  },
+  {
+   "Name": "Niagara",
+   "Enabled": true
+  },
+  {
+   "Name": "Cascade",
+   "Enabled": true
+  },
+  {
+   "Name": "ProceduralMeshComponent",
+   "Enabled": true
+  },
+  {
+   "Name": "EnhancedInput",
+   "Enabled": true
+  },
+  {
+   "Name": "ModelingToolsEditorMode",
+   "Enabled": false
+  }
+ ]
+}

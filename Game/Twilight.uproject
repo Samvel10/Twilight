@@ -1,0 +1,18 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "5.8",
+	"Category": "Games",
+	"Description": "Twilight contest: Armenian mythology games (Vahagn, Hayk, Aralez).",
+	"Modules": [
+		{ "Name": "Twilight", "Type": "Runtime", "LoadingPhase": "Default", "AdditionalDependencies": ["Engine", "AIModule", "UMG"] }
+	],
+	"Plugins": [
+		{ "Name": "PythonScriptPlugin", "Enabled": true, "TargetAllowList": ["Editor"] },
+		{ "Name": "EditorScriptingUtilities", "Enabled": true, "TargetAllowList": ["Editor"] },
+		{ "Name": "Niagara", "Enabled": true },
+		{ "Name": "Cascade", "Enabled": true },
+		{ "Name": "ProceduralMeshComponent", "Enabled": true },
+		{ "Name": "EnhancedInput", "Enabled": true },
+		{ "Name": "ModelingToolsEditorMode", "Enabled": false }
+	]
+}

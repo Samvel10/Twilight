@@ -10,3 +10,11 @@ Makefile
 # misc
 .DS_Store
 art/_build/
+# engine-provided content, restored by Game/Tools/setup_content.sh
+Game/Content/StarterContent/
+Game/Content/Characters/
+Game/DerivedDataCache/
+Game/Intermediate/
+Game/Binaries/
+Game/Saved/
+__pycache__/
