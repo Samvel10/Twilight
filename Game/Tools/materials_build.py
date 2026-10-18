@@ -8,7 +8,7 @@ Creates under /Game/Twilight/Materials:
                     fresnel rim, pulse, HitFlash.  Opaque.
     M_FireSprite    additive unlit radial sprite for Niagara/Cascade (ParticleColor, DepthFade).
     M_Additive      additive unlit glow for meshes/billboards (radial-UV or view-facing core).
-    M_Water_Purple  opaque lit purple sea: 3 sine WPO waves, 2 panning engine normal maps,
+    M_Water_Purple  opaque lit purple sea: 3 sine WPO waves, 8 analytic noise-warped ripple normals,
                     fresnel colour blend, fake sky reflection, sun glint path (no SSR / no translucency).
     M_Rock          world-aligned triplanar rock (3 samples) + macro variation + top tint.
     M_VishapSkin    dark scaly skin (hex-tile normal), glowing pulsing veins, fresnel rim, HitFlash.
@@ -27,6 +27,7 @@ Re-runnable: existing materials are cleared and rebuilt in place (references fro
 
 import os
 import traceback
+import math
 import unreal
 
 # ----------------------------------------------------------------------------------------------
@@ -534,7 +535,7 @@ def build_additive():
     return mat
 
 
-def build_water(water_n):
+def build_water(water_n, noise_tex=None):
     mat = get_or_create_material("M_Water_Purple")
     setup_material(mat, usages=("MATUSAGE_INSTANCED_STATIC_MESHES",))
     g = G(mat)
@@ -554,14 +555,37 @@ def build_water(water_n):
         hsum = s if hsum is None else g.add(hsum, s)
     g.out("MP_WORLD_POSITION_OFFSET", g.append(g.c2(0.0, 0.0), g.mul(hsum, amp)))
 
-    # --- Normal: two panning engine normal maps in world space
-    if water_n is not None:
-        wuv = g.div(xy, g.scalar("NormalTile", 900.0, "Surface"))
-        nobj = g.tex_param_obj("WaterNormal", water_n)
-        na = g.sample(nobj, water_n, g.panner(wuv, 0.012, 0.008))
-        nb = g.sample(nobj, water_n, g.panner(g.mul(wuv, 0.57), -0.009, 0.011))
-        g.out("MP_NORMAL", g.lerp(g.c3(0.0, 0.0, 1.0), g.add(na, nb),
-                                  g.scalar("NormalStrength", 0.6, "Surface")))
+    # --- Normal: 8 analytic directional ripples (exact cosine slopes), phases domain-warped by
+    # low-frequency Perlin noise so no texture cell / tile pattern can repeat. The engine
+    # T_Water_N cells read as a polka-dot grid (and as dotted sun glints) when seen from altitude.
+    base_l = g.scalar("NormalTile", 900.0, "Surface")          # longest ripple wavelength (cm)
+    xyb = g.div(xy, base_l)
+    rspd = g.scalar("RippleSpeed", 0.16, "Surface")
+    warp = None
+    if noise_tex is not None:
+        wobj = g.tex_param_obj("WarpNoise", noise_tex)
+        warp = g.sample(wobj, noise_tex, g.panner(g.mul(xyb, 0.13), 0.004, -0.003), out="R")
+        warp = g.mul(warp, g.scalar("WarpAmount", 1.0, "Surface"))
+    ripples = [  # (angle deg, wavelength factor, slope weight, phase offset, warp gain)
+        (12, 1.00, 0.22, 0.13, 0.6), (77, 0.71, 0.18, 0.61, 0.9), (141, 0.53, 0.15, 0.27, 1.2),
+        (203, 0.39, 0.13, 0.88, 1.5), (251, 0.29, 0.11, 0.44, 1.8), (318, 0.21, 0.09, 0.07, 2.1),
+        (33, 0.155, 0.07, 0.73, 2.4), (169, 0.11, 0.05, 0.35, 2.7)]
+    grad = None
+    for ang, m, w, off, wk in ripples:
+        a = math.radians(ang)
+        dx, dy = math.cos(a), math.sin(a)
+        ph = g.dot(xyb, g.c2(dx / m, dy / m))
+        ph = g.add(ph, g.add(g.mul(t, g.mul(rspd, 1.0 / math.sqrt(m))), off + 0.25))  # +0.25 -> cosine
+        if warp is not None:
+            ph = g.add(ph, g.mul(warp, wk))
+        term = g.mul(g.sine(ph), g.c2(dx * w, dy * w))
+        grad = term if grad is None else g.add(grad, term)
+    dist = g.new(unreal.MaterialExpressionDistance)
+    g.link(g.new(unreal.MaterialExpressionCameraPositionWS), dist, "A")
+    g.link(g.world_pos("XYZ"), dist, "B")
+    fade = g.lerp(g.c1(1.0), g.c1(0.3), g.sat(g.div(dist, g.scalar("NormalFadeDistance", 60000.0, "Surface"))))
+    slope = g.mul(grad, g.mul(g.scalar("NormalStrength", 0.6, "Surface"), g.mul(fade, -1.0)))
+    g.out("MP_NORMAL", g.normalize(g.append(slope, g.c1(1.0))))
 
     # --- Colour: fresnel blend deep->horizon, crest tint
     fr = g.fresnel(g.scalar("FresnelExponent", 4.0, "Surface"), 0.02)
@@ -748,7 +772,7 @@ def main():
         ("M_FireBody", lambda: build_fire_body(noise)),
         ("M_FireSprite", build_fire_sprite),
         ("M_Additive", build_additive),
-        ("M_Water_Purple", lambda: build_water(water_n)),
+        ("M_Water_Purple", lambda: build_water(water_n, noise)),
         ("M_Rock", lambda: build_rock(rock, noise)),
         ("M_VishapSkin", lambda: build_vishap(noise, scales_n)),
         ("M_Sky", build_sky),

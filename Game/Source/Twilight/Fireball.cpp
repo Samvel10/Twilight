@@ -74,15 +74,37 @@ void AFireball::Launch(const FVector& Dir, float InDamage, float InAoe, float Sc
 	Sphere->OnComponentHit.AddDynamic(this, &AFireball::OnHit);
 
 	if (UStaticMesh* S = TwAssets::Sphere()) Core->SetStaticMesh(S);
-	const FLinearColor Col = bHostile ? FLinearColor(1.f, 0.18f, 0.06f) : FLinearColor(1.f, 0.62f, 0.2f);
+	const FLinearColor Col = bHostile ? FLinearColor(1.f, 0.11f, 0.03f) : FLinearColor(1.f, 0.62f, 0.2f);
+	const bool bBigShot = Scale > 1.2f || bHostile;
 	CoreMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
 	if (CoreMat)
 	{
 		CoreMat->SetVectorParameterValue(TEXT("Color"), Col);
-		CoreMat->SetScalarParameterValue(TEXT("GlowMode"), 1.f); CoreMat->SetScalarParameterValue(TEXT("Intensity"), 25.f);
+		// big shots: a saturated shell with soft edges (high intensity tonemaps to a flat cream disc)
+		CoreMat->SetScalarParameterValue(TEXT("GlowMode"), 1.f);
+		CoreMat->SetScalarParameterValue(TEXT("Intensity"), bBigShot ? (bHostile ? 5.f : 7.f) : 25.f);
+		if (bBigShot) CoreMat->SetScalarParameterValue(TEXT("Falloff"), 3.f);
 		Core->SetMaterial(0, CoreMat);
 	}
 	Core->SetRelativeScale3D(FVector(0.42f * Scale));
+	if (bBigShot)
+	{
+		// small white-hot heart inside the shell
+		InnerCore = NewObject<UStaticMeshComponent>(this);
+		InnerCore->SetStaticMesh(TwAssets::Sphere());
+		InnerCore->SetupAttachment(Core);
+		InnerCore->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		InnerCore->SetCastShadow(false);
+		InnerCore->SetRelativeScale3D(FVector(0.42f));
+		if (UMaterialInstanceDynamic* HM = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this))
+		{
+			HM->SetVectorParameterValue(TEXT("Color"), bHostile ? FLinearColor(1.f, 0.55f, 0.25f) : FLinearColor(1.f, 0.85f, 0.55f));
+			HM->SetScalarParameterValue(TEXT("GlowMode"), 1.f);
+			HM->SetScalarParameterValue(TEXT("Intensity"), 14.f);
+			InnerCore->SetMaterial(0, HM);
+		}
+		InnerCore->RegisterComponent();
+	}
 	Light->SetLightColor(Col);
 	Light->SetIntensity(4500.f * Scale);
 	Light->SetAttenuationRadius(800.f * FMath::Sqrt(Scale));
@@ -210,7 +232,7 @@ void AFireball::Explode(const FVector& Where, AActor* DirectActor, UPrimitiveCom
 	Move->StopMovementImmediately();
 	Move->Deactivate();
 	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Core->SetVisibility(false);
+	Core->SetVisibility(false, true);
 	Light->SetVisibility(false);
 	for (UStaticMeshComponent* T : Tail) if (T) T->SetVisibility(false);
 	if (Flame) Flame->Deactivate();
