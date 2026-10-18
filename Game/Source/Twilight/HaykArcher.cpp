@@ -144,6 +144,46 @@ void AHaykArcher::BeginPlay()
 		AddPart(TwAssets::Sphere(), FVector(0.f, 0, 30.f), FRotator::ZeroRotator, FVector(0.035f), Gold);
 	}
 
+	// tunic and cape
+	{
+		UMaterialInstanceDynamic* Tunic = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_VishapSkin")), this);
+		UMaterialInstanceDynamic* Cape = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_VishapSkin")), this);
+		if (Tunic)
+		{
+			Tunic->SetVectorParameterValue(TEXT("SkinColor"), bBel ? FLinearColor(0.03f, 0.02f, 0.02f) : FLinearColor(0.3f, 0.17f, 0.07f));
+			Tunic->SetVectorParameterValue(TEXT("VeinColor"), bBel ? FLinearColor(1.f, 0.08f, 0.02f) : FLinearColor(1.f, 0.65f, 0.25f));
+			Tunic->SetScalarParameterValue(TEXT("VeinIntensity"), bBel ? 1.6f : 0.8f);
+			Tunic->SetScalarParameterValue(TEXT("Metallic"), 0.7f);
+			Tunic->SetScalarParameterValue(TEXT("RimIntensity"), 0.25f);
+		}
+		if (Cape)
+		{
+			Cape->SetVectorParameterValue(TEXT("SkinColor"), bBel ? FLinearColor(0.012f, 0.008f, 0.01f) : FLinearColor(0.28f, 0.025f, 0.02f));
+			Cape->SetVectorParameterValue(TEXT("VeinColor"), bBel ? FLinearColor(0.6f, 0.04f, 0.02f) : FLinearColor(0.9f, 0.3f, 0.1f));
+			Cape->SetScalarParameterValue(TEXT("VeinIntensity"), 0.25f);
+			Cape->SetScalarParameterValue(TEXT("Metallic"), 0.f);
+			Cape->SetScalarParameterValue(TEXT("Roughness"), 0.9f);
+			Cape->SetScalarParameterValue(TEXT("RimIntensity"), 0.2f);
+		}
+		auto AddGarment = [this](UStaticMesh* Mesh, FName Bone, const FVector& Off, const FRotator& Rot, const FVector& Scl, UMaterialInterface* Mat)
+		{
+			UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(this);
+			C->SetStaticMesh(Mesh);
+			C->SetupAttachment(Root);
+			C->SetAbsolute(true, true, true);
+			C->SetWorldScale3D(Scl * Scale);
+			C->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			if (Mat) C->SetMaterial(0, Mat);
+			C->RegisterComponent();
+			Garments.Add(C);
+			GarmentBone.Add(Bone);
+			GarmentOffset.Add(Off);
+			GarmentRot.Add(Rot);
+		};
+		AddGarment(TwAssets::Cone(), TEXT("pelvis"), FVector(0.f, 0.f, -18.f), FRotator::ZeroRotator, FVector(0.52f, 0.48f, 0.8f), Tunic);
+		(void)Cape; // a rigid cape read as a flat board over the shoulder camera: tunic only
+	}
+
 	BuildBow();
 	if (UStaticMesh* Cyl = TwAssets::Cylinder())
 	{
@@ -287,6 +327,11 @@ void AHaykArcher::UpdateBowAndZones()
 	const FVector Pelvis = Body->GetBoneLocation(TEXT("pelvis"));
 	const FVector Feet = (Body->GetBoneLocation(TEXT("foot_l")) + Body->GetBoneLocation(TEXT("foot_r"))) * 0.5f;
 	HeadZone->SetWorldLocation(Head + FVector(0, 0, 8.f * Scale));
+	for (int32 i = 0; i < Garments.Num(); ++i)
+	{
+		const FRotator Y(0.f, AimYaw, 0.f);
+		Garments[i]->SetWorldLocationAndRotation(Body->GetBoneLocation(GarmentBone[i]) + Y.RotateVector(GarmentOffset[i] * Scale), FRotator(GarmentRot[i].Pitch, AimYaw + GarmentRot[i].Yaw, GarmentRot[i].Roll));
+	}
 	for (int32 i = 0; i < Regalia.Num(); ++i)
 	{
 		const FRotator Y(0.f, AimYaw, 0.f);

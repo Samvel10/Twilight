@@ -72,6 +72,11 @@ private:
 	UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Regalia;
 	TArray<FVector> RegaliaOffset;
 	TArray<FRotator> RegaliaRot;
+	// clothing that follows a bone (tunic at the pelvis, cape at the neck): no more bare mannequins
+	UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Garments;
+	TArray<FName> GarmentBone;
+	TArray<FVector> GarmentOffset;
+	TArray<FRotator> GarmentRot;
 	UPROPERTY() TObjectPtr<UTwPoseAnimInstance> Poser;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> BodyMat;
 
