@@ -1,0 +1,12 @@
+# Unreal
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+*.sln
+*.code-workspace
+Makefile
+# misc
+.DS_Store
+art/_build/
