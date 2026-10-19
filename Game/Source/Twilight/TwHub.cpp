@@ -217,7 +217,7 @@ void STwHubWidget::Construct(const FArguments& Args)
 		]
 		+ SOverlay::Slot().HAlign(HAlign_Center).VAlign(VAlign_Bottom).Padding(0, 0, 0, 10)
 		[
-			SNew(STextBlock).Text(LOCTEXT("Credits", "Վիշապի մոդել՝ «European Dragon», Regina Cachoa (CC BY 4.0) · Երկինք և ժայռեր՝ Poly Haven (CC0) · Մասիսի ռելիեֆ՝ AWS Terrain Tiles"))
+			SNew(STextBlock).Text(LOCTEXT("Credits", "Վիշապ՝ «European Dragon», Regina Cachoa (CC BY 4.0) · Վահագնի մարմին՝ «Spartan», Andy Woodhead (CC BY 4.0) · Երկինք, ժայռեր՝ Poly Haven (CC0) · Մասիսի ռելիեֆ՝ AWS Terrain Tiles"))
 			.Font(TwAssets::Font(11.f, false, false)).ColorAndOpacity(FLinearColor(1.f, 0.92f, 0.8f, 0.55f))
 		]
 		+ SOverlay::Slot()

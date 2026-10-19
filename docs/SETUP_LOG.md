@@ -206,3 +206,14 @@
   - Fog cutoff 15 կմ։ Փոթորիկը ներկում է նաև HDRI գմբեթը։
 - **Scalability** (`DefaultScalability.ini`). CSM 2×1024, light shafts, tonemapper 5, lens flare, bloom 5, material quality 1, sky atmosphere samples։ Contact shadows, aerial perspective։
 - **Արդյունք (փաթեթ)**. Վահագն 290 վ՝ հաղթանակ, **70.8 FPS** (p95 56, p99 45)։ Առաջ ~100 էր. արժեքը շվաքներն են, post-ը, HDRI-ն և skeletal վիշապները։
+
+## 2026-10-19 11:45 — Քայլ 21. «Դեռ իրական չէ». բնական գույներ, իրական կերպար, վիշապներ, կղզիներ
+- **Օգտատիրոջ ընտրությունը.** ամենաքիչ իրականը թվում էին վիշապները, Վահագնը, կղզիները և գույները, ուստի անցանք բնական մայրամուտի։
+- **Գույներ** (`AVahagnWorld::GetSkyPreset`). չեզոք HDRI, կապտամոխրագույն ծով, չեզոք grading, բնական մառախուղ։ Արևի լույսը հավասարեցված է HDRI-ի արևին (azimuth 265, `SunRot yaw 265`), իսկ ծովի փայլը՝ նույն ուղղությամբ (`SunDir`)։
+- **Workflow «twilight-realism-2»** (3 գործակալ, scratch նախագծերում, render + գնահատում).
+  - **Կերպար.** «Rigged for UE4 - Spartan - free», Andy Woodhead, CC BY 4.0։ Կմախքը UE4 mannequin-ն է. 7 Manny clip retarget է արված IK Retargeter-ով (`Tools/hero/build_hero.sh`)։ Նյութերն ըստ slot-ի են, սաղավարտի կատարը վառվում է։ `VahagnCharacter`. `bRealHero`, mesh scale 0.86, `HeroAnim()`։
+  - **Վիշապ.** մոդելը նույնն է (մյուս «լավերը» game-rip/re-upload էին)։ Իրատեսական մաշկ, թևերը TwoSidedFoliage են (թափանցիկ, արևի դեմ կարմիր փայլում են)։ Wing mask-ը թխված է skin weights-ից (`Tools/wingmask_bake.py`)։ Կեղծ լավան և եզրը հանված են։ Թևերի բացվածքը ~22 մ է, boss-ինը ~60 մ, թափահարումը դանդաղ։
+  - **Կղզիներ.** `IslandZ v2`. ալիքատաշ ժայռափներ, ձորակներ, aerial_rocks_02 displacement (`DetailDisp.inl`)։ Ավելացան ծովային սյուներ (`StackZ`) և Poly Haven boulder_01 սկան (4 LOD, ISM)։ `M_IslandTerrain` (ժայռափներ + aerial top, wet band, ջրիմուռի գիծ), `M_ScanRock`։
+- **Boss.** փոքրացված մարմնի համար հարվածի ծավալները ×1.9։
+- **Արդյունք (փաթեթ).** Վահագն 330 վ՝ ՀԱՂԹԱՆԱԿ 4:25-ում, **65.4 FPS** (p95 52, p99 47)։ Նկար՝ `docs/screens/vahagn_realism_2.jpg`։
+- Հեղինակներ՝ `art/CREDITS_3D.md`։

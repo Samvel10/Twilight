@@ -316,7 +316,7 @@ bool AVishap::CalibrateDragon()
 		for (int32 i = 0; i < NumSeg && i < Segments.Num(); ++i)
 		{
 			SegDist[i] = i * Step;
-			SegRadius[i] *= 1.35f;
+			SegRadius[i] *= bBoss ? 1.9f : 1.35f; // the boss is a bigger target (wings, neck)
 			const float R = SegRadius[i];
 			Segments[i]->SetWorldScale3D(FVector(R / 50.f * 1.7f, R / 50.f, R / 50.f * 0.92f));
 		}
