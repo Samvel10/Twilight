@@ -84,6 +84,8 @@ private:
 	TArray<FRotator> GarmentRot;
 	UPROPERTY() TObjectPtr<UTwPoseAnimInstance> Poser;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> BodyMat;
+	UPROPERTY() TArray<TObjectPtr<UMaterialInstanceDynamic>> HumanMats;
+	bool bRealHuman = false;
 
 	UPROPERTY() TObjectPtr<UAnimSequence> AnimIdle;
 	UPROPERTY() TObjectPtr<UAnimSequence> AnimAim;

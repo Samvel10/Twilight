@@ -1,4 +1,6 @@
 #include "HaykArcher.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "Twilight.h"
 #include "TwAssets.h"
 #include "TwFx.h"
@@ -82,21 +84,40 @@ void AHaykArcher::Setup(bool bInBel, float InMaxHealth, bool bInSoldier)
 void AHaykArcher::BeginPlay()
 {
 	Super::BeginPlay();
-	Body->SetSkeletalMesh(TwAssets::Manny());
+	// realistic CC-BY people: Hayk the bearded giant archer, Bel in gold armour, Bel's Babylonian guards in bronze and lapis
+	const TCHAR* Char = bBel ? TEXT("Bel") : (bSoldier ? TEXT("Babsoldc") : TEXT("Hayk"));
+	USkeletalMesh* HumanMesh = FParse::Param(FCommandLine::Get(), TEXT("TwManny")) ? nullptr : TwAssets::Human(Char);
+	bRealHuman = HumanMesh != nullptr;
+	Body->SetSkeletalMesh(bRealHuman ? HumanMesh : TwAssets::Manny());
 	Body->SetRelativeLocation(FVector(0, 0, 0));
 	Body->SetRelativeRotation(FRotator(0, -90.f, 0));
-	Body->SetRelativeScale3D(FVector(Scale));
+	// the Spartan base is 2.09 m: Hayk stays a head taller than everyone; the Roman base (Bel, guards) is 1.75 m
+	Body->SetRelativeScale3D(FVector(Scale * (bRealHuman ? (bBel || bSoldier ? 1.03f : 0.92f) : 1.f)));
 	Body->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	Body->SetAnimInstanceClass(UTwPoseAnimInstance::StaticClass());
 	Poser = Cast<UTwPoseAnimInstance>(Body->GetAnimInstance());
 
+	if (bRealHuman)
+	{
+		AnimIdle = TwAssets::HumanAnim(Char, TEXT("MM_Idle"));
+		AnimAim = TwAssets::HumanAnim(Char, TEXT("MF_Rifle_Idle_ADS"));
+		AnimShoot = TwAssets::HumanAnim(Char, TEXT("MM_Rifle_Fire"));
+		AnimHit = TwAssets::HumanAnim(Char, TEXT("MM_HitReact_Front_Hvy_01"));
+		AnimHitHeavy = AnimHit;
+		AnimDeath = TwAssets::HumanAnim(Char, TEXT("MM_Death_Back_01"));
+		AnimCheer = TwAssets::HumanAnim(Char, TEXT("MM_ChargedAttack"));
+	}
+	if (!AnimIdle)
 	AnimIdle = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Unarmed/MM_Idle.MM_Idle"));
+	if (!bRealHuman || !AnimAim)
+	{
 	AnimAim = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Rifle/MF_Rifle_Idle_ADS.MF_Rifle_Idle_ADS"));
 	AnimShoot = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Rifle/MM_Rifle_Fire.MM_Rifle_Fire"));
 	AnimHit = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Front_Lgt_01.MM_HitReact_Front_Lgt_01"));
 	AnimHitHeavy = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Front_Hvy_01.MM_HitReact_Front_Hvy_01"));
 	AnimDeath = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Death/MM_Death_Back_01.MM_Death_Back_01"));
 	AnimCheer = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_ChargedAttack.MM_ChargedAttack"));
+	}
 	if (Poser) Poser->SetLoop(AnimIdle, 0.01f);
 
 	// armour look: engraved bronze for Hayk, black iron with blood-red veins for Bel
@@ -108,7 +129,20 @@ void AHaykArcher::BeginPlay()
 		BodyMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBel ? 4.f : 1.2f); BodyMat->SetScalarParameterValue(TEXT("RimIntensity"), 0.35f); BodyMat->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(1.f, 0.55f, 0.25f));
 		BodyMat->SetScalarParameterValue(TEXT("Metallic"), 0.6f);
 		BodyMat->SetVectorParameterValue(TEXT("FlashColor"), FLinearColor(1.f, 0.22f, 0.04f)); // a red-hot hit, not a cream wash
-		for (int32 i = 0; i < Body->GetNumMaterials(); ++i) Body->SetMaterial(i, BodyMat);
+		if (!bRealHuman) for (int32 i = 0; i < Body->GetNumMaterials(); ++i) Body->SetMaterial(i, BodyMat);
+	}
+	if (bRealHuman)
+	{
+		// keep the people's own look-dev materials; MIDs only for the hit flash and per-soldier variation
+		for (int32 i = 0; i < Body->GetNumMaterials(); ++i)
+			if (UMaterialInstanceDynamic* D = Body->CreateDynamicMaterialInstance(i))
+			{
+				D->SetVectorParameterValue(TEXT("FlashColor"), FLinearColor(1.f, 0.22f, 0.04f));
+				D->SetScalarParameterValue(TEXT("DustAmount"), 0.5f);
+				HumanMats.Add(D);
+			}
+		for (int32 i = 0; i < 3; ++i) Body->SetCustomPrimitiveDataFloat(i, FMath::FRand());
+		Body->SetCastShadow(true);
 	}
 
 	// regalia, placed in world space every frame from the head bone (bone axes differ from the actor's)
@@ -130,7 +164,8 @@ void AHaykArcher::BeginPlay()
 		RegaliaOffset.Add(Off);
 		RegaliaRot.Add(Rot);
 	};
-	if (bBel)
+	if (bRealHuman) {} // the models carry their own helmets, crowns and armour
+	else if (bBel)
 	{
 		for (int32 i = 0; i < 6; ++i)
 		{
@@ -181,7 +216,7 @@ void AHaykArcher::BeginPlay()
 			GarmentOffset.Add(Off);
 			GarmentRot.Add(Rot);
 		};
-		AddGarment(TwAssets::Cone(), TEXT("pelvis"), FVector(0.f, 0.f, -18.f), FRotator::ZeroRotator, FVector(0.52f, 0.48f, 0.8f), Tunic);
+		if (!bRealHuman) AddGarment(TwAssets::Cone(), TEXT("pelvis"), FVector(0.f, 0.f, -18.f), FRotator::ZeroRotator, FVector(0.52f, 0.48f, 0.8f), Tunic);
 		(void)Cape; // a rigid cape read as a flat board over the shoulder camera: tunic only
 	}
 
@@ -358,6 +393,7 @@ void AHaykArcher::Tick(float Dt)
 	UpdateBowAndZones();
 	HurtFlash = FMath::Max(0.f, HurtFlash - Dt * 2.f);
 	if (BodyMat) BodyMat->SetScalarParameterValue(TEXT("HitFlash"), HurtFlash * 0.45f);
+	for (UMaterialInstanceDynamic* D : HumanMats) if (D) D->SetScalarParameterValue(TEXT("HitFlash"), HurtFlash * 0.45f);
 }
 
 EArcherZone AHaykArcher::ZoneOf(const UPrimitiveComponent* C) const

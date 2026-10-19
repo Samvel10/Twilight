@@ -1,4 +1,38 @@
 #include "HaykWorld.h"
+#include "Engine/LevelStreamingDynamic.h"
+#include "Engine/DirectionalLight.h"
+#include "Engine/SkyLight.h"
+#include "Engine/ExponentialHeightFog.h"
+#include "Engine/PostProcessVolume.h"
+#include "Engine/StaticMeshActor.h"
+#include "Engine/TextureCube.h"
+#include "Camera/CameraActor.h"
+#include "Components/SkyAtmosphereComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/ExponentialHeightFogComponent.h"
+#include "Misc/PackageName.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "HaykVanHeight.inl"
+#include "TwGrass.h"
+
+static bool GHaykVan = false;
+bool AHaykWorld::IsVanActive() { return GHaykVan; }
+
+// game frame: +X runs from Hayk to Bel. The Van level is turned -90 deg so the DEM's south (+Y) becomes +X,
+// and shifted so the midpoint between the two archers sits at the origin.
+static float VanTerrainZ(float X, float Y)
+{
+	const double DX = -Y / 100.0 + VanMidX, DY = X / 100.0 + VanMidY;   // DEM metres
+	const double U = (DX - VanX0) / VanSp, V = (DY - VanY0) / VanSp;
+	const int32 I = FMath::Clamp((int32)FMath::FloorToDouble(U), 0, VanN - 2), J = FMath::Clamp((int32)FMath::FloorToDouble(V), 0, VanN - 2);
+	const double FU = FMath::Clamp(U - I, 0.0, 1.0), FV = FMath::Clamp(V - J, 0.0, 1.0);
+	auto Z = [](int32 i, int32 j) { return (double)VanZ[j * VanN + i]; };
+	double H;
+	if (FU + FV <= 1.0) H = Z(I, J) + (Z(I + 1, J) - Z(I, J)) * FU + (Z(I, J + 1) - Z(I, J)) * FV;
+	else H = Z(I + 1, J + 1) + (Z(I, J + 1) - Z(I + 1, J + 1)) * (1.0 - FU) + (Z(I + 1, J) - Z(I + 1, J + 1)) * (1.0 - FV);
+	return (float)((H - VanMidZ) * 100.0);
+}
 #include "Twilight.h"
 #include "TwAssets.h"
 #include "HaykShield.h"
@@ -13,6 +47,7 @@ AHaykWorld::AHaykWorld() {}
 
 float AHaykWorld::TerrainZ(float X, float Y)
 {
+	if (GHaykVan) return VanTerrainZ(X, Y);
 	// two hills facing each other across the valley, steep walls on both sides
 	const float HillHayk = 520.f * FMath::Exp(-FMath::Square((X - HaykX) / 1900.f) - FMath::Square(Y / 2600.f));
 	const float HillBel = 760.f * FMath::Exp(-FMath::Square((X - BelX) / 2100.f) - FMath::Square(Y / 2800.f));
@@ -28,6 +63,30 @@ float AHaykWorld::TerrainZ(float X, float Y)
 FTwSkyPreset AHaykWorld::GetSkyPreset() const
 {
 	FTwSkyPreset P;
+	if (!bNight && !FParse::Param(FCommandLine::Get(), TEXT("TwOldValley")) && FPackageName::DoesPackageExist(TEXT("/Game/Test/L_Van")))
+	{
+		// Lake Van at sunset (highlands kit values); the level is turned -90 deg, so the sun turns with it
+		P.SunRot = FRotator(-8.f, -105.f, 0.f);
+		P.SunColor = FLinearColor(1.f, 0.56f, 0.32f);
+		P.SunIntensity = 11.f;
+		P.MoonIntensity = 0.f;
+		P.FogColor = FLinearColor(0.36f, 0.42f, 0.55f);
+		P.FogSunColor = FLinearColor(1.f, 0.5f, 0.25f);
+		P.FogDensity = 0.00019f;
+		P.FogFalloff = 0.0067f;
+		P.FogStart = 0.f;
+		P.FogMaxOpacity = 1.f;
+		P.Exposure = 0.f;
+		P.SkyLightIntensity = 0.65f;
+		P.SkyLightColor = FLinearColor(1.f, 1.f, 1.f);
+		P.LowerHemisphere = FLinearColor(0.03f, 0.035f, 0.04f);
+		P.SkyLuminance = FLinearColor(1.f, 1.f, 1.f);
+		P.GainShadows = FVector4(1.f, 1.f, 1.f, 1.f);
+		P.GainHighlights = FVector4(1.f, 1.f, 1.f, 1.f);
+		P.Saturation = FVector4(1.08f, 1.08f, 1.08f, 1.08f);
+		P.ShadowDistance = 12000.f;
+		return P;
+	}
 	if (!bNight)
 	{
 		// sun low behind Bel: his army is a dark silhouette against a burning sky
@@ -67,8 +126,119 @@ FTwSkyPreset AHaykWorld::GetSkyPreset() const
 	return P;
 }
 
+void AHaykWorld::StreamVan()
+{
+	GHaykVan = true;
+	bool bOk = false;
+	const FVector Off(-VanMidY * 100.0, VanMidX * 100.0, -VanMidZ * 100.0);
+	EnvLevel = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(), TEXT("/Game/Test/L_Van"), Off, FRotator(0.f, -90.f, 0.f), bOk);
+	if (EnvLevel) { EnvLevel->SetShouldBeVisible(true); EnvLevel->bShouldBlockOnLoad = true; }
+	GetWorld()->FlushLevelStreaming();
+	int32 Removed = 0;
+	if (ULevel* L = EnvLevel ? EnvLevel->GetLoadedLevel() : nullptr)
+		for (AActor* A : L->Actors)
+		{
+			if (!A) continue;
+			bool bDrop = A->IsA<ADirectionalLight>() || A->IsA<ASkyLight>() || A->IsA<AExponentialHeightFog>() || A->IsA<APostProcessVolume>() || A->IsA<ACameraActor>()
+				|| A->FindComponentByClass<USkyAtmosphereComponent>() != nullptr;
+			if (AStaticMeshActor* SM = Cast<AStaticMeshActor>(A))
+				if (UMaterialInterface* M = SM->GetStaticMeshComponent() ? SM->GetStaticMeshComponent()->GetMaterial(0) : nullptr)
+					bDrop |= M->GetName().Contains(TEXT("HLSky"));
+			if (bDrop) { A->Destroy(); ++Removed; }
+		}
+	UE_LOG(LogTwilight, Display, TEXT("[TwEnv] stream L_Van ok=%d removed=%d"), bOk ? 1 : 0, Removed);
+	if (Fog) Fog->SetFogCutoffDistance(0.f);
+}
+
+void AHaykWorld::BuildSkyDome(float Yaw)
+{
+	UMaterialInterface* M = TwAssets::Material(TEXT("M_SkyHDRI"));
+	UMaterialInstanceDynamic* Sky = M ? UMaterialInstanceDynamic::Create(M, this) : nullptr;
+	if (!Sky) return;
+	if (UTextureCube* Cube = LoadObject<UTextureCube>(nullptr, TEXT("/Game/Env/HDRI/kloppenheim_06_puresky_4k.kloppenheim_06_puresky_4k")))
+		Sky->SetTextureParameterValue(TEXT("SkyCube"), Cube);
+	FParse::Value(FCommandLine::Get(), TEXT("TwSkyYaw="), Yaw);
+	Sky->SetScalarParameterValue(TEXT("Yaw"), Yaw);
+	Sky->SetScalarParameterValue(TEXT("Exposure"), 0.8f);
+	UStaticMeshComponent* Dome = NewObject<UStaticMeshComponent>(this);
+	Dome->SetStaticMesh(TwAssets::Sphere());
+	Dome->SetupAttachment(RootComponent);
+	Dome->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Dome->SetCastShadow(false);
+	Dome->SetWorldScale3D(FVector(400000.f));
+	Dome->SetMaterial(0, Sky);
+	Dome->RegisterComponent();
+}
+
+void AHaykWorld::BuildRealArmy(float X0, float X1, int32 Rows, int32 Cols, bool bEnemy, int32 Seed)
+{
+	const TCHAR* C = bEnemy ? TEXT("Babsoldc") : TEXT("Armsoldc");
+	USkeletalMesh* Mesh = TwAssets::Human(C);
+	if (!Mesh) return;
+	UAnimSequence* Idle = TwAssets::HumanAnim(C, TEXT("MM_Idle"));
+	UStaticMesh* SpearMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Twilight/Humans/Props/Spear2/spear/StaticMeshes/spear.spear"));
+	FRandomStream R(Seed);
+	const float Face = bEnemy ? 180.f : 0.f; // both armies look across the valley at each other
+	for (int32 r = 0; r < Rows; ++r)
+		for (int32 c = 0; c < Cols; ++c)
+		{
+			const float X = FMath::Lerp(X0, X1, Rows > 1 ? float(r) / (Rows - 1) : 0.f) + R.FRandRange(-60.f, 60.f);
+			const float Y = (c - (Cols - 1) * 0.5f) * 170.f + R.FRandRange(-40.f, 40.f) + (r % 2) * 85.f;
+			USkeletalMeshComponent* S = NewObject<USkeletalMeshComponent>(this);
+			S->SetSkeletalMesh(Mesh);
+			S->SetupAttachment(RootComponent);
+			S->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			S->SetCastShadow(r < 2);
+			S->bEnableUpdateRateOptimizations = true;
+			S->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+			S->RegisterComponent();
+			S->SetWorldLocationAndRotation(FVector(X, Y, TerrainZ(X, Y)), FRotator(0.f, Face - 90.f + R.FRandRange(-8.f, 8.f), 0.f));
+			S->SetWorldScale3D(FVector(R.FRandRange(0.95f, 1.05f)));
+			for (int32 i = 0; i < 3; ++i) S->SetCustomPrimitiveDataFloat(i, R.FRand());
+			if (Idle)
+			{
+				S->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+				S->PlayAnimation(Idle, true);
+				S->SetPosition(R.FRand() * 2.f, false);
+				S->SetPlayRate(R.FRandRange(0.85f, 1.15f));
+			}
+			if (SpearMesh && R.FRand() < 0.7f)
+			{
+				UStaticMeshComponent* Sp = NewObject<UStaticMeshComponent>(this);
+				Sp->SetStaticMesh(SpearMesh);
+				Sp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				Sp->SetCastShadow(r < 2);
+				Sp->SetupAttachment(S, TEXT("hand_r"));
+				Sp->SetRelativeTransform(FTransform(FRotator(21.03f, -88.92f, 85.09f), FVector(-93.86f, -4.67f, -7.52f), FVector(1.0188f)));
+				Sp->RegisterComponent();
+			}
+			Soldiers.Add(S);
+		}
+}
+
 void AHaykWorld::BuildLevel()
 {
+	if (!bNight && !FParse::Param(FCommandLine::Get(), TEXT("TwOldValley")) && FPackageName::DoesPackageExist(TEXT("/Game/Test/L_Van")))
+	{
+		// the real east shore of Lake Van, where tradition puts the battle (Hayots Dzor)
+		StreamVan();
+		BuildSkyDome(0.102f);
+		const FVector Shields[4] = { FVector(-1150.f, 480.f, 0.f), FVector(-150.f, -520.f, 0.f), FVector(800.f, 470.f, 0.f), FVector(1700.f, -460.f, 0.f) };
+		for (const FVector& S : Shields)
+		{
+			const FVector P(S.X, S.Y, FMath::Min(TerrainZ(S.X, S.Y - 80.f), TerrainZ(S.X, S.Y + 80.f)) + 105.f);
+			FActorSpawnParameters Sp;
+			Sp.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			GetWorld()->SpawnActor<AHaykShield>(P, FRotator(0.f, FMath::FRandRange(-12.f, 12.f), 0.f), Sp);
+		}
+		// Bel's host fills the slope behind him; Hayk's kin stand behind Hayk
+		BuildRealArmy(5200.f, 8200.f, 4, 9, true, 11);
+		BuildRealArmy(-5200.f, -7000.f, 3, 7, false, 23);
+		// steppe grass and poppies over the duel ground
+		TwGrass::Scatter(this, FVector2D(0.f, 0.f), FVector2D(9000.f, 6000.f), 2.2f, [](float X, float Y) { return TerrainZ(X, Y); }, 7, 0.05f);
+		return;
+	}
+	GHaykVan = false;
 	UMaterialInstanceDynamic* Rock = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Rock")), this);
 	if (Rock)
 	{

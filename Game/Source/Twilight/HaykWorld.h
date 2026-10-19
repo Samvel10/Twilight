@@ -16,6 +16,8 @@ public:
 	/** World Z of the valley terrain at (X,Y). */
 	static float TerrainZ(float X, float Y);
 	void SetNight(bool bInNight) { bNight = bInNight; }
+	/** True while the real Lake Van terrain (streamed DEM level) is the battlefield. */
+	static bool IsVanActive();
 
 	static constexpr float HaykX = -2700.f;
 	static constexpr float BelX = 2700.f;
@@ -27,6 +29,12 @@ protected:
 
 private:
 	void BuildArmy(float X0, float X1, float Y0, float Y1, int32 Count, bool bEnemy, int32 Seed);
+	/** Ranks of real soldiers (skeletal crowd meshes, idle loops): Babylonians behind Bel, Armenians behind Hayk. */
+	void BuildRealArmy(float X0, float X1, int32 Rows, int32 Cols, bool bEnemy, int32 Seed);
+	void StreamVan();
+	void BuildSkyDome(float Yaw);
+	UPROPERTY() TObjectPtr<class ULevelStreamingDynamic> EnvLevel;
+	UPROPERTY() TArray<TObjectPtr<class USkeletalMeshComponent>> Soldiers;
 
 	UPROPERTY() TArray<TObjectPtr<UInstancedStaticMeshComponent>> ArmyParts;
 	bool bNight = false;
