@@ -113,7 +113,7 @@ void SHaykHud::Construct(const FArguments& Args)
 					const AHaykGameMode* GM = O.IsValid() ? O->Mode() : nullptr;
 					if (!GM) return FText::GetEmpty();
 					if (!GM->IsVsBot()) return GM->DidHaykWin() ? LOCTEXT("P1W", "ՀԱՂԹԵՑ ՀԱՅԿԸ") : LOCTEXT("P2W", "ՀԱՂԹԵՑ ԲԵԼԸ");
-					return GM->DidHaykWin() ? LOCTEXT("Win", "ՀԱՂԹԱՆԱԿ") : LOCTEXT("Lose", "ՊԱՐՏՈՒԹՅՈՒՆ");
+					return GM->DidHaykWin() ? LOCTEXT("Win", "ՆԱՎԱՍԱՐԴ") : LOCTEXT("Lose", "ՊԱՐՏՈՒԹՅՈՒՆ");
 				})
 				.ColorAndOpacity_Lambda([O]() { const AHaykGameMode* GM = O.IsValid() ? O->Mode() : nullptr; return FSlateColor(GM && (GM->DidHaykWin() || !GM->IsVsBot()) ? Gold : Blood); })
 				.ShadowOffset(FVector2D(0, 0)).ShadowColorAndOpacity(FLinearColor(1.f, 0.3f, 0.05f, 0.8f))
@@ -125,7 +125,11 @@ void SHaykHud::Construct(const FArguments& Args)
 				{
 					const AHaykGameMode* GM = O.IsValid() ? O->Mode() : nullptr;
 					if (!GM) return FText::GetEmpty();
-					const FText Line = GM->DidHaykWin() ? LOCTEXT("WinL", "Եռաթև նետը խոցեց Բելի կուրծքը։ Հայկի ժառանգներն ազատ են։") : LOCTEXT("LoseL", "Բելն այս անգամ ավելի դիպուկ էր… Կրկին փորձի՛ր։");
+					const FText Line = !GM->IsVsBot()
+						? (GM->DidHaykWin() ? LOCTEXT("WinL2", "Եռաթև նետը խոցեց Բելի կուրծքը։") : LOCTEXT("LoseL2", "Բելի նետը գտավ Հայկին։"))
+						: (GM->DidHaykWin()
+							? LOCTEXT("WinL", "Եռաթև նետը ծակեց Բելի երկաթե զրահը, և բռնակալն ընկավ։ Նրա զորքը փախավ։\nԱվանդության համաձայն՝ մ.թ.ա. 2492 թ.՝ հայոց հին տոմարի առաջին տարին, որի ամիսը Նավասարդ է։")
+							: LOCTEXT("LoseL", "Բելի նետաձիգները կանգուն մնացին… Կրկին փորձի՛ր։"));
 					return FText::Format(LOCTEXT("Stats", "{0}\nՀայկ՝ {1} դիպուկ ({2} գլխին)   ·   Բել՝ {3} դիպուկ ({4} գլխին)   ·   Հերթեր՝ {5}"), Line,
 						FText::AsNumber(GM->GetHits(false)), FText::AsNumber(GM->GetHeadshots(false)), FText::AsNumber(GM->GetHits(true)), FText::AsNumber(GM->GetHeadshots(true)), FText::AsNumber(GM->GetTurn()));
 				})
