@@ -179,7 +179,7 @@ void ATwEnvironment::BuildSky(const FTwSkyPreset& S)
 	SkyLight->bRealTimeCapture = false;
 	SkyLight->SetIntensity(S.SkyLightIntensity);
 	SkyLight->SetLightColor(S.SkyLightColor);
-	SkyLight->SetLowerHemisphereColor(FLinearColor(0.12f, 0.03f, 0.15f));
+	SkyLight->SetLowerHemisphereColor(S.LowerHemisphere);
 	SkyLight->bLowerHemisphereIsBlack = false;
 
 	Fog->SetMobility(EComponentMobility::Movable);
@@ -206,7 +206,7 @@ void ATwEnvironment::BuildSky(const FTwSkyPreset& S)
 	P.bOverride_BloomThreshold = true; P.BloomThreshold = 1.2f;
 	P.bOverride_VignetteIntensity = true; P.VignetteIntensity = 0.55f;
 	P.bOverride_FilmGrainIntensity = true; P.FilmGrainIntensity = 0.12f;
-	P.bOverride_ColorSaturation = true; P.ColorSaturation = FVector4(1.08f, 1.02f, 1.12f, 1.1f);
+	P.bOverride_ColorSaturation = true; P.ColorSaturation = S.Saturation;
 	P.bOverride_ColorContrast = true; P.ColorContrast = FVector4(1.f, 1.f, 1.f, 1.08f);
 	P.bOverride_ColorGainShadows = true; P.ColorGainShadows = S.GainShadows;
 	P.bOverride_ColorGainHighlights = true; P.ColorGainHighlights = S.GainHighlights;

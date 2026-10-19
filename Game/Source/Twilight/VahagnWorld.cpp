@@ -24,9 +24,9 @@
 #include "IslandHeights.inl"
 
 // sea palette under the HDRI sky: deep water is darker than the sky, it only mirrors the lavender at grazing angles
-static const FLinearColor SeaDeep(0.028f, 0.02f, 0.06f);
-static const FLinearColor SeaHorizon(0.33f, 0.25f, 0.45f);
-static const FLinearColor SeaReflect(0.62f, 0.48f, 0.72f);
+static const FLinearColor SeaDeep(0.006f, 0.02f, 0.032f);
+static const FLinearColor SeaHorizon(0.13f, 0.15f, 0.2f);
+static const FLinearColor SeaReflect(0.7f, 0.55f, 0.48f);
 
 AVahagnWorld::AVahagnWorld()
 {
@@ -118,7 +118,10 @@ void AVahagnWorld::Tick(float Dt)
 			if (!DebugCam)
 			{
 				const FVector From(0.f, 0.f, 3000.f);
-				DebugCam = GetWorld()->SpawnActor<ACameraActor>(From, (FVector(-1900000.f, 1500000.f, 120000.f) - From).Rotation());
+				FRotator R = (FVector(-1900000.f, 1500000.f, 120000.f) - From).Rotation();
+				float DbgYaw = 0.f;
+				if (FParse::Value(FCommandLine::Get(), TEXT("TwViewYaw="), DbgYaw)) R = FRotator(4.f, DbgYaw, 0.f);
+				DebugCam = GetWorld()->SpawnActor<ACameraActor>(From, R);
 			}
 			if (DebugCam && PC->GetViewTarget() != DebugCam) PC->SetViewTarget(DebugCam);
 		}
@@ -149,7 +152,7 @@ void AVahagnWorld::ApplyStorm(float K)
 	if (Atmosphere)
 	{
 		// keep Rayleigh (it is what lights the upper sky); tint the whole dome crimson and thicken the haze
-		Atmosphere->SetSkyLuminanceFactor(L(FLinearColor(1.05f, 0.85f, 1.2f), FLinearColor(1.6f, 0.42f, 0.55f)));
+		Atmosphere->SetSkyLuminanceFactor(L(B.SkyLuminance, FLinearColor(1.4f, 0.45f, 0.4f)));
 		Atmosphere->SetMieScatteringScale(FMath::Lerp(0.006f, 0.018f, E));
 	}
 	if (Fog)
@@ -166,8 +169,8 @@ void AVahagnWorld::ApplyStorm(float K)
 	if (SkyMat)
 	{
 		// the HDRI dome carries the visible sky: it must turn crimson with the storm
-		SkyMat->SetVectorParameterValue(TEXT("ZenithTint"), L(FLinearColor(0.75f, 0.62f, 1.f), FLinearColor(0.75f, 0.22f, 0.3f)));
-		SkyMat->SetVectorParameterValue(TEXT("HorizonTint"), L(FLinearColor(1.f, 0.62f, 0.78f), FLinearColor(1.3f, 0.32f, 0.22f)));
+		SkyMat->SetVectorParameterValue(TEXT("ZenithTint"), L(FLinearColor(1.f, 1.f, 1.f), FLinearColor(0.7f, 0.32f, 0.3f)));
+		SkyMat->SetVectorParameterValue(TEXT("HorizonTint"), L(FLinearColor(1.05f, 0.95f, 0.9f), FLinearColor(1.2f, 0.4f, 0.22f)));
 		SkyMat->SetScalarParameterValue(TEXT("Exposure"), FMath::Lerp(SkyExposure, SkyExposure * 0.75f, E));
 	}
 	if (SeaMat)
@@ -282,10 +285,12 @@ void AVahagnWorld::UpdateBolt(float Dt)
 void AVahagnWorld::BuildVishapakar(const FVector& Base, float Yaw, float Scale)
 {
 	UStaticMesh* Cube = TwAssets::Cube();
-	UMaterialInstanceDynamic* Stone = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Rock")), this);
-	if (Stone) Stone->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.5f, 0.42f, 0.45f));
+	// carved basalt (same scanned rock as the islands, a little lighter: worked stone)
+	UMaterialInterface* StoneBase = TwAssets::Material(TEXT("M_RockPBR"));
+	UMaterialInstanceDynamic* Stone = UMaterialInstanceDynamic::Create(StoneBase ? StoneBase : TwAssets::Material(TEXT("M_Rock")), this);
+	if (Stone) { Stone->SetVectorParameterValue(TEXT("Tint"), StoneBase ? FLinearColor(2.6f, 2.4f, 2.2f) : FLinearColor(0.48f, 0.44f, 0.4f)); if (StoneBase) Stone->SetScalarParameterValue(TEXT("Tiling"), 300.f); }
 	UMaterialInstanceDynamic* Glyph = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
-	if (Glyph) { Glyph->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.4f, 0.1f)); Glyph->SetScalarParameterValue(TEXT("GlowMode"), 1.f); Glyph->SetScalarParameterValue(TEXT("Intensity"), 7.f); }
+	if (Glyph) { Glyph->SetVectorParameterValue(TEXT("Color"), FLinearColor(1.f, 0.3f, 0.06f)); Glyph->SetScalarParameterValue(TEXT("GlowMode"), 1.f); Glyph->SetScalarParameterValue(TEXT("Intensity"), 1.6f); }
 
 	auto Part = [&](const FVector& Rel, const FVector& Scl, UMaterialInterface* M)
 	{
@@ -323,6 +328,34 @@ void AVahagnWorld::BuildVishapakar(const FVector& Base, float Yaw, float Scale)
 	L->SetAttenuationRadius(3500.f * Scale);
 	L->SetLightColor(FLinearColor(1.f, 0.4f, 0.12f));
 	L->SetCastShadows(false);
+}
+
+FTwSkyPreset AVahagnWorld::GetSkyPreset() const
+{
+	// natural sunset over open sea: warm low sun, blue-grey water, neutral-cool shadows (no purple stylisation)
+	FTwSkyPreset P;
+	P.EmberFloorZ = 60.f;
+	P.AerialPerspectiveScale = 1.5f;
+	P.ShadowDistance = 20000.f;
+	P.FogMaxOpacity = 0.75f;
+	P.FogFalloff = 0.22f;
+	P.FogDensity = 0.014f;
+	P.SunRot = FRotator(-6.f, 265.f, 0.f); // matches the sun in the HDRI dome (azimuth ~265)
+	P.SunColor = FLinearColor(1.f, 0.56f, 0.3f);
+	P.SunIntensity = 8.f;
+	P.MoonColor = FLinearColor(0.45f, 0.55f, 0.85f);
+	P.MoonIntensity = 0.5f;
+	P.FogColor = FLinearColor(0.28f, 0.26f, 0.3f);
+	P.FogSunColor = FLinearColor(1.f, 0.5f, 0.22f);
+	P.SkyLightIntensity = 1.f;
+	P.SkyLightColor = FLinearColor(1.f, 0.9f, 0.85f);
+	P.LowerHemisphere = FLinearColor(0.02f, 0.03f, 0.045f);
+	P.SkyLuminance = FLinearColor(1.f, 1.f, 1.f);
+	P.GainShadows = FVector4(0.97f, 0.99f, 1.05f, 1.f);
+	P.GainHighlights = FVector4(1.04f, 1.f, 0.96f, 1.f);
+	P.Saturation = FVector4(1.f, 1.f, 1.f, 1.02f);
+	P.EmberColor = FLinearColor(1.f, 0.42f, 0.12f);
+	return P;
 }
 
 void AVahagnWorld::BuildSkyDome()
@@ -400,7 +433,7 @@ void AVahagnWorld::BuildIslands()
 	const bool bPBR = RockBase != nullptr;
 	UMaterialInstanceDynamic* Rock = UMaterialInstanceDynamic::Create(bPBR ? RockBase : TwAssets::Material(TEXT("M_Rock")), this);
 	if (Rock && !bPBR) Rock->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.42f, 0.3f, 0.34f));
-	if (Rock && bPBR) { Rock->SetVectorParameterValue(TEXT("Tint"), FLinearColor(2.1f, 1.75f, 1.9f)); Rock->SetScalarParameterValue(TEXT("Tiling"), 1500.f); } // dark_rock albedo is near black
+	if (Rock && bPBR) { Rock->SetVectorParameterValue(TEXT("Tint"), FLinearColor(1.9f, 1.8f, 1.75f)); Rock->SetScalarParameterValue(TEXT("Tiling"), 1500.f); } // dark_rock albedo is near black
 	UMaterialInstanceDynamic* Snow = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Rock")), this);
 	if (Snow) { Snow->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.5f, 0.38f, 0.45f)); Snow->SetScalarParameterValue(TEXT("TopAmount"), 1.f); }
 
@@ -433,11 +466,11 @@ void AVahagnWorld::BuildIslands()
 	{
 		// 25 km of air: mostly sky-coloured haze, the snowfields catching a little warm light
 		MasisMat->SetScalarParameterValue(TEXT("Tiling"), 60000.f);
-		MasisMat->SetVectorParameterValue(TEXT("Tint"), FLinearColor(1.4f, 1.2f, 1.35f));
+		MasisMat->SetVectorParameterValue(TEXT("Tint"), FLinearColor(1.3f, 1.25f, 1.25f));
 		MasisMat->SetScalarParameterValue(TEXT("TopAmount"), 0.6f);
 		MasisMat->SetVectorParameterValue(TEXT("TopTint"), FLinearColor(2.f, 1.8f, 2.f));
 		MasisMat->SetScalarParameterValue(TEXT("HazeAmount"), 0.5f);
-		MasisMat->SetVectorParameterValue(TEXT("HazeColor"), FLinearColor(0.34f, 0.27f, 0.42f));
+		MasisMat->SetVectorParameterValue(TEXT("HazeColor"), FLinearColor(0.32f, 0.3f, 0.34f));
 	}
 	if (!FParse::Param(FCommandLine::Get(), TEXT("TwNoMasis"))) BuildMasis(MasisMat ? MasisMat : (Snow ? Snow : Rock));
 	(void)Snow;

@@ -44,6 +44,8 @@ struct FTwSkyPreset
 	int32 Stars = 0;
 	/** SkyAtmosphere aerial perspective distance scale: >1 makes distant terrain fade into the sky sooner. */
 	float AerialPerspectiveScale = 1.f;
+	FLinearColor LowerHemisphere = FLinearColor(0.12f, 0.03f, 0.15f);
+	FVector4 Saturation = FVector4(1.08f, 1.02f, 1.12f, 1.1f);
 	bool bMoonDisc = false;
 };
 

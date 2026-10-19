@@ -134,6 +134,7 @@ void AVahagnCharacter::BeginPlay()
 		BodyMat->SetScalarParameterValue(TEXT("RimIntensity"), HeroBase ? 1.f : 1.6f);
 		BodyMat->SetScalarParameterValue(TEXT("AmbientFill"), 0.6f);
 		BodyMat->SetVectorParameterValue(TEXT("FlashColor"), FLinearColor(1.f, 0.22f, 0.04f));
+		if (HeroBase) BodyMat->SetVectorParameterValue(TEXT("SkinColor"), FLinearColor(0.3f, 0.17f, 0.085f)); // aged bronze, not polished gold
 		for (int32 i = 0; i < GetMesh()->GetNumMaterials(); ++i) GetMesh()->SetMaterial(i, BodyMat);
 		// second UV set of the mannequin (arms/hands) uses its own normal map
 		if (HeroBase && GetMesh()->GetNumMaterials() > 1)
@@ -145,6 +146,7 @@ void AVahagnCharacter::BeginPlay()
 				if (UTexture* D2 = LoadObject<UTexture>(nullptr, *(FString(T) + TEXT("T_Manny_02_D.T_Manny_02_D")))) M2->SetTextureParameterValue(TEXT("DiffTex"), D2);
 				M2->SetScalarParameterValue(TEXT("EmissiveIntensity"), 1.2f);
 				M2->SetScalarParameterValue(TEXT("RimIntensity"), 1.f);
+				M2->SetVectorParameterValue(TEXT("SkinColor"), FLinearColor(0.3f, 0.17f, 0.085f));
 				GetMesh()->SetMaterial(1, M2);
 				BodyMat2 = M2;
 			}

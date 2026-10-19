@@ -19,7 +19,7 @@ public:
 
 protected:
 	virtual void BuildLevel() override;
-	virtual FTwSkyPreset GetSkyPreset() const override { FTwSkyPreset P; P.EmberFloorZ = 60.f; P.AerialPerspectiveScale = 1.5f; P.ShadowDistance = 20000.f; P.FogMaxOpacity = 0.78f; P.FogFalloff = 0.22f; P.FogDensity = 0.016f; return P; }
+	virtual FTwSkyPreset GetSkyPreset() const override;
 
 private:
 	void BuildSea();
