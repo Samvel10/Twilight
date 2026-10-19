@@ -911,6 +911,52 @@ def build_rock_pbr():
     return mat
 
 
+
+def build_hero(noise_tex):
+    """Vahagn: molten bronze god. Lit metallic bronze using the mannequin's own normal/MRA maps (real anatomy
+    detail), thin flowing lava veins, fire rim. Same parameter names as M_FireBody (EmissiveIntensity, RimIntensity,
+    HitFlash, FlashColor) so the character code drives either."""
+    M = "/Game/Characters/Mannequins/Textures/Manny/"
+    bn, mra, dif = _load(M + "T_Manny_01_BN"), _load(M + "T_Manny_01_MRA"), _load(M + "T_Manny_01_D")
+    if bn is None or noise_tex is None:
+        warn("Manny textures missing - M_Hero skipped")
+        return None
+    mat = get_or_create_material("M_Hero")
+    setup_material(mat, usages=("MATUSAGE_SKELETAL_MESH",))
+    g = G(mat)
+    t = g.time()
+    uv = g.texcoord()
+    g.out("MP_NORMAL", g.tex_param("NormalTex", bn, uv))
+    shade = g.c1(1.0)
+    if dif is not None:
+        d = g.tex_param("DiffTex", dif, uv)
+        shade = g.lerp(g.c1(0.7), g.c1(1.25), g.dot(d, g.c3(0.33, 0.33, 0.33)))
+    if mra is not None:
+        r = g.tex_param("MRATex", mra, uv, "G")
+        g.out("MP_ROUGHNESS", g.sat(g.add(g.mul(r, 0.5), g.scalar("RoughnessBias", 0.18, "Surface"))))
+    else:
+        g.out("MP_ROUGHNESS", g.c1(0.35))
+    g.out("MP_METALLIC", g.scalar("Metallic", 0.85, "Surface"))
+    # lava veins: sharp ridges of flowing noise
+    nobj = g.tex_param_obj("NoiseTex", noise_tex)
+    tflow = g.mul(t, g.scalar("FlowSpeed", 0.6, "Cracks"))
+    uv1 = g.mul(uv, g.scalar("NoiseTiling", 3.0, "Cracks"))
+    n1 = g.sample(nobj, noise_tex, g.panner(uv1, 0.02, 0.05, tflow), "R")
+    n2 = g.sample(nobj, noise_tex, g.panner(g.mul(uv1, 2.3), -0.04, 0.03, tflow), "R")
+    n = g.mul(g.add(n1, n2), 0.5)
+    ridge = g.one_minus(g.absx(g.sub(g.mul(n, 2.0), 1.0)))
+    veins = g.sat(g.mul(g.power(ridge, g.scalar("CrackSharpness", 90.0, "Cracks")), 1.5))
+    g.out("MP_BASE_COLOR", g.mul(g.mul(g.vec("SkinColor", (0.55, 0.3, 0.12)), shade), g.one_minus(veins)))
+    pulse = g.add(g.mul(g.sine(g.mul(t, 0.7)), 0.15), 1.0)
+    e_veins = g.mul(g.mul(g.vec("CrackColorHot", (1.0, 0.45, 0.08)), veins), g.mul(g.scalar("EmissiveIntensity", 3.0, "Emissive"), pulse))
+    fr = g.fresnel(g.scalar("RimExponent", 3.0, "Rim"))
+    rim = g.mul(g.mul(g.vec("RimColor", (1.0, 0.42, 0.08)), fr), g.scalar("RimIntensity", 1.2, "Rim"))
+    flash = g.mul(g.vec("FlashColor", (1.0, 0.22, 0.04)), g.scalar("HitFlash", 0.0, "Emissive"))
+    g.out("MP_EMISSIVE_COLOR", g.add(g.add(e_veins, rim), flash))
+    finish_material(mat)
+    return mat
+
+
 # ----------------------------------------------------------------------------------------------
 def main():
     log("=== materials_build.py start (ROOT=%s) ===" % ROOT)
@@ -934,6 +980,7 @@ def main():
         ("M_DragonTeeth", build_dragon_teeth),
         ("M_SkyHDRI", build_sky_hdri),
         ("M_RockPBR", build_rock_pbr),
+        ("M_Hero", lambda: build_hero(noise)),
     ]
     for name, fn in steps:
         try:

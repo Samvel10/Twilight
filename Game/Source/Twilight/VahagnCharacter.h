@@ -85,6 +85,7 @@ private:
 	UPROPERTY() TArray<TObjectPtr<UFXSystemComponent>> Auras;
 	UPROPERTY() TObjectPtr<UTwPoseAnimInstance> Poser;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> BodyMat;
+	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> BodyMat2;
 	UPROPERTY(VisibleAnywhere) TObjectPtr<UInstancedStaticMeshComponent> FireTrail;
 	TArray<float> TrailBirth;
 	int32 TrailNext = 0;

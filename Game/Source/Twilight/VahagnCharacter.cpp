@@ -1,4 +1,5 @@
 #include "VahagnCharacter.h"
+#include "Engine/Texture.h"
 #include "Twilight.h"
 #include "TwAssets.h"
 #include "TwFx.h"
@@ -124,14 +125,29 @@ void AVahagnCharacter::BeginPlay()
 	if (Poser) { Poser->SetLoop(AnimFly, 0.01f, 0.35f); Poser->SetOneShotMask(TEXT("spine_01")); } // casts move the arms, the legs keep flying
 
 	// Molten fire body
-	BodyMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_FireBody")), this);
+	// molten bronze god (lit, mannequin normal maps, lava veins); falls back to the old unlit fire body
+	UMaterialInterface* HeroBase = TwAssets::Material(TEXT("M_Hero"));
+	BodyMat = UMaterialInstanceDynamic::Create(HeroBase ? HeroBase : TwAssets::Material(TEXT("M_FireBody")), this);
 	if (BodyMat)
 	{
-		BodyMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), 2.6f);
-		BodyMat->SetScalarParameterValue(TEXT("RimIntensity"), 1.6f);
+		BodyMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), HeroBase ? 1.2f : 2.6f);
+		BodyMat->SetScalarParameterValue(TEXT("RimIntensity"), HeroBase ? 1.f : 1.6f);
 		BodyMat->SetScalarParameterValue(TEXT("AmbientFill"), 0.6f);
 		BodyMat->SetVectorParameterValue(TEXT("FlashColor"), FLinearColor(1.f, 0.22f, 0.04f));
 		for (int32 i = 0; i < GetMesh()->GetNumMaterials(); ++i) GetMesh()->SetMaterial(i, BodyMat);
+		// second UV set of the mannequin (arms/hands) uses its own normal map
+		if (HeroBase && GetMesh()->GetNumMaterials() > 1)
+			if (UMaterialInstanceDynamic* M2 = UMaterialInstanceDynamic::Create(HeroBase, this))
+			{
+				const TCHAR* T = TEXT("/Game/Characters/Mannequins/Textures/Manny/");
+				if (UTexture* N2 = LoadObject<UTexture>(nullptr, *(FString(T) + TEXT("T_Manny_02_BN.T_Manny_02_BN")))) M2->SetTextureParameterValue(TEXT("NormalTex"), N2);
+				if (UTexture* R2 = LoadObject<UTexture>(nullptr, *(FString(T) + TEXT("T_Manny_02_MRA.T_Manny_02_MRA")))) M2->SetTextureParameterValue(TEXT("MRATex"), R2);
+				if (UTexture* D2 = LoadObject<UTexture>(nullptr, *(FString(T) + TEXT("T_Manny_02_D.T_Manny_02_D")))) M2->SetTextureParameterValue(TEXT("DiffTex"), D2);
+				M2->SetScalarParameterValue(TEXT("EmissiveIntensity"), 1.2f);
+				M2->SetScalarParameterValue(TEXT("RimIntensity"), 1.f);
+				GetMesh()->SetMaterial(1, M2);
+				BodyMat2 = M2;
+			}
 	}
 
 	// Flames on hands, head and chest; embers trailing from the pelvis
@@ -464,7 +480,9 @@ void AVahagnCharacter::UpdateVisuals(float Dt)
 	Glow->SetIntensity((7000.f + Charge * 14000.f) * Flicker * (bDead ? 0.2f : 1.f));
 	if (BodyMat)
 	{
-		BodyMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), 2.6f * (1.f + Charge * 2.f + 2.5f * DamageFlash) * Flicker);
+		const float EBase = TwAssets::Material(TEXT("M_Hero")) ? 1.2f : 2.6f;
+		BodyMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), EBase * (1.f + Charge * 2.f + 2.5f * DamageFlash) * Flicker);
+		if (BodyMat2) BodyMat2->SetScalarParameterValue(TEXT("EmissiveIntensity"), EBase * (1.f + Charge * 2.f + 2.5f * DamageFlash) * Flicker);
 		BodyMat->SetScalarParameterValue(TEXT("HitFlash"), DamageFlash * DamageFlash * 0.04f);
 	}
 	if (WindLoop) WindLoop->SetVolumeMultiplier(FMath::Clamp(Speed / 5600.f, 0.f, 1.f) * 0.6f);
