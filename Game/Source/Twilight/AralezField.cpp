@@ -20,6 +20,19 @@
 // real relief of Mount Ararat (Masis) on the horizon of the Ararat plain
 #include "MasisHeight.inl"
 #include "DetailDisp.inl"
+#include "AraratHeight.inl"
+#include "TwGrass.h"
+#include "Engine/LevelStreamingDynamic.h"
+#include "Engine/DirectionalLight.h"
+#include "Engine/SkyLight.h"
+#include "Engine/ExponentialHeightFog.h"
+#include "Engine/PostProcessVolume.h"
+#include "Engine/StaticMeshActor.h"
+#include "Camera/CameraActor.h"
+#include "Components/SkyAtmosphereComponent.h"
+#include "Misc/PackageName.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 
 namespace
 {
@@ -54,10 +67,76 @@ static float PlainZ(float X, float Y, bool bDetail)
 	return Z;
 }
 
-float AAralezField::GroundZ(float X, float Y) { return PlainZ(X, Y, true); }
+bool AAralezField::UsePlain()
+{
+	static const bool b = !FParse::Param(FCommandLine::Get(), TEXT("TwOldField")) && FPackageName::DoesPackageExist(TEXT("/Game/Test/L_Ararat"));
+	return b;
+}
+
+static float AraratZ(float X, float Y)
+{
+	// same triangles as the streamed core tiles; the level is shifted so the field centre sits at Z = 0
+	const double DX = X / 100.0 + AraMidX, DY = Y / 100.0 + AraMidY;
+	const double U = (DX - AraX0) / AraSp, V = (DY - AraY0) / AraSp;
+	const int32 I = FMath::Clamp((int32)FMath::FloorToDouble(U), 0, AraN - 2), J = FMath::Clamp((int32)FMath::FloorToDouble(V), 0, AraN - 2);
+	const double FU = FMath::Clamp(U - I, 0.0, 1.0), FV = FMath::Clamp(V - J, 0.0, 1.0);
+	auto Z = [](int32 i, int32 j) { return (double)AraZ[j * AraN + i]; };
+	const double H = (FU + FV <= 1.0) ? Z(I, J) + (Z(I + 1, J) - Z(I, J)) * FU + (Z(I, J + 1) - Z(I, J)) * FV
+		: Z(I + 1, J + 1) + (Z(I, J + 1) - Z(I + 1, J + 1)) * (1.0 - FU) + (Z(I + 1, J) - Z(I + 1, J + 1)) * (1.0 - FV);
+	return (float)((H - AraMidZ) * 100.0);
+}
+
+float AAralezField::GroundZ(float X, float Y) { return UsePlain() ? AraratZ(X, Y) : PlainZ(X, Y, true); }
+
+void AAralezField::StreamPlain()
+{
+	bool bOk = false;
+	EnvLevel = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(), TEXT("/Game/Test/L_Ararat"), FVector(-AraMidX * 100.0, -AraMidY * 100.0, -AraMidZ * 100.0), FRotator::ZeroRotator, bOk);
+	if (EnvLevel) { EnvLevel->SetShouldBeVisible(true); EnvLevel->bShouldBlockOnLoad = true; }
+	GetWorld()->FlushLevelStreaming();
+	int32 Removed = 0;
+	if (ULevel* L = EnvLevel ? EnvLevel->GetLoadedLevel() : nullptr)
+		for (AActor* A : L->Actors)
+		{
+			if (!A) continue;
+			bool bDrop = A->IsA<ADirectionalLight>() || A->IsA<ASkyLight>() || A->IsA<AExponentialHeightFog>() || A->IsA<APostProcessVolume>() || A->IsA<ACameraActor>()
+				|| A->FindComponentByClass<USkyAtmosphereComponent>() != nullptr;
+			if (AStaticMeshActor* SM = Cast<AStaticMeshActor>(A))
+				if (UMaterialInterface* M = SM->GetStaticMeshComponent() ? SM->GetStaticMeshComponent()->GetMaterial(0) : nullptr)
+					bDrop |= M->GetName().Contains(TEXT("HLSky"));
+			if (bDrop) { A->Destroy(); ++Removed; }
+		}
+	UE_LOG(LogTwilight, Display, TEXT("[TwEnv] stream L_Ararat ok=%d removed=%d"), bOk ? 1 : 0, Removed);
+	if (Fog) Fog->SetFogCutoffDistance(0.f);
+}
 
 FTwSkyPreset AAralezField::GetSkyPreset() const
 {
+	if (UsePlain())
+	{
+		FTwSkyPreset H;
+		H.SunRot = FRotator(-8.f, -15.f, 0.f);
+		H.SunColor = FLinearColor(1.f, 0.56f, 0.32f);
+		H.SunIntensity = 11.f;
+		H.MoonIntensity = 0.f;
+		H.FogColor = FLinearColor(0.36f, 0.42f, 0.55f);
+		H.FogSunColor = FLinearColor(1.f, 0.5f, 0.25f);
+		H.FogDensity = 0.00019f;
+		H.FogFalloff = 0.0067f;
+		H.FogStart = 0.f;
+		H.FogMaxOpacity = 1.f;
+		H.Exposure = 0.f;
+		H.SkyLightIntensity = 0.65f;
+		H.SkyLightColor = FLinearColor(1.f, 1.f, 1.f);
+		H.LowerHemisphere = FLinearColor(0.03f, 0.035f, 0.04f);
+		H.SkyLuminance = FLinearColor(1.f, 1.f, 1.f);
+		H.GainShadows = FVector4(1.f, 1.f, 1.f, 1.f);
+		H.GainHighlights = FVector4(1.f, 1.f, 1.f, 1.f);
+		H.Saturation = FVector4(1.08f, 1.08f, 1.08f, 1.08f);
+		H.ShadowDistance = 15000.f;
+		H.EmberColor = FLinearColor(1.f, 0.45f, 0.15f);
+		return H;
+	}
 	// dusk after the battle: the sun is going down behind smoke, warm light, blue-grey shadows
 	FTwSkyPreset P;
 	P.SunRot = FRotator(-9.f, 265.f, 0.f); // matches the sun of the qwantani dusk HDRI
@@ -87,6 +166,15 @@ FTwSkyPreset AAralezField::GetSkyPreset() const
 
 void AAralezField::BuildLevel()
 {
+	if (UsePlain())
+	{
+		// the real Ararat plain: Masis 40 km to the south, Aragats to the north-west
+		StreamPlain();
+		BuildSkyDome();
+		BuildDressing();
+		TwGrass::Scatter(this, FVector2D(0.f, 0.f), FVector2D(25000.f, 25000.f), 1.6f, [](float X, float Y) { return GroundZ(X, Y); }, 19, 0.06f);
+		return;
+	}
 	BuildSkyDome();
 	BuildGround();
 	BuildMasis();
@@ -99,7 +187,14 @@ void AAralezField::BuildSkyDome()
 	if (!M) return;
 	UMaterialInstanceDynamic* Sky = UMaterialInstanceDynamic::Create(M, this);
 	if (!Sky) return;
-	if (UTextureCube* Dusk = LoadObject<UTextureCube>(nullptr, TEXT("/Game/Twilight/Env/HDRI/qwantani_dusk_2_puresky_2k.qwantani_dusk_2_puresky_2k")))
+	if (UsePlain())
+	{
+		if (UTextureCube* K = LoadObject<UTextureCube>(nullptr, TEXT("/Game/Env/HDRI/kloppenheim_06_puresky_4k.kloppenheim_06_puresky_4k")))
+			Sky->SetTextureParameterValue(TEXT("SkyCube"), K);
+		Sky->SetScalarParameterValue(TEXT("Yaw"), 0.352f); // HDRI sun on the directional light (az 255, el 8)
+		Sky->SetScalarParameterValue(TEXT("Exposure"), 0.8f);
+	}
+	else if (UTextureCube* Dusk = LoadObject<UTextureCube>(nullptr, TEXT("/Game/Twilight/Env/HDRI/qwantani_dusk_2_puresky_2k.qwantani_dusk_2_puresky_2k")))
 		Sky->SetTextureParameterValue(TEXT("SkyCube"), Dusk);
 	Sky->SetVectorParameterValue(TEXT("ZenithTint"), FLinearColor(1.f, 1.f, 1.f));
 	Sky->SetVectorParameterValue(TEXT("HorizonTint"), FLinearColor(1.1f, 0.9f, 0.82f));
@@ -180,7 +275,7 @@ void AAralezField::BuildDressing()
 	// scanned boulders strewn over the plain
 	UStaticMesh* BoulderMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Twilight/Env/Scan/boulder_01/boulder_01_2k/StaticMeshes/boulder_01_2k.boulder_01_2k"));
 	UMaterialInterface* BoulderMat = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Twilight/Materials/MI_Scan_boulder_01.MI_Scan_boulder_01"));
-	if (BoulderMesh)
+	if (BoulderMesh && !UsePlain())
 	{
 		UInstancedStaticMeshComponent* B = NewObject<UInstancedStaticMeshComponent>(this);
 		B->SetStaticMesh(BoulderMesh);

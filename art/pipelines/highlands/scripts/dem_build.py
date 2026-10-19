@@ -46,7 +46,13 @@ def fetch_tile(z, tx, ty):
     p = os.path.join(TILE_CACHE, '%d_%d_%d.png' % (z, tx, ty))
     if not os.path.exists(p):
         u = 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/%d/%d/%d.png' % (z, tx, ty)
-        b = urllib.request.urlopen(urllib.request.Request(u, headers={'User-Agent': 'TwilightResearch/1.0'}), timeout=60).read()
+        for attempt in range(6):   # the tile server resets connections now and then
+            try:
+                b = urllib.request.urlopen(urllib.request.Request(u, headers={'User-Agent': 'TwilightResearch/1.0'}), timeout=60).read()
+                break
+            except Exception as e:
+                if attempt == 5: raise
+                import time; time.sleep(2 + 3 * attempt)
         open(p, 'wb').write(b)
     a = np.asarray(Image.open(p).convert('RGB')).astype(np.float64)
     return a[..., 0] * 256 + a[..., 1] + a[..., 2] / 256 - 32768

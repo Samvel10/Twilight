@@ -20,6 +20,8 @@ public:
 	AAralezField();
 	/** Ground height of the plain (cm). */
 	static float GroundZ(float X, float Y);
+	/** True when the real Ararat-plain DEM level (/Game/Test/L_Ararat) is used. */
+	static bool UsePlain();
 	static constexpr float FieldRadius = 45000.f; // playable radius (cm, 450 m); the plain itself is much bigger
 	static FVector AraSpot() { return FVector(0.f, 0.f, GroundZ(0.f, 0.f)); }
 
@@ -34,6 +36,8 @@ private:
 	void BuildGround();
 	void BuildMasis();
 	void BuildDressing();
+	void StreamPlain();
+	UPROPERTY() TObjectPtr<class ULevelStreamingDynamic> EnvLevel;
 
 	UPROPERTY() TArray<FVector> SmokeSpots;
 	float SmokeTimer = 0.f;

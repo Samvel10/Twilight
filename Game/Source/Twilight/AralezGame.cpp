@@ -64,15 +64,18 @@ void AAralezGameMode::RestartPlayer(AController* NewPlayer)
 		{ FLinearColor(0.8f, 0.85f, 1.f), TEXT("Լուսնակ") },
 	};
 	// west of the field, facing east: the battlefield ahead, Masis on the horizon, the sun low on the left
-	const FVector Start(-26000.f, 0.f, AAralezField::GroundZ(-26000.f, 0.f) + 5200.f);
-	const FVector Fwd(1.f, 0.f, 0.f);
-	const FVector Right(0.f, 1.f, 0.f);
+	// on the real plain Masis stands 40 km south: come down from the north and face it
+	const bool bPlain = AAralezField::UsePlain();
+	const FVector Fwd = bPlain ? FVector(0.f, 1.f, 0.f) : FVector(1.f, 0.f, 0.f);
+	const FVector Right = bPlain ? FVector(-1.f, 0.f, 0.f) : FVector(0.f, 1.f, 0.f);
+	const FVector Start = -Fwd * 26000.f + FVector(0, 0, AAralezField::GroundZ(-Fwd.X * 26000.f, -Fwd.Y * 26000.f) + 5200.f);
+	const float StartYaw = Fwd.Rotation().Yaw;
 	auto Spawn = [&](const FVector& Off, bool bBot, const FLinearColor& C, const FText& Name, int32 Skill) -> AAralezSpirit*
 	{
 		FActorSpawnParameters S;
 		S.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		S.bDeferConstruction = true;
-		const FTransform T(FRotator(-12.f, 0.f, 0.f), Start + Off);
+		const FTransform T(FRotator(-12.f, StartYaw, 0.f), Start + Off);
 		AAralezSpirit* A = GetWorld()->SpawnActor<AAralezSpirit>(AAralezSpirit::StaticClass(), T, S);
 		if (!A) return nullptr;
 		A->Setup(bBot, C, Name, Skill);
@@ -88,7 +91,7 @@ void AAralezGameMode::RestartPlayer(AController* NewPlayer)
 	if (PlayerSpirit && NewPlayer)
 	{
 		NewPlayer->Possess(PlayerSpirit);
-		NewPlayer->SetControlRotation(FRotator(-14.f, 0.f, 0.f));
+		NewPlayer->SetControlRotation(FRotator(-14.f, StartYaw, 0.f));
 	}
 }
 
@@ -138,7 +141,7 @@ void AAralezGameMode::SpawnBattlefield()
 	}
 	// Queen Shamiram watches from a rise east of the field, between two of her guards
 	{
-		const FVector2D Q(5200.f, -1800.f);
+		const FVector2D Q = AAralezField::UsePlain() ? FVector2D(1800.f, 5200.f) : FVector2D(5200.f, -1800.f);
 		const FVector QP(Q.X, Q.Y, AAralezField::GroundZ(Q.X, Q.Y));
 		const FTransform T((FVector::ZeroVector - QP).GetSafeNormal2D().Rotation(), QP);
 		if (AShamiramSoldier* Queen = GetWorld()->SpawnActor<AShamiramSoldier>(AShamiramSoldier::StaticClass(), T, S))

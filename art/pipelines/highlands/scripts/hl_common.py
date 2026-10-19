@@ -5,7 +5,7 @@ SITE = os.environ.get('HL_SITE', '')                  # '' = Geghama/Sevan (defa
 GEN = P + ('gen_%s/' % SITE if SITE else 'gen/')
 TROOT = '/Game/Terrain' + ('_' + SITE if SITE else '')  # content root for tiles/maps/water of this site
 SFX = ('_' + SITE) if SITE else ''                      # suffix for site-specific MIs / level
-LEVEL = '/Game/Test/L_' + ('Van' if SITE == 'van' else 'Highlands')
+LEVEL = '/Game/Test/L_' + ({'van': 'Van', 'ararat': 'Ararat'}.get(SITE, 'Highlands'))
 VEGGEN = P + 'gen/'                                      # vegetation glTFs are shared by all sites
 AT = unreal.AssetToolsHelpers.get_asset_tools()
 EAL = unreal.EditorAssetLibrary

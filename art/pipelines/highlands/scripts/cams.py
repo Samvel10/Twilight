@@ -40,7 +40,12 @@ def cam(name, x, y, agl, yaw_deg=None, pitch=-5.0, target=None, fov=75.0, tgt_ag
 az = lambda deg_from_north: deg_from_north - 90.0     # compass azimuth -> UE yaw (X east, Y south)
 masis = ll(44.2983, 39.7019)
 azhd = ll(44.9500, 40.2236)
-if os.environ.get('HL_SITE') == 'van':
+if os.environ.get('HL_SITE') == 'ararat':
+  V = dict([   # Aralez: Ara's field on the Ararat plain, Masis to the south
+    cam('field2', 0, 0, 2.0, az(180), -1, fov=70),
+    cam('field60', 0, 0, 60, target=masis, fov=60, tgt_agl=-1500),
+  ])
+elif os.environ.get('HL_SITE') == 'van':
   V = dict([   # Hayk: valley on the east shore of Lake Van, a hill for Bel
     cam('van300', 8000, 0, 300, az(268), -6, fov=75),
     cam('hayk_plain', 9000, 3000, 1.8, az(110), -1, fov=70),
