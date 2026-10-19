@@ -189,3 +189,20 @@
 - **Արձագանք.** Խաղերը նորմալ աշխատում են, բայց վիշապները, սարերը, կերպարներն ու աշխարհը իրական չեն թվում։ Առաջնահերթությունը Վահագնն է. իրական վիշապներ, իրական սարեր, գեղեցիկ աշխարհ, ավելի լավ կրակ։ Հայկի համար՝ առասպելին համապատասխան. նախ զորքերի ճակատամարտ, հետո միայն Հայկն է նետ արձակում Բելին (ոչ թե փոխադարձ մենամարտ)։
 - **Higgsfield**՝ 10 կրեդիտ (3D գեներացիայի համար բավարար չէ)։
 - **Workflow «twilight-realism-research»** (4 գործակալ). (1) իրական վիշապի/օձի 3D մոդելներ առանց login-ի (CC0/CC-BY), (2) Poly Haven/ambientCG + Արարատի իրական ռելիեֆ (AWS terrain tiles), (3) Iris Xe-ի վրա իրատեսության համար լավագույն rendering կարգավորումներ, (4) ամբողջովին procedural, բայց իրատեսական վիշապի նախագիծ։
+
+## 2026-10-19 09:50 — Քայլ 20. Վահագն. իրատեսական վիշապներ և աշխարհ
+- **Հետազոտություն** (workflow, 4 գործակալ, ~42 րոպե). Ազատ (CC0) աղբյուրներում իրատեսական վիշապ չկա։ Objaverse-ը (HuggingFace, առանց login-ի) Sketchfab-ի CC-BY մոդելների հայելի է. ընտրվեց «European Dragon»-ը (Regina Cachoa, CC BY 4.0, 42k եռանկյուն, 169 ոսկոր, Fly անիմացիա)։ Game-rip կասկածով մոդելները մերժվեցին։ Iris Xe-ի վրա չափված rendering. շվաքներ +1.7 մվ, post +0.5 մվ, Lumen/Nanite/VSM/volumetric clouds՝ ոչ։
+- **Ներմուծում** (`build_assets.py`, նոր `env` քայլ)։ Վիշապը ներմուծվում է Interchange-ով (մեկ SkeletalMesh, Nanite off). նաև Poly Haven HDRI-ները (TextureCube) և dark_rock PBR-ը։ Արվեստի ֆայլերը `art/models`, `art/hdri`, `art/textures`, `art/terrain` պանակներում են, իսկ հեղինակային ցուցակը՝ `art/CREDITS_3D.md`-ում և հաբի ներքևում։
+- **Նյութեր** (`materials_build.py`).
+  - `M_Dragon`. սեփական albedo/normal/roughness, օբսիդիանի tint, լավա ամենամութ ճեղքերում (գծային լուսավորվածություն < 0.0045, ~10%), սառը եզր, HitFlash/Burn միայն ճեղքերում։
+  - `M_SkyHDRI`. HDRI գմբեթ՝ yaw/tint/exposure պարամետրերով։
+  - `M_RockPBR`. triplanar, macro variation, haze։
+  - `M_Hero`. մետաղական բրոնզ մանեկենի normal/MRA-ով, բարակ լավայի երակներ։
+  - Ծով. ocean normal texture, իսկ կետավոր ցանցի իրական պատճառը `CrestAmount`-ն էր (երեք պարբերական sine-ների գումարը base color-ում) → 0։
+- **Vishap.cpp**. `BuildDragon`/`UpdateDragon`/`CalibrateDragon`։ Կմախքը skeletal mesh է, իսկ նախկին գնդերը մնացել են որպես անտեսանելի հարվածի ծավալներ։ Կողմնորոշումը վերցվում է անիմացված պոզից (reference pose-ը ուղղահայաց է)։ Մասշտաբը 1800/2100/5200 սմ է։ Bank ըստ պտույտի, թևերի արագությունն ըստ արագության, մահ՝ այրվող անկում ծովը։ Ոսկորների անունները UE-ում «.»-ը փոխում է «_»-ի։
+- **Աշխարհ** (`VahagnWorld.cpp`).
+  - Մասիսը Արարատի իրական ռելիեֆից է (`MasisHeight.inl`, 257², 18 կմ լայն, 3.6 կմ բարձր), հեռացված արևի ուղղությունից։
+  - 3 կղզին և ժայռերի օղակը կտրված են իրական գագաթներից (`IslandHeights.inl`, 8×129². Փոքր Արարատ, Մասիսի գագաթ, խառնարաններ)։
+  - Fog cutoff 15 կմ։ Փոթորիկը ներկում է նաև HDRI գմբեթը։
+- **Scalability** (`DefaultScalability.ini`). CSM 2×1024, light shafts, tonemapper 5, lens flare, bloom 5, material quality 1, sky atmosphere samples։ Contact shadows, aerial perspective։
+- **Արդյունք (փաթեթ)**. Վահագն 290 վ՝ հաղթանակ, **70.8 FPS** (p95 56, p99 45)։ Առաջ ~100 էր. արժեքը շվաքներն են, post-ը, HDRI-ն և skeletal վիշապները։
