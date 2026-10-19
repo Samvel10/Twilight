@@ -970,6 +970,128 @@ def build_hero(noise_tex):
     return mat
 
 
+
+# ---------------------------------------------------------------- islands (photogrammetry, proto-verified)
+def grade(g, diff, arm_r, arm_g, nrm_ws_z, macro_obj, macro_tex):
+    """Scan albedo -> basalt: desaturate, darken, world macro variation, oxidised patches, ledge dust,
+    wet band above the sea by world Z. Returns (base_color, roughness)."""
+    wp = g.world_pos("XYZ")
+    lum = g.dot(diff, g.c3(0.3, 0.59, 0.11))
+    base = g.lerp(diff, lum, g.scalar('Desaturate', 0.65, 'Grade'))
+    base = g.mul(base, g.vec('BasaltTint', (0.62, 0.6, 0.6), 'Grade'))
+    # contrast around mid grey keeps the scan's crevice detail while darkening
+    base = g.power(g.maxx(base, 0.0001), g.scalar('AlbedoGamma', 1.15, 'Grade'))
+    # world-space macro variation (breaks scan repetition across pieces): R = brightness, G = oxidised tint
+    m = g.sample(macro_obj, macro_tex, g.div(g.mask(wp, r=True, g=True), g.scalar('MacroScale', 9000.0, 'Macro')))
+    m2 = g.sample(macro_obj, macro_tex, g.div(g.mask(wp, r=True, g=True), g.scalar('MacroScale2', 2300.0, 'Macro')))
+    mr = g.mul(g.add(g.mask(m, r=True), g.mask(m2, r=True)), 0.5)
+    base = g.mul(base, g.lerp(g.scalar('MacroMin', 0.7, 'Macro'), g.scalar('MacroMax', 1.25, 'Macro'), mr))
+    rust = g.sat(g.mul(g.sub(g.mask(m, g=True), 0.5), 3.0))
+    base = g.lerp(base, g.mul(base, g.vec('OxideTint', (1.35, 0.85, 0.62), 'Macro')), g.mul(rust, g.scalar('OxideAmount', 0.5, 'Macro')))
+    # ledges facing up collect pale ash/salt
+    up = g.sat(g.mul(g.sub(nrm_ws_z, g.scalar('TopThreshold', 0.65, 'Top')), 4.0))
+    base = g.lerp(base, g.mul(g.vec('TopColor', (0.16, 0.15, 0.14), 'Top'), g.add(g.mul(mr, 0.6), 0.7)), g.mul(up, g.scalar('TopAmount', 0.35, 'Top')))
+    # wet band: dark + glossy below SeaZ + WetHeight (edge jittered by the macro noise)
+    z = g.mask(wp, b=True)
+    wet_top = g.add(g.scalar('SeaZ', 0.0, 'Wet'), g.mul(g.scalar('WetHeight', 450.0, 'Wet'), g.add(g.mul(g.mask(m2, b=True), 0.9), 0.55)))
+    wet = g.sat(g.div(g.sub(wet_top, z), g.scalar('WetFade', 120.0, 'Wet')))
+    base = g.mul(base, g.lerp(g.c1(1.0), g.scalar('WetDarken', 0.45, 'Wet'), wet))
+    # tide-line algae: very dark green-black just above the water
+    algae = g.sat(g.div(g.sub(g.add(g.scalar('SeaZ', 0.0, 'Wet'), g.scalar('AlgaeHeight', 120.0, 'Wet')), z), 60.0))
+    base = g.lerp(base, g.vec('AlgaeColor', (0.012, 0.016, 0.012), 'Wet'), g.mul(algae, g.scalar('AlgaeAmount', 0.7, 'Wet')))
+    rough = g.sat(g.mul(arm_g, g.scalar('RoughnessScale', 1.0, 'Surface')))
+    rough = g.lerp(rough, g.scalar('WetRoughness', 0.7, 'Wet'), wet)
+    base = g.mul(base, g.scalar('Brightness', 1.0, 'Grade'))
+    return base, rough
+
+
+def build_scan_rock(diff, nor, arm, macro):
+    mat = get_or_create_material('M_ScanRock')
+    setup_material(mat, two_sided=True, usages=('MATUSAGE_INSTANCED_STATIC_MESHES',))
+    g = G(mat)
+    uv = g.texcoord()
+    d = g.sample(g.tex_param_obj('Diff', diff), diff, uv)
+    aobj = g.tex_param_obj('ARM', arm)
+    a = g.sample(aobj, arm, uv, 'RGB')
+    n = g.sample(g.tex_param_obj('Normal', nor), nor, uv)
+    nws = g.mask(g.new(unreal.MaterialExpressionVertexNormalWS), b=True)
+    mobj = g.tex_param_obj('MacroNoise', macro)
+    base, rough = grade(g, d, g.mask(a, r=True), g.mask(a, g=True), nws, mobj, macro)
+    g.out('MP_BASE_COLOR', base)
+    g.out('MP_ROUGHNESS', rough)
+    g.out('MP_SPECULAR', g.scalar('Specular', 0.3, 'Surface'))
+    g.out('MP_AMBIENT_OCCLUSION', g.lerp(g.c1(1.0), g.mask(a, r=True), g.scalar('AOAmount', 1.0, 'Surface')))
+    g.out('MP_NORMAL', g.lerp(g.c3(0.0, 0.0, 1.0), n, g.scalar('NormalStrength', 1.0, 'Surface')))
+    finish_material(mat)
+    return mat
+
+
+def build_island_terrain(sdiff, snor, sarm, tdiff, tnor, tarm, macro):
+    """Heightfield core: steep faces = triplanar dark basalt (dark_rock), flats = top-down aerial photogrammetry
+    (aerial_rocks_02, 50 m tile) partially desaturated; then the same grade() as the scan facades."""
+    mat = get_or_create_material('M_IslandTerrain')
+    setup_material(mat, usages=('MATUSAGE_INSTANCED_STATIC_MESHES',))
+    g = G(mat)
+    wp = g.world_pos("XYZ")
+    p = g.div(wp, g.scalar('SteepTiling', 1800.0, 'Surface'))
+    nrm = g.new(unreal.MaterialExpressionVertexNormalWS)
+    w = g.power(g.absx(nrm), 4.0)
+    w = g.div(w, g.dot(w, g.c3(1.0, 1.0, 1.0)))
+    wx, wy, wz = g.mask(w, r=True), g.mask(w, g=True), g.mask(w, b=True)
+    uvx = g.append(g.mask(p, g=True), g.mask(p, b=True))
+    uvy = g.append(g.mask(p, r=True), g.mask(p, b=True))
+    uvz = g.append(g.mask(p, r=True), g.mask(p, g=True))
+    sobj = g.tex_param_obj('SteepDiff', sdiff); saobj = g.tex_param_obj('SteepARM', sarm)
+    def tri(obj, tex, out='RGB'):
+        a = g.sample(obj, tex, uvx, out); b = g.sample(obj, tex, uvy, out); c = g.sample(obj, tex, uvz, out)
+        return g.add(g.add(g.mul(a, wx), g.mul(b, wy)), g.mul(c, wz))
+    sd = g.mul(tri(sobj, sdiff), g.scalar('SteepBright', 1.6, 'Surface'))
+    sa = tri(saobj, sarm)
+    tuv = g.div(g.mask(wp, r=True, g=True), g.scalar('TopTiling', 5000.0, 'Surface'))
+    td = g.sample(g.tex_param_obj('TopDiff', tdiff), tdiff, tuv)
+    tlum = g.dot(td, g.c3(0.3, 0.59, 0.11))
+    td = g.mul(g.lerp(td, tlum, g.scalar('TopDesaturate', 0.55, 'Surface')), g.scalar('TopBright', 0.45, 'Surface'))
+    ta = g.sample(g.tex_param_obj('TopARM', tarm), tarm, tuv, 'RGB')
+    mobj = g.tex_param_obj('MacroNoise', macro)
+    mn = g.mask(g.sample(mobj, macro, g.div(g.mask(wp, r=True, g=True), 3100.0)), b=True)
+    nz = g.mask(nrm, b=True)
+    topm = g.sat(g.div(g.sub(g.add(nz, g.mul(g.sub(mn, 0.5), 0.3)), g.scalar('TopStart', 0.72, 'Surface')), g.scalar('TopFade', 0.12, 'Surface')))
+    d = g.lerp(sd, td, topm)
+    a = g.lerp(sa, ta, topm)
+    base, rough = grade(g, d, g.mask(a, r=True), g.mask(a, g=True), nz, mobj, macro)
+    g.out('MP_BASE_COLOR', base)
+    g.out('MP_ROUGHNESS', rough)
+    g.out('MP_SPECULAR', g.scalar('Specular', 0.3, 'Surface'))
+    g.out('MP_AMBIENT_OCCLUSION', g.mask(a, r=True))
+    sn = g.sample(g.tex_param_obj('SteepNormal', snor), snor, uvz)
+    tn = g.sample(g.tex_param_obj('TopNormal', tnor), tnor, tuv)
+    g.out('MP_NORMAL', g.lerp(g.c3(0.0, 0.0, 1.0), g.lerp(sn, tn, topm), g.scalar('NormalStrength', 0.8, 'Surface')))
+    finish_material(mat)
+    return mat
+
+
+
+
+def build_islands_set():
+    """M_IslandTerrain (heightfield core) + M_ScanRock (Poly Haven boulder_01) and their instances."""
+    macro = _load("/Game/Twilight/Env/Textures/T_MacroNoise")
+    D = "/Game/Twilight/Env/Textures/dark_rock_"
+    A = "/Game/Twilight/Env/Textures/aerial_rocks_02_"
+    if macro is None or _load(A + "diff_2k") is None:
+        warn("island textures missing - island materials skipped")
+        return None
+    isl = build_island_terrain(_load(D + "diff_2k"), _load(D + "nor_gl_2k"), _load(D + "arm_2k"),
+                               _load(A + "diff_2k"), _load(A + "nor_gl_2k"), _load(A + "arm_2k"), macro)
+    make_mi("MI_IslandTerrain", isl, scalars={"TopAmount": 0.0, "OxideAmount": 0.15, "Desaturate": 0.5, "TopStart": 0.62},
+            vectors={"BasaltTint": (0.52, 0.52, 0.55)})
+    B = "/Game/Twilight/Env/Scan/boulder_01/"
+    bd, bn, ba = _load(B + "boulder_01_diff_2k"), _load(B + "boulder_01_nor_gl_2k"), _load(B + "boulder_01_arm_2k")
+    if bd is not None:
+        sc = build_scan_rock(bd, bn, ba, macro)
+        make_mi("MI_Scan_boulder_01", sc, scalars={"TopAmount": 0.1, "Desaturate": 0.85, "AlbedoGamma": 1.3, "OxideAmount": 0.15},
+                vectors={"BasaltTint": (0.45, 0.45, 0.47)})
+    return isl
+
 # ----------------------------------------------------------------------------------------------
 def main():
     log("=== materials_build.py start (ROOT=%s) ===" % ROOT)
@@ -994,6 +1116,7 @@ def main():
         ("M_SkyHDRI", build_sky_hdri),
         ("M_RockPBR", build_rock_pbr),
         ("M_Hero", lambda: build_hero(noise)),
+        ("M_IslandTerrain", build_islands_set),
     ]
     for name, fn in steps:
         try:

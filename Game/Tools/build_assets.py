@@ -84,7 +84,10 @@ def import_env():
             if not a: continue
             n = a.get_name().lower()
             if isinstance(a, unreal.Texture2D):
-                if "wingmask" in n:
+                if "macronoise" in n:
+                    a.set_editor_property("srgb", False)
+                    a.set_editor_property("compression_settings", unreal.TextureCompressionSettings.TC_MASKS)
+                elif "wingmask" in n:
                     a.set_editor_property("srgb", False)
                     a.set_editor_property("compression_settings", unreal.TextureCompressionSettings.TC_GRAYSCALE)
                 elif "nor" in n or n.endswith("_n_1k"):

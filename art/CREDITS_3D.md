@@ -8,3 +8,4 @@
 | Mount Ararat / Armenian highlands elevation | AWS Terrain Tiles (Mapzen terrarium; SRTM, public domain sources) | open data | Masis and island relief |
 | Ocean wave normal map | generated (Phillips spectrum) | own work | sea surface |
 | "Rigged for UE4 - Spartan - free" (Sketchfab 666f485199db43488b14035f2a3840bf, via Objaverse) | Andy Woodhead | CC BY 4.0 | Vahagn hero body (modified: shield/sword removed, re-materialed, Manny animations retargeted) |
+| boulder_01 (scan), aerial_rocks_02 (textures + displacement) | Poly Haven (Rico Cilliers et al.) | CC0 | island boulders, island tops, cliff displacement |

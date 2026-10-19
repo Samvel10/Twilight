@@ -22,6 +22,8 @@
 // real relief of Mount Ararat (Masis): 257x257 heights, AWS Terrain Tiles (Mapzen terrarium, public domain sources)
 #include "MasisHeight.inl"
 #include "IslandHeights.inl"
+#include "DetailDisp.inl"
+#include "Components/InstancedStaticMeshComponent.h"
 
 // sea palette under the HDRI sky: deep water is darker than the sky, it only mirrors the lavender at grazing angles
 static const FLinearColor SeaDeep(0.006f, 0.02f, 0.032f);
@@ -85,6 +87,8 @@ void AVahagnWorld::BuildSea()
 		M->SetVectorParameterValue(TEXT("DeepColor"), SeaDeep);
 		M->SetVectorParameterValue(TEXT("HorizonColor"), SeaHorizon);
 		M->SetVectorParameterValue(TEXT("SkyReflectColor"), SeaReflect);
+		M->SetVectorParameterValue(TEXT("SunDir"), FLinearColor(-0.087f, -0.996f, 0.1f)); // glint path toward the HDRI sun (azimuth 265)
+		M->SetVectorParameterValue(TEXT("SunColor"), FLinearColor(1.f, 0.55f, 0.28f));
 		// larger, softer ripples: the hero flies high, small tiles read as a repeating dot pattern
 		M->SetScalarParameterValue(TEXT("NormalTile"), 2800.f);
 		M->SetScalarParameterValue(TEXT("NormalStrength"), 0.45f);
@@ -411,9 +415,25 @@ void AVahagnWorld::BuildMasis(UMaterialInterface* Mat)
 		UE_LOG(LogTwilight, Display, TEXT("[TwMasis] bounds origin=%s extent=%s"), *Heightfields.Last()->Bounds.Origin.ToCompactString(), *Heightfields.Last()->Bounds.BoxExtent.ToCompactString());
 }
 
-// island from real relief: crop Index (0..7), Radius/Height in cm; returns the peak height
-static float IslandZ(int32 Index, float X, float Y, float Radius, float Height)
+static float DetailSample(float X, float Y, float Tile)
 {
+	const float U = FMath::Fmod(FMath::Fmod(X / Tile, 1.f) + 1.f, 1.f) * DetailRes, V = FMath::Fmod(FMath::Fmod(Y / Tile, 1.f) + 1.f, 1.f) * DetailRes;
+	const int32 I0 = (int32)U % DetailRes, J0 = (int32)V % DetailRes, I1 = (I0 + 1) % DetailRes, J1 = (J0 + 1) % DetailRes;
+	const float FU = U - (int32)U, FV = V - (int32)V;
+	auto D = [](int32 i, int32 j) { return DetailDisp[j * DetailRes + i] / 255.f - DetailMean; };
+	return FMath::Lerp(FMath::Lerp(D(I0, J0), D(I1, J0), FU), FMath::Lerp(D(I0, J1), D(I1, J1), FU), FV);
+}
+static float Fbm(float X, float Y, float S, int32 Oct)
+{
+	float A = 1.f, T = 0.f, F = 1.f;
+	for (int32 o = 0; o < Oct; ++o) { T += A * FMath::PerlinNoise2D(FVector2D(X, Y) * (F / S) + FVector2D(o * 17.3f, o * 5.1f)); A *= 0.5f; F *= 2.03f; }
+	return T;
+}
+
+// CliffH: wave-cut sea cliff height (inner islands 1800, ring islands 3500 cm)
+static float IslandZ(int32 Index, float X, float Y, float Radius, float Height, float CliffH = 1800.f)
+{
+	// --- today's real relief (unchanged)
 	const float U = FMath::Clamp((X / Radius + 1.f) * 0.5f, 0.f, 1.f) * (IslandRes - 1);
 	const float V = FMath::Clamp((Y / Radius + 1.f) * 0.5f, 0.f, 1.f) * (IslandRes - 1);
 	const int32 X0 = FMath::Min((int32)U, IslandRes - 2), Y0 = FMath::Min((int32)V, IslandRes - 2);
@@ -421,9 +441,33 @@ static float IslandZ(int32 Index, float X, float Y, float Radius, float Height)
 	const uint16* D = IslandHeight + (Index % IslandCount) * IslandRes * IslandRes;
 	auto H = [D](int32 x, int32 y) { return (float)D[y * IslandRes + x] / 65535.f * 1.3f - 0.3f; };
 	const float Base = FMath::Lerp(FMath::Lerp(H(X0, Y0), H(X0 + 1, Y0), FX), FMath::Lerp(H(X0, Y0 + 1), H(X0 + 1, Y0 + 1), FX), FY);
-	// fine rocky detail the 29 m/px data cannot carry at this scale
 	const float Detail = FMath::PerlinNoise2D(FVector2D(X, Y) / (Radius * 0.12f)) * 0.05f + FMath::PerlinNoise2D(FVector2D(X, Y) / (Radius * 0.035f)) * 0.018f;
-	return (Base + (Base > 0.f ? Detail : 0.f)) * Height;
+	float Z = (Base + (Base > 0.f ? Detail : 0.f)) * Height;
+	// --- v2: irregular coastline (bays/headlands)
+	Z += Fbm(X, Y, Radius * 0.35f, 3) * Height * 0.12f * FMath::Clamp((Z + Height * 0.2f) / (Height * 0.4f), 0.f, 1.f);
+	if (Z <= 0.f) return Z;
+	// --- v2: vertical wave-cut cliff at the coastline (everything above 2.5 m of old relief is lifted by ~CliffH)
+	const float Up = FMath::SmoothStep(0.f, 250.f, Z);
+	const float CliffVar = CliffH * (0.75f + 0.5f * (Fbm(X, Y, 2500.f, 2) * 0.5f + 0.5f));
+	Z = Z * (1.f - CliffH / Height * 0.8f) + CliffVar * Up;
+	// --- v2: ridged gullies + photogrammetry displacement (aerial_rocks_02, 50 m and 17 m tiles)
+	const float Ridge = 1.f - FMath::Abs(Fbm(X, Y, 1800.f, 3));
+	Z -= 600.f * Ridge * Ridge * Ridge * Up;
+	Z += Up * (DetailSample(X, Y, 5000.f) * 450.f + DetailSample(X + 1700.f, Y - 900.f, 1700.f) * 160.f);
+	return Z;
+}
+
+// sea stack: a ribbed, layered basalt pillar (~32 m footprint, ~50 m tall), cm
+static float StackZ(float X, float Y, float Seed)
+{
+	const float A = FMath::Atan2(Y, X);
+	const float R = FMath::Sqrt(X * X + Y * Y);
+	const float R0 = 1600.f * (1.f + 0.22f * FMath::Sin(3.f * A + Seed) + 0.12f * FMath::Sin(5.f * A + Seed * 2.f) + 0.07f * FMath::Sin(9.f * A) + 0.05f * FMath::Sin(14.f * A) + 0.08f * Fbm(X + Seed * 900.f, Y, 700.f, 2));
+	if (R >= R0) return -2000.f;
+	float Z = 5200.f * FMath::Pow(1.f - R / R0, 0.1f) * (0.78f + 0.22f * (Fbm(X, Y + Seed * 500.f, 600.f, 2) * 0.5f + 0.5f));
+	Z -= 140.f * FMath::Frac(Z / 650.f); // strata
+	Z += DetailSample(X, Y, 2500.f) * 300.f;
+	return Z;
 }
 
 void AVahagnWorld::BuildIslands()
@@ -431,9 +475,45 @@ void AVahagnWorld::BuildIslands()
 	// volcanic rock (Poly Haven dark_rock, CC0), triplanar; falls back to the procedural rock
 	UMaterialInterface* RockBase = TwAssets::Material(TEXT("M_RockPBR"));
 	const bool bPBR = RockBase != nullptr;
+	// islands: basalt cliffs (triplanar dark_rock) + aerial photogrammetry on the flats, wet band, algae line
+	UMaterialInterface* IslandMat = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Twilight/Materials/MI_IslandTerrain.MI_IslandTerrain"));
 	UMaterialInstanceDynamic* Rock = UMaterialInstanceDynamic::Create(bPBR ? RockBase : TwAssets::Material(TEXT("M_Rock")), this);
 	if (Rock && !bPBR) Rock->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.42f, 0.3f, 0.34f));
 	if (Rock && bPBR) { Rock->SetVectorParameterValue(TEXT("Tint"), FLinearColor(1.9f, 1.8f, 1.75f)); Rock->SetScalarParameterValue(TEXT("Tiling"), 1500.f); } // dark_rock albedo is near black
+	UMaterialInterface* IslandSurf = IslandMat ? IslandMat : (UMaterialInterface*)Rock;
+	// scanned boulders (Poly Haven boulder_01, CC0, 4 LODs) around every coastline
+	UStaticMesh* BoulderMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Twilight/Env/Scan/boulder_01/boulder_01_2k/StaticMeshes/boulder_01_2k.boulder_01_2k"));
+	UMaterialInterface* BoulderMat = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Twilight/Materials/MI_Scan_boulder_01.MI_Scan_boulder_01"));
+	UInstancedStaticMeshComponent* Boulders = nullptr;
+	if (BoulderMesh)
+	{
+		Boulders = NewObject<UInstancedStaticMeshComponent>(this);
+		Boulders->SetStaticMesh(BoulderMesh);
+		if (BoulderMat) Boulders->SetMaterial(0, BoulderMat);
+		Boulders->SetupAttachment(RootComponent);
+		Boulders->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Boulders->SetCastShadow(true);
+		Boulders->RegisterComponent();
+		Boulders->SetWorldTransform(FTransform::Identity);
+	}
+	FRandomStream Br(808);
+	// boulders at the foot of a coast: walk rays out from the centre to the waterline
+	auto ScatterBoulders = [&](const FVector& C, TFunctionRef<float(float, float)> Hf, float MaxR, int32 Count, float SMin, float SMax)
+	{
+		if (!Boulders) return;
+		for (int32 k = 0; k < Count; ++k)
+		{
+			const float Ang = Br.FRandRange(0.f, 2.f * PI);
+			const FVector2D D(FMath::Cos(Ang), FMath::Sin(Ang));
+			float Coast = -1.f;
+			for (float R = 0.f; R < MaxR; R += 150.f) if (Hf(D.X * R, D.Y * R) <= 0.f) { Coast = R; break; }
+			if (Coast < 0.f) continue;
+			const float Rr = Coast + Br.FRandRange(100.f, 900.f);
+			const float S = Br.FRandRange(SMin, SMax);
+			const FRotator Rot(Br.FRandRange(-25.f, 25.f), Br.FRandRange(0.f, 360.f), Br.FRandRange(-25.f, 25.f));
+			Boulders->AddInstance(FTransform(Rot, C + FVector(D.X * Rr, D.Y * Rr, -S * Br.FRandRange(25.f, 50.f)), FVector(S)), true);
+		}
+	};
 	UMaterialInstanceDynamic* Snow = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Rock")), this);
 	if (Snow) { Snow->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.5f, 0.38f, 0.45f)); Snow->SetScalarParameterValue(TEXT("TopAmount"), 1.f); }
 
@@ -447,7 +527,10 @@ void AVahagnWorld::BuildIslands()
 		const float Rad = Rs.FRandRange(11000.f, 17000.f);
 		const float Hgt = Rs.FRandRange(7000.f, 16000.f);
 		const int32 Idx = 2 + i % 6;
-		BuildTerrain(FVector(FMath::Cos(A) * Dist, FMath::Sin(A) * Dist, 0.f), Rad, Rad, 80, 80, [=](float X, float Y) { return IslandZ(Idx, X, Y, Rad, Hgt); }, Rock, true);
+		const FVector C(FMath::Cos(A) * Dist, FMath::Sin(A) * Dist, 0.f);
+		auto Hf = [=](float X, float Y) { return IslandZ(Idx, X, Y, Rad, Hgt, 3500.f); };
+		BuildTerrain(C, Rad, Rad, 128, 128, Hf, IslandSurf, true);
+		ScatterBoulders(C, Hf, Rad, 6, 6.f, 12.f);
 	}
 	// three inner islands with vishapakar stones (Aragats-like plateaus)
 	const FVector Inner[3] = { FVector(16000, -9000, 0), FVector(-21000, -14000, 0), FVector(-6000, 25000, 0) };
@@ -456,8 +539,16 @@ void AVahagnWorld::BuildIslands()
 		const float Rad = 7000.f + i * 900.f;
 		const float Hgt = 4200.f + i * 900.f;
 		const int32 Idx = i == 0 ? 0 : (i == 1 ? 1 : 3); // Little Ararat, the Masis summit ridge, a crater
-		BuildTerrain(Inner[i], Rad, Rad, 96, 96, [=](float X, float Y) { return IslandZ(Idx, X, Y, Rad, Hgt); }, Rock, true);
-		const float Top = IslandZ(Idx, 0.f, 0.f, Rad, Hgt);
+		auto Hf = [=](float X, float Y) { return IslandZ(Idx, X, Y, Rad, Hgt, 1800.f); };
+		BuildTerrain(Inner[i], Rad, Rad, 160, 160, Hf, IslandSurf, true);
+		ScatterBoulders(Inner[i], Hf, Rad, 10, 5.f, 12.f);
+		// a sea stack off each inner island, with boulders leaning on it
+		const float SA = 0.8f + i * 2.1f;
+		const FVector SC = Inner[i] + FVector(FMath::Cos(SA), FMath::Sin(SA), 0.f) * (Rad + 2600.f);
+		const float Seed = 1.7f + i * 3.3f;
+		BuildTerrain(SC, 3200.f, 3200.f, 112, 112, [=](float X, float Y) { return StackZ(X, Y, Seed); }, IslandSurf, true);
+		ScatterBoulders(SC, [=](float X, float Y) { return StackZ(X, Y, Seed); }, 3200.f, 6, 8.f, 16.f);
+		const float Top = IslandZ(Idx, 0.f, 0.f, Rad, Hgt, 1800.f);
 		BuildVishapakar(Inner[i] + FVector(0, 0, Top - 150.f), 30.f + i * 70.f, 1.2f);
 	}
 	// Masis on the horizon from real elevation data
