@@ -8,6 +8,10 @@
 #include "VahagnGameMode.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Engine/SkeletalMesh.h"
+#include "Animation/AnimSequence.h"
+#include "ReferenceSkeleton.h"
 #include "Components/PointLightComponent.h"
 #include "Components/AudioComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -227,6 +231,145 @@ void AVishap::Build()
 	BreathAudio->bAutoActivate = false;
 	BreathAudio->SetSound(TwAssets::Sound(TEXT("sfx_fire_breath")));
 	BreathAudio->RegisterComponent();
+	BuildDragon();
+}
+
+// ------------------------------------------------------------------ dragon body
+namespace
+{
+	const TCHAR* DragonMeshPath = TEXT("/Game/Twilight/Vishap/Dragon/european_dragon.european_dragon");
+	const TCHAR* DragonFlyPath = TEXT("/Game/Twilight/Vishap/Dragon/european_dragonFly.european_dragonFly");
+	const FName DragonHeadBone(TEXT("DEF-neck_004_012")); // UE turns the glTF "." into "_"
+	const FName DragonJawBone(TEXT("DEF-Teeth_Top_013"));
+	const FName DragonTailBone(TEXT("DEF-tail_010_0161"));
+}
+
+void AVishap::BuildDragon()
+{
+	USkeletalMesh* Mesh = LoadObject<USkeletalMesh>(nullptr, DragonMeshPath);
+	UAnimSequence* Fly = LoadObject<UAnimSequence>(nullptr, DragonFlyPath);
+	if (!Mesh || !Fly) return;
+	Dragon = NewObject<USkeletalMeshComponent>(this);
+	Dragon->SetupAttachment(RootComponent);
+	Dragon->SetAbsolute(true, true, true);
+	Dragon->SetSkeletalMesh(Mesh);
+	Dragon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Dragon->SetCastShadow(true);
+	Dragon->bCastDynamicShadow = true;
+	Dragon->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
+	Dragon->RegisterComponent();
+	DragonMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Dragon")), this);
+	if (DragonMat)
+	{
+		const FLinearColor Tint = bBoss ? FLinearColor(0.8f, 0.36f, 0.3f) : (Tier ? FLinearColor(0.75f, 0.42f, 0.38f) : FLinearColor(0.62f, 0.55f, 0.6f));
+		DragonMat->SetVectorParameterValue(TEXT("Tint"), Tint);
+		// lava only in the deepest ~10% of the painted crevices (linear albedo luminance < ~0.009)
+		DragonMat->SetScalarParameterValue(TEXT("VeinThreshold"), 0.0045f);
+		DragonMat->SetScalarParameterValue(TEXT("VeinGain"), 260.f);
+		DragonMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBoss ? 4.f : (Tier ? 3.2f : 2.5f));
+		Dragon->SetMaterial(0, DragonMat);
+	}
+	if (UMaterialInterface* Teeth = TwAssets::Material(TEXT("M_DragonTeeth"))) { Dragon->SetMaterial(1, Teeth); Dragon->SetMaterial(2, Teeth); }
+	if (EyeMat) Dragon->SetMaterial(3, EyeMat);
+	Dragon->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+	Dragon->PlayAnimation(Fly, true);
+	Dragon->SetPlayRate(FMath::FRandRange(0.9f, 1.1f) * (bBoss ? 0.7f : 1.f));
+	Dragon->SetPosition(FMath::FRandRange(0.f, Fly->GetPlayLength()), false);
+	bDragon = true;
+	CalibrateDragon();
+
+	// the sphere chain becomes invisible hit volumes along the flight path, sized to the dragon
+	for (UStaticMeshComponent* Sg : Segments) if (Sg) Sg->SetVisibility(false, true);
+	if (EyeMat) EyeMat->SetScalarParameterValue(TEXT("Intensity"), 6.f);
+}
+
+bool AVishap::CalibrateDragon()
+{
+	if (!Dragon || !Dragon->GetSkeletalMeshAsset()) return false;
+	const FReferenceSkeleton& Ref = Dragon->GetSkeletalMeshAsset()->GetRefSkeleton();
+	auto RefCS = [&Ref](FName Bone) -> FVector
+	{
+		int32 I = Ref.FindBoneIndex(Bone);
+		if (I == INDEX_NONE) return FVector::ZeroVector;
+		FTransform T = FTransform::Identity;
+		while (I != INDEX_NONE) { T = T * Ref.GetRefBonePose()[I]; I = Ref.GetParentIndex(I); }
+		return T.GetLocation();
+	};
+	const FVector Head = RefCS(DragonHeadBone);
+	const FVector Tail = RefCS(DragonTailBone);
+	if (Head.IsNearlyZero() && Tail.IsNearlyZero()) return false;
+	DragonHeadCS = Head;
+	const FVector Fwd = (Head - Tail).GetSafeNormal();
+	FVector Up = FVector::UpVector - Fwd * FVector::DotProduct(FVector::UpVector, Fwd);
+	if (Up.SizeSquared() < 0.05f) Up = FVector::ForwardVector - Fwd * FVector::DotProduct(FVector::ForwardVector, Fwd);
+	DragonMeshFrame = FRotationMatrix::MakeFromXZ(Fwd, Up.GetSafeNormal()).ToQuat();
+	const float RefLen = FMath::Max(50.f, FVector::Dist(Head, Tail));
+	const float WantLen = bBoss ? 5200.f : (Tier ? 2100.f : 1800.f); // head-to-tail
+	DragonScale = WantLen / RefLen;
+	Dragon->SetWorldScale3D(FVector(DragonScale));
+	UE_LOG(LogTwilight, Display, TEXT("[TwDragon] head=%s tail=%s reflen=%.0f scale=%.2f bones=%d"), *Head.ToCompactString(), *Tail.ToCompactString(), RefLen, DragonScale, Ref.GetNum());
+	// hit volumes: spread the chain over the dragon's real length, a little fatter (wings)
+	if (NumSeg > 1)
+	{
+		const float Step = WantLen * 1.1f / (NumSeg - 1);
+		for (int32 i = 0; i < NumSeg && i < Segments.Num(); ++i)
+		{
+			SegDist[i] = i * Step;
+			SegRadius[i] *= 1.35f;
+			const float R = SegRadius[i];
+			Segments[i]->SetWorldScale3D(FVector(R / 50.f * 1.7f, R / 50.f, R / 50.f * 0.92f));
+		}
+	}
+	bDragonCalibrated = true;
+	return true;
+}
+
+void AVishap::UpdateDragon(float Dt)
+{
+	if (!bDragon || !Dragon) return;
+	// the reference pose stands upright; the Fly clip lays the body out: take the frame from the animated pose
+	if (!bDragonAnimFrame && LifeTime > 0.2f)
+	{
+		const FVector H = Dragon->GetBoneLocation(DragonHeadBone, EBoneSpaces::ComponentSpace);
+		const FVector T = Dragon->GetBoneLocation(DragonTailBone, EBoneSpaces::ComponentSpace);
+		if (!(H - T).IsNearlyZero())
+		{
+			const FVector Fwd = (H - T).GetSafeNormal();
+			FVector Up = FVector::UpVector - Fwd * FVector::DotProduct(FVector::UpVector, Fwd);
+			if (Up.SizeSquared() < 0.05f) Up = FVector::RightVector - Fwd * FVector::DotProduct(FVector::RightVector, Fwd);
+			DragonMeshFrame = FRotationMatrix::MakeFromXZ(Fwd, Up.GetSafeNormal()).ToQuat();
+			DragonHeadCS = H;
+			bDragonAnimFrame = true;
+			UE_LOG(LogTwilight, Display, TEXT("[TwDragon] anim frame head=%s tail=%s"), *H.ToCompactString(), *T.ToCompactString());
+		}
+	}
+	// heading follows the flight with a short lag; bank into turns
+	const FVector V = (HeadVel + KnockVel);
+	const FVector Want = V.GetSafeNormal().IsNearlyZero() ? DragonFwd : V.GetSafeNormal();
+	const FVector Prev = DragonFwd;
+	DragonFwd = FMath::VInterpNormalRotationTo(DragonFwd, Want, Dt, 160.f);
+	const float Yaw = FMath::FindDeltaAngleDegrees(Prev.Rotation().Yaw, DragonFwd.Rotation().Yaw) / FMath::Max(Dt, 1e-3f);
+	DragonBank = FMath::FInterpTo(DragonBank, FMath::Clamp(-Yaw * 0.6f, -50.f, 50.f), Dt, 3.f);
+	FVector Up = FVector::UpVector - DragonFwd * FVector::DotProduct(FVector::UpVector, DragonFwd);
+	if (Up.SizeSquared() < 0.02f) Up = FVector::ForwardVector;
+	const FQuat World = FRotationMatrix::MakeFromXZ(DragonFwd, Up.GetSafeNormal()).ToQuat() * FQuat(FVector::ForwardVector, FMath::DegreesToRadians(DragonBank));
+	const FQuat Rot = World * DragonMeshFrame.Inverse();
+	Dragon->SetWorldLocationAndRotation(HeadPos - Rot.RotateVector(DragonHeadCS * DragonScale), Rot);
+	// wings beat faster when climbing / dashing
+	Dragon->SetPlayRate((bBoss ? 0.7f : 1.f) * FMath::Clamp(0.8f + V.Size() / 6000.f + FMath::Max(0.f, V.Z) / 4000.f, 0.8f, 1.6f));
+	if (DragonMat)
+	{
+		DragonMat->SetScalarParameterValue(TEXT("HitFlash"), HitFlash * 1.5f); // (the material keeps it to the cracks)
+		const bool bFiring = State == EVishapState::Breath || State == EVishapState::BreathWindup;
+		DragonMat->SetScalarParameterValue(TEXT("VeinIntensity"), (bBoss ? 3.f : (Tier ? 2.4f : 1.8f)) * (bFiring ? 1.8f : 1.f));
+	}
+	// never fill the lens with a wing
+	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+		if (PC->PlayerCameraManager)
+		{
+			const bool bNear = FVector::DistSquared(Dragon->Bounds.Origin, PC->PlayerCameraManager->GetCameraLocation()) < FMath::Square(Dragon->Bounds.SphereRadius * 0.55f);
+			if (Dragon->IsVisible() == bNear) Dragon->SetVisibility(!bNear);
+		}
 }
 
 AVahagnCharacter* AVishap::Player() const
@@ -236,6 +379,7 @@ AVahagnCharacter* AVishap::Player() const
 
 FVector AVishap::MouthLocation() const
 {
+	if (bDragon && Dragon) return Dragon->GetBoneLocation(DragonJawBone) + DragonFwd * 60.f * DragonScale;
 	if (Segments.Num() == 0) return HeadPos;
 	const FTransform T = Segments[0]->GetComponentTransform();
 	return T.TransformPosition(FVector(150.f, 0.f, -5.f));
@@ -602,6 +746,7 @@ void AVishap::Tick(float Dt)
 		if (Trail.Num() > Need) Trail.SetNum(Need);
 	}
 	UpdateBody(Dt);
+	UpdateDragon(Dt);
 	HitFlash = FMath::Max(0.f, HitFlash - Dt * 6.f);
 }
 
@@ -625,7 +770,7 @@ void AVishap::UpdateBody(float Dt)
 		P += Side * Wave;
 		const FRotator Rot = FRotationMatrix::MakeFromXZ(Tan, FVector::UpVector).Rotator();
 		Segments[i]->SetWorldLocationAndRotation(P, Rot);
-		if (bHideNear)
+		if (bHideNear && !bDragon)
 		{
 			const bool bNear = FVector::DistSquared(P, CamLoc) < FMath::Square(SegRadius[i] * 1.8f + (bBoss ? 600.f : 250.f));
 			if (Segments[i]->IsVisible() == bNear) Segments[i]->SetVisibility(!bNear, true);
@@ -669,6 +814,28 @@ void AVishap::UpdateBody(float Dt)
 void AVishap::UpdateDying(float Dt)
 {
 	DyingTime += Dt;
+	if (bDragon && Dragon && Dragon->IsVisible())
+	{
+		if (DragonFallVel.IsNearlyZero()) DragonFallVel = HeadVel * 0.4f + FVector(0, 0, 400.f);
+		if (!DragonFire)
+		{
+			// the body catches fire as it falls
+			DragonFire = TwFx::AttachFlame(Dragon, TEXT("DEF-Spine_003_05"), FVector::ZeroVector, bBoss ? 2.5f : 1.4f);
+			TwFx::AttachFlame(Dragon, DragonHeadBone, FVector::ZeroVector, bBoss ? 1.6f : 0.9f);
+		}
+		DragonFallVel.Z -= 2600.f * Dt;
+		Dragon->SetWorldLocation(Dragon->GetComponentLocation() + DragonFallVel * Dt);
+		Dragon->AddWorldRotation(FRotator(-70.f * Dt, 0.f, 140.f * Dt));
+		Dragon->SetPlayRate(0.25f);
+		if (DragonMat) DragonMat->SetScalarParameterValue(TEXT("Burn"), FMath::Min(DyingTime * 2.5f, 6.f));
+		if (Dragon->Bounds.Origin.Z < 0.f || DyingTime > StateDur - 0.15f)
+		{
+			const FVector P = Dragon->Bounds.Origin;
+			TwFx::Burst(GetWorld(), TwFx::EFx::Splash, FVector(P.X, P.Y, 10.f), bBoss ? 6.f : 3.f);
+			TwFx::Burst(GetWorld(), TwFx::EFx::FireballImpact, P, bBoss ? 3.f : 1.8f);
+			Dragon->SetVisibility(false);
+		}
+	}
 	for (int32 i = 0; i < Segments.Num(); ++i)
 	{
 		if (!Segments[i]->IsVisible()) continue;

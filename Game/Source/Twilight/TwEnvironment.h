@@ -27,6 +27,7 @@ struct FTwSkyPreset
 	FLinearColor FogSunColor = FLinearColor(1.f, 0.42f, 0.18f);
 	float FogDensity = 0.012f;
 	float FogFalloff = 0.08f;
+	float FogMaxOpacity = 0.92f;
 	float FogStart = 4500.f;
 	float Exposure = 0.f;
 	FLinearColor EmberColor = FLinearColor(1.f, 0.42f, 0.12f);
@@ -41,6 +42,8 @@ struct FTwSkyPreset
 	FLinearColor SkyLuminance = FLinearColor(1.05f, 0.85f, 1.2f);
 	/** Night skies: number of stars on a far dome (0 = none) and a moon disc opposite the key light. */
 	int32 Stars = 0;
+	/** SkyAtmosphere aerial perspective distance scale: >1 makes distant terrain fade into the sky sooner. */
+	float AerialPerspectiveScale = 1.f;
 	bool bMoonDisc = false;
 };
 

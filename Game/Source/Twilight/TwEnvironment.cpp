@@ -144,6 +144,12 @@ void ATwEnvironment::BuildSky(const FTwSkyPreset& S)
 	Sun->SetAtmosphereSunLightIndex(0);
 	Sun->SetCastShadows(true);
 	Sun->SetDynamicShadowDistanceMovableLight(S.ShadowDistance);
+	Sun->SetEnableLightShaftOcclusion(true);
+	Sun->SetOcclusionMaskDarkness(0.35f);
+	// distant landmarks (Masis at 25 km) must occlude the shaft bloom; the default 1 km range treats them as sky
+	Sun->SetOcclusionDepthRange(4000000.f);
+	Sun->ContactShadowLength = 0.04f; // fine contact shadows (scales, fingers) for ~0.3 ms
+	Sun->MarkRenderStateDirty();
 	Sun->SetDynamicShadowCascades(2);
 	Sun->bUseInsetShadowsForMovableObjects = false;
 	Sun->SetLightSourceAngle(2.f);
@@ -166,6 +172,7 @@ void ATwEnvironment::BuildSky(const FTwSkyPreset& S)
 	Atmosphere->SetMieScatteringScale(0.006f);
 	Atmosphere->SetMieAnisotropy(0.85f);
 	Atmosphere->SetSkyLuminanceFactor(S.SkyLuminance);
+	Atmosphere->SetAerialPespectiveViewDistanceScale(S.AerialPerspectiveScale); // (engine spelling) distant mountains fade into haze
 
 	SkyLight->SetMobility(EComponentMobility::Movable);
 	SkyLight->SourceType = ESkyLightSourceType::SLS_CapturedScene;
@@ -184,7 +191,7 @@ void ATwEnvironment::BuildSky(const FTwSkyPreset& S)
 	Fog->SetDirectionalInscatteringExponent(6.f);
 	Fog->SetDirectionalInscatteringStartDistance(3000.f);
 	Fog->SetStartDistance(S.FogStart);
-	Fog->SetFogMaxOpacity(0.92f);
+	Fog->SetFogMaxOpacity(S.FogMaxOpacity);
 	Fog->SetVolumetricFog(false);
 
 	// Post-process: warm highlights, violet shadows, strong bloom, cinematic vignette

@@ -15,6 +15,18 @@
 #include "GameFramework/PlayerController.h"
 #include "Camera/PlayerCameraManager.h"
 #include "TimerManager.h"
+#include "Camera/CameraActor.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+
+// real relief of Mount Ararat (Masis): 257x257 heights, AWS Terrain Tiles (Mapzen terrarium, public domain sources)
+#include "MasisHeight.inl"
+#include "IslandHeights.inl"
+
+// sea palette under the HDRI sky: deep water is darker than the sky, it only mirrors the lavender at grazing angles
+static const FLinearColor SeaDeep(0.028f, 0.02f, 0.06f);
+static const FLinearColor SeaHorizon(0.33f, 0.25f, 0.45f);
+static const FLinearColor SeaReflect(0.62f, 0.48f, 0.72f);
 
 AVahagnWorld::AVahagnWorld()
 {
@@ -24,6 +36,7 @@ AVahagnWorld::AVahagnWorld()
 
 void AVahagnWorld::BuildLevel()
 {
+	BuildSkyDome();
 	BuildSea();
 	BuildIslands();
 	// the crimson reed of the birth myth, standing out of the sea at the world centre
@@ -69,10 +82,25 @@ void AVahagnWorld::BuildSea()
 	UMaterialInstanceDynamic* M = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Water_Purple")), this);
 	if (M)
 	{
-		M->SetVectorParameterValue(TEXT("DeepColor"), FLinearColor(0.10f, 0.02f, 0.14f));
+		M->SetVectorParameterValue(TEXT("DeepColor"), SeaDeep);
+		M->SetVectorParameterValue(TEXT("HorizonColor"), SeaHorizon);
+		M->SetVectorParameterValue(TEXT("SkyReflectColor"), SeaReflect);
 		// larger, softer ripples: the hero flies high, small tiles read as a repeating dot pattern
 		M->SetScalarParameterValue(TEXT("NormalTile"), 2800.f);
 		M->SetScalarParameterValue(TEXT("NormalStrength"), 0.45f);
+		// any periodic normal pattern aliases into a dot lattice when seen from altitude (83% res + TAA):
+		// ripples only near the lens, glassy dusk water beyond
+		M->SetScalarParameterValue(TEXT("NormalFadeDistance"), 30000.f);
+		M->SetScalarParameterValue(TEXT("OceanStrength"), 0.35f);
+		// the crest tint is a sum of three periodic sines in the base colour: a bright dot lattice from altitude
+		M->SetScalarParameterValue(TEXT("CrestAmount"), 0.f);
+		// tuning overrides: -TwSea="OceanStrength=0.3,NormalFadeDistance=8000"
+		FString Ov;
+		if (FParse::Value(FCommandLine::Get(), TEXT("TwSea="), Ov, false))
+		{
+			TArray<FString> Parts; Ov.ParseIntoArray(Parts, TEXT(","));
+			for (const FString& Pp : Parts) { FString K, V; if (Pp.Split(TEXT("="), &K, &V)) M->SetScalarParameterValue(FName(*K), FCString::Atof(*V)); }
+		}
 		Sea->SetMaterial(0, M);
 		SeaMat = M;
 	}
@@ -82,6 +110,18 @@ void AVahagnWorld::BuildSea()
 void AVahagnWorld::Tick(float Dt)
 {
 	Super::Tick(Dt);
+	// -TwViewMasis (debug): a fixed camera on the horizon toward Masis, re-asserted every frame
+	static bool bViewMasis = FParse::Param(FCommandLine::Get(), TEXT("TwViewMasis"));
+	if (bViewMasis && GetWorld()->GetTimeSeconds() > 1.f)
+		if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+		{
+			if (!DebugCam)
+			{
+				const FVector From(0.f, 0.f, 3000.f);
+				DebugCam = GetWorld()->SpawnActor<ACameraActor>(From, (FVector(-1900000.f, 1500000.f, 120000.f) - From).Rotation());
+			}
+			if (DebugCam && PC->GetViewTarget() != DebugCam) PC->SetViewTarget(DebugCam);
+		}
 	Storm = FMath::FInterpConstantTo(Storm, StormTarget, Dt, 1.f / 6.f); // ~6 s blend
 	if (!FMath::IsNearlyEqual(Storm, LastApplied, 0.002f)) ApplyStorm(Storm);
 	// the sky light is a static capture: refresh it halfway through and at the end of the blend
@@ -125,9 +165,9 @@ void AVahagnWorld::ApplyStorm(float K)
 	}
 	if (SeaMat)
 	{
-		SeaMat->SetVectorParameterValue(TEXT("DeepColor"), L(FLinearColor(0.10f, 0.02f, 0.14f), FLinearColor(0.09f, 0.01f, 0.03f)));
-		SeaMat->SetVectorParameterValue(TEXT("HorizonColor"), L(FLinearColor(0.42f, 0.16f, 0.55f), FLinearColor(0.45f, 0.05f, 0.10f)));
-		SeaMat->SetVectorParameterValue(TEXT("SkyReflectColor"), L(FLinearColor(0.9f, 0.38f, 0.55f), FLinearColor(0.9f, 0.12f, 0.18f)));
+		SeaMat->SetVectorParameterValue(TEXT("DeepColor"), L(SeaDeep, FLinearColor(0.07f, 0.008f, 0.02f)));
+		SeaMat->SetVectorParameterValue(TEXT("HorizonColor"), L(SeaHorizon, FLinearColor(0.4f, 0.05f, 0.09f)));
+		SeaMat->SetVectorParameterValue(TEXT("SkyReflectColor"), L(SeaReflect, FLinearColor(0.85f, 0.12f, 0.16f)));
 		SeaMat->SetVectorParameterValue(TEXT("SunColor"), L(FLinearColor(1.f, 0.55f, 0.25f), FLinearColor(1.f, 0.22f, 0.08f)));
 	}
 }
@@ -278,10 +318,81 @@ void AVahagnWorld::BuildVishapakar(const FVector& Base, float Yaw, float Scale)
 	L->SetCastShadows(false);
 }
 
+void AVahagnWorld::BuildSkyDome()
+{
+	UMaterialInterface* M = TwAssets::Material(TEXT("M_SkyHDRI"));
+	if (!M) return;
+	SkyMat = UMaterialInstanceDynamic::Create(M, this);
+	float Yaw = 0.f;
+	FParse::Value(FCommandLine::Get(), TEXT("TwSkyYaw="), Yaw);
+	if (SkyMat) SkyMat->SetScalarParameterValue(TEXT("Yaw"), Yaw);
+	float Exp = 1.f;
+	FParse::Value(FCommandLine::Get(), TEXT("TwSkyExp="), Exp);
+	if (SkyMat) SkyMat->SetScalarParameterValue(TEXT("Exposure"), Exp);
+	UStaticMeshComponent* Dome = NewObject<UStaticMeshComponent>(this);
+	Dome->SetStaticMesh(TwAssets::Sphere());
+	Dome->SetupAttachment(RootComponent);
+	Dome->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Dome->SetCastShadow(false);
+	Dome->bAffectDistanceFieldLighting = false;
+	Dome->SetWorldScale3D(FVector(400000.f)); // 200 km radius: beyond Masis and the sea
+	Dome->SetMaterial(0, SkyMat);
+	Dome->RegisterComponent();
+}
+
+void AVahagnWorld::BuildMasis(UMaterialInterface* Mat)
+{
+	// height fog would swallow a mountain 25 km away entirely; beyond 15 km only the atmosphere's
+	// aerial perspective hazes it, so Masis stands as a pale silhouette against the sunset
+	if (Fog) Fog->SetFogCutoffDistance(1500000.f);
+	// the real twin-peaked Masis (Greater + Little Ararat), ~18 km wide, ~3.6 km tall, ~26 km away behind the cliffs
+	const float Half = 900000.f;                   // cm
+	const float HeightScale = 360000.f / (MasisMaxM - MasisMinM);
+	auto Sample = [](float U, float V) -> float
+	{
+		const float X = FMath::Clamp(U, 0.f, 1.f) * (MasisRes - 1), Y = FMath::Clamp(V, 0.f, 1.f) * (MasisRes - 1);
+		const int32 X0 = FMath::Min((int32)X, MasisRes - 2), Y0 = FMath::Min((int32)Y, MasisRes - 2);
+		const float FX = X - X0, FY = Y - Y0;
+		auto H = [](int32 x, int32 y) { return (float)MasisHeight[y * MasisRes + x] / 65535.f; };
+		return FMath::Lerp(FMath::Lerp(H(X0, Y0), H(X0 + 1, Y0), FX), FMath::Lerp(H(X0, Y0 + 1), H(X0 + 1, Y0 + 1), FX), FY);
+	};
+	const float Range = MasisMaxM - MasisMinM;
+	BuildTerrain(FVector(-1900000.f, 1500000.f, -2000.f), Half, Half, 240, 240, [&](float X, float Y)
+	{
+		// row 0 of the data is north; our -Y is north here
+		const float U = (X + Half) / (2.f * Half), V = (Y + Half) / (2.f * Half);
+		const float Hm = Sample(U, V) * Range;                     // metres above the lowest point
+		const float R = FMath::Sqrt(FMath::Square(U - 0.5f) + FMath::Square(V - 0.5f)) * 2.f;
+		const float Window = 1.f - FMath::SmoothStep(0.62f, 0.98f, R); // edges sink under the sea
+		return Hm * HeightScale * Window - (1.f - Window) * 60000.f;
+	}, Mat, false, 400000.f);
+	if (Heightfields.Num() > 0 && Heightfields.Last())
+		UE_LOG(LogTwilight, Display, TEXT("[TwMasis] bounds origin=%s extent=%s"), *Heightfields.Last()->Bounds.Origin.ToCompactString(), *Heightfields.Last()->Bounds.BoxExtent.ToCompactString());
+}
+
+// island from real relief: crop Index (0..7), Radius/Height in cm; returns the peak height
+static float IslandZ(int32 Index, float X, float Y, float Radius, float Height)
+{
+	const float U = FMath::Clamp((X / Radius + 1.f) * 0.5f, 0.f, 1.f) * (IslandRes - 1);
+	const float V = FMath::Clamp((Y / Radius + 1.f) * 0.5f, 0.f, 1.f) * (IslandRes - 1);
+	const int32 X0 = FMath::Min((int32)U, IslandRes - 2), Y0 = FMath::Min((int32)V, IslandRes - 2);
+	const float FX = U - X0, FY = V - Y0;
+	const uint16* D = IslandHeight + (Index % IslandCount) * IslandRes * IslandRes;
+	auto H = [D](int32 x, int32 y) { return (float)D[y * IslandRes + x] / 65535.f * 1.3f - 0.3f; };
+	const float Base = FMath::Lerp(FMath::Lerp(H(X0, Y0), H(X0 + 1, Y0), FX), FMath::Lerp(H(X0, Y0 + 1), H(X0 + 1, Y0 + 1), FX), FY);
+	// fine rocky detail the 29 m/px data cannot carry at this scale
+	const float Detail = FMath::PerlinNoise2D(FVector2D(X, Y) / (Radius * 0.12f)) * 0.05f + FMath::PerlinNoise2D(FVector2D(X, Y) / (Radius * 0.035f)) * 0.018f;
+	return (Base + (Base > 0.f ? Detail : 0.f)) * Height;
+}
+
 void AVahagnWorld::BuildIslands()
 {
-	UMaterialInstanceDynamic* Rock = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Rock")), this);
-	if (Rock) Rock->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.42f, 0.3f, 0.34f));
+	// volcanic rock (Poly Haven dark_rock, CC0), triplanar; falls back to the procedural rock
+	UMaterialInterface* RockBase = TwAssets::Material(TEXT("M_RockPBR"));
+	const bool bPBR = RockBase != nullptr;
+	UMaterialInstanceDynamic* Rock = UMaterialInstanceDynamic::Create(bPBR ? RockBase : TwAssets::Material(TEXT("M_Rock")), this);
+	if (Rock && !bPBR) Rock->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.42f, 0.3f, 0.34f));
+	if (Rock && bPBR) { Rock->SetVectorParameterValue(TEXT("Tint"), FLinearColor(2.1f, 1.75f, 1.9f)); Rock->SetScalarParameterValue(TEXT("Tiling"), 1500.f); } // dark_rock albedo is near black
 	UMaterialInstanceDynamic* Snow = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Rock")), this);
 	if (Snow) { Snow->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.5f, 0.38f, 0.45f)); Snow->SetScalarParameterValue(TEXT("TopAmount"), 1.f); }
 
@@ -294,19 +405,33 @@ void AVahagnWorld::BuildIslands()
 		const float Dist = Rs.FRandRange(60000.f, 72000.f);
 		const float Rad = Rs.FRandRange(11000.f, 17000.f);
 		const float Hgt = Rs.FRandRange(7000.f, 16000.f);
-		BuildHeightfield(FVector(FMath::Cos(A) * Dist, FMath::Sin(A) * Dist, 0.f), Rad, Hgt, 10 + i, 56, false, Rock, true);
+		const int32 Idx = 2 + i % 6;
+		BuildTerrain(FVector(FMath::Cos(A) * Dist, FMath::Sin(A) * Dist, 0.f), Rad, Rad, 80, 80, [=](float X, float Y) { return IslandZ(Idx, X, Y, Rad, Hgt); }, Rock, true);
 	}
 	// three inner islands with vishapakar stones (Aragats-like plateaus)
 	const FVector Inner[3] = { FVector(16000, -9000, 0), FVector(-21000, -14000, 0), FVector(-6000, 25000, 0) };
 	for (int32 i = 0; i < 3; ++i)
 	{
 		const float Rad = 7000.f + i * 900.f;
-		const float Hgt = 2600.f + i * 700.f;
-		BuildHeightfield(Inner[i], Rad, Hgt, 50 + i, 60, false, Rock, true);
-		const float Top = HillHeight(0.f, 0.f, Rad, Hgt, 50 + i, false);
+		const float Hgt = 4200.f + i * 900.f;
+		const int32 Idx = i == 0 ? 0 : (i == 1 ? 1 : 3); // Little Ararat, the Masis summit ridge, a crater
+		BuildTerrain(Inner[i], Rad, Rad, 96, 96, [=](float X, float Y) { return IslandZ(Idx, X, Y, Rad, Hgt); }, Rock, true);
+		const float Top = IslandZ(Idx, 0.f, 0.f, Rad, Hgt);
 		BuildVishapakar(Inner[i] + FVector(0, 0, Top - 150.f), 30.f + i * 70.f, 1.2f);
 	}
-	// Masis on the horizon, catching the last sun (no collision, far away)
-	BuildHeightfield(FVector(-150000.f, -60000.f, 0.f), 60000.f, 52000.f, 7, 96, true, Snow ? Snow : Rock, false);
+	// Masis on the horizon from real elevation data
+	UMaterialInstanceDynamic* MasisMat = UMaterialInstanceDynamic::Create(bPBR ? RockBase : TwAssets::Material(TEXT("M_Rock")), this);
+	if (MasisMat && bPBR)
+	{
+		// 25 km of air: mostly sky-coloured haze, the snowfields catching a little warm light
+		MasisMat->SetScalarParameterValue(TEXT("Tiling"), 60000.f);
+		MasisMat->SetVectorParameterValue(TEXT("Tint"), FLinearColor(1.4f, 1.2f, 1.35f));
+		MasisMat->SetScalarParameterValue(TEXT("TopAmount"), 0.6f);
+		MasisMat->SetVectorParameterValue(TEXT("TopTint"), FLinearColor(2.f, 1.8f, 2.f));
+		MasisMat->SetScalarParameterValue(TEXT("HazeAmount"), 0.5f);
+		MasisMat->SetVectorParameterValue(TEXT("HazeColor"), FLinearColor(0.34f, 0.27f, 0.42f));
+	}
+	if (!FParse::Param(FCommandLine::Get(), TEXT("TwNoMasis"))) BuildMasis(MasisMat ? MasisMat : (Snow ? Snow : Rock));
+	(void)Snow;
 }
 

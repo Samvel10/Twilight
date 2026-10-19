@@ -45,6 +45,50 @@ def import_audio():
         n += 1
     log("audio imported: %d / %d" % (n, len(files)))
 
+def import_env():
+    """External CC0/CC-BY assets: vishap model (glTF via Interchange), HDRI skies, PBR rock textures."""
+    # --- dragon (skeletal mesh + Fly/Idle anims). One combined skeletal mesh, no Nanite.
+    glb = os.path.join(ROOT, "art", "models", "vishap", "european_dragon.glb")
+    dest = "/Game/Twilight/Vishap/Dragon"
+    if os.path.exists(glb):
+        mgr = unreal.InterchangeManager.get_interchange_manager_scripted()
+        src = unreal.InterchangeManager.create_source_data(glb)
+        prm = unreal.ImportAssetParameters(); prm.is_automated = True
+        pipe = unreal.InterchangeGenericAssetsPipeline()
+        try: pipe.get_editor_property("mesh_pipeline").set_editor_property("build_nanite", False)
+        except Exception as e: unreal.log_warning("[TwilightBuild] build_nanite: %s" % e)
+        prm.override_pipelines.append(unreal.SoftObjectPath(pipe.get_path_name()))
+        mgr.import_asset(dest, src, prm)
+        reg = unreal.AssetRegistryHelpers.get_asset_registry()
+        for a in reg.get_assets_by_path(dest, recursive=True):
+            log("dragon asset %s %s" % (a.asset_class_path.asset_name, a.package_name))
+            EAL.save_asset(str(a.package_name), only_if_is_dirty=False)
+    # --- HDRI skies -> TextureCube
+    tasks = []
+    for f in sorted(glob.glob(os.path.join(ROOT, "art", "hdri", "*.hdr"))):
+        t = unreal.AssetImportTask(); t.filename = f; t.destination_path = "/Game/Twilight/Env/HDRI"
+        t.automated = True; t.replace_existing = True; t.save = True; tasks.append(t)
+    # --- PBR rock (Poly Haven dark_rock, CC0): diff sRGB, GL normal (flip green), ARM masks
+    for f in sorted(glob.glob(os.path.join(ROOT, "art", "textures", "*", "*.jpg")) + glob.glob(os.path.join(ROOT, "art", "textures", "*", "*.png"))):
+        t = unreal.AssetImportTask(); t.filename = f; t.destination_path = "/Game/Twilight/Env/Textures"
+        t.automated = True; t.replace_existing = True; t.save = True; tasks.append(t)
+    TOOLS.import_asset_tasks(tasks)
+    for t in tasks:
+        for path in t.get_editor_property("imported_object_paths"):
+            a = EAL.load_asset(path)
+            if not a: continue
+            n = a.get_name().lower()
+            if isinstance(a, unreal.Texture2D):
+                if "nor" in n or n.endswith("_n_1k"):
+                    a.set_editor_property("compression_settings", unreal.TextureCompressionSettings.TC_NORMALMAP)
+                    a.set_editor_property("srgb", False)
+                    a.set_editor_property("flip_green_channel", "nor_gl" in n)  # T_OceanWaves_N is already DirectX
+                elif "arm" in n:
+                    a.set_editor_property("compression_settings", unreal.TextureCompressionSettings.TC_MASKS)
+                    a.set_editor_property("srgb", False)
+            EAL.save_asset(path.split(".")[0], only_if_is_dirty=False)
+            log("env import %s (%s)" % (path, a.get_class().get_name()))
+
 def build_maps():
     for name in ["L_Vahagn", "L_Hayk", "L_Aralez", "L_Menu"]:
         path = "/Game/Twilight/Maps/" + name
@@ -55,7 +99,7 @@ def build_maps():
         ok = unreal.EditorLoadingAndSavingUtils.save_map(world, path)
         log("map %s saved=%s" % (path, ok))
 
-steps = [("materials", build_materials), ("audio", import_audio), ("maps", build_maps)]
+steps = [("env", import_env), ("materials", build_materials), ("audio", import_audio), ("maps", build_maps)]
 errors = 0
 for key, fn in steps:
     if key not in ONLY: continue

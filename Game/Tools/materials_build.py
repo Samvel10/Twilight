@@ -589,9 +589,27 @@ def build_water(water_n, noise_tex=None):
     dist = g.new(unreal.MaterialExpressionDistance)
     g.link(g.new(unreal.MaterialExpressionCameraPositionWS), dist, "A")
     g.link(g.world_pos("XYZ"), dist, "B")
-    fade = g.lerp(g.c1(1.0), g.c1(0.3), g.sat(g.div(dist, g.scalar("NormalFadeDistance", 60000.0, "Surface"))))
+    fade = g.lerp(g.c1(1.0), g.c1(0.0), g.sat(g.div(dist, g.scalar("NormalFadeDistance", 2500.0, "Surface"))))
     slope = g.mul(grad, g.mul(g.scalar("NormalStrength", 0.6, "Surface"), g.mul(fade, -1.0)))
-    g.out("MP_NORMAL", g.normalize(g.append(slope, g.c1(1.0))))
+    nrm_analytic = g.normalize(g.append(slope, g.c1(1.0)))
+    ocean = None
+    try:
+        ocean = unreal.load_asset("/Game/Twilight/Env/Textures/T_OceanWaves_N_1k")
+    except Exception:
+        ocean = None
+    if ocean is not None:
+        # Phillips-spectrum wave normals (generated, tileable) at two scales and directions: carry the far field
+        # where the analytic ripples fade (they read as a dot lattice from altitude)
+        oobj = g.tex_param_obj("OceanNormal", ocean)
+        ouv = g.div(xy, g.scalar("OceanTile", 4200.0, "Surface"))
+        o1 = g.sample(oobj, ocean, g.panner(ouv, 0.006, 0.004))
+        o2 = g.sample(oobj, ocean, g.panner(g.mul(ouv, 2.7), -0.005, 0.007))
+        o = g.add(o1, o2)
+        ok = g.scalar("OceanStrength", 0.6, "Surface")
+        o_flat = g.lerp(g.c3(0.0, 0.0, 1.0), o, ok)
+        g.out("MP_NORMAL", g.normalize(g.add(nrm_analytic, g.mul(o_flat, g.c1(1.0)))))
+    else:
+        g.out("MP_NORMAL", nrm_analytic)
 
     # --- Colour: fresnel blend deep->horizon, crest tint
     fr = g.fresnel(g.scalar("FresnelExponent", 4.0, "Surface"), 0.02)
@@ -763,6 +781,136 @@ def build_instances(m):
     make_mi("MI_Sky_Sunset", m.get("M_Sky"), scalars={"SkyIntensity": 1.0})
 
 
+
+def _load(path):
+    try:
+        return unreal.load_asset(path)
+    except Exception:
+        return None
+
+
+def build_dragon():
+    """Skin for the CC-BY 'European Dragon' (Regina Cachoa): its own albedo/normal/roughness, re-tinted to
+    dark obsidian, glowing lava in the crevices (dark albedo), cold fresnel rim, hit flash. Two-sided wings."""
+    D = "/Game/Twilight/Vishap/Dragon/european_dragon_texture_"
+    albedo, rough, normal = _load(D + "0"), _load(D + "1"), _load(D + "2")
+    if albedo is None or normal is None:
+        warn("dragon textures missing - M_Dragon skipped")
+        return None
+    mat = get_or_create_material("M_Dragon")
+    setup_material(mat, two_sided=True, usages=("MATUSAGE_SKELETAL_MESH",))
+    g = G(mat)
+    t = g.time()
+    uv = g.texcoord()
+    a = g.tex_param("BaseTex", albedo, uv)
+    lum = g.dot(a, g.c3(0.3, 0.59, 0.11))
+    tint = g.vec("Tint", (0.42, 0.36, 0.40))
+    g.out("MP_BASE_COLOR", g.mul(a, tint))
+    g.out("MP_NORMAL", g.tex_param("NormalTex", normal, uv))
+    if rough is not None:
+        r = g.tex_param("RoughTex", rough, uv, "G")
+        g.out("MP_ROUGHNESS", g.sat(g.mul(r, g.scalar("RoughnessScale", 0.75, "Surface"))))
+    else:
+        g.out("MP_ROUGHNESS", g.scalar("Roughness", 0.55, "Surface"))
+    g.out("MP_METALLIC", g.scalar("Metallic", 0.12, "Surface"))
+    crev = g.sat(g.mul(g.sat(g.sub(g.scalar("VeinThreshold", 0.16, "Veins"), lum)), g.scalar("VeinGain", 9.0, "Veins")))
+    pulse = g.add(g.mul(g.sine(g.add(g.mul(t, g.scalar("PulseSpeed", 0.6, "Veins")), g.mul(g.mask(uv, r=True), 3.0))), 0.3), 1.0)
+    vein_e = g.mul(g.mul(g.vec("VeinColor", (1.0, 0.25, 0.04)), crev), g.mul(g.scalar("VeinIntensity", 2.5, "Veins"), pulse))
+    rim = g.mul(g.mul(g.vec("RimColor", (0.35, 0.45, 1.0)), g.fresnel(g.scalar("RimExponent", 4.0, "Rim"))),
+                g.scalar("RimIntensity", 0.5, "Rim"))
+    flash = g.mul(g.vec("FlashColor", (1.0, 0.25, 0.05)), g.scalar("HitFlash", 0.0, "Veins"))
+    burn = g.mul(g.vec("BurnColor", (1.0, 0.35, 0.05)), g.scalar("Burn", 0.0, "Veins"))
+    g.out("MP_EMISSIVE_COLOR", g.add(g.add(vein_e, rim), g.add(g.mul(flash, g.add(crev, 0.15)), g.mul(burn, g.add(crev, 0.04)))))
+    finish_material(mat)
+    return mat
+
+
+def build_dragon_teeth():
+    tex = _load("/Game/Twilight/Vishap/Dragon/european_dragon_texture_3")
+    if tex is None:
+        return None
+    mat = get_or_create_material("M_DragonTeeth")
+    setup_material(mat, two_sided=True, usages=("MATUSAGE_SKELETAL_MESH",))
+    g = G(mat)
+    a = g.tex_param("BaseTex", tex, g.texcoord())
+    g.out("MP_BASE_COLOR", g.mul(a, g.vec("Tint", (0.55, 0.45, 0.38))))
+    g.out("MP_ROUGHNESS", g.scalar("Roughness", 0.45, "Surface"))
+    finish_material(mat)
+    return mat
+
+
+def build_sky_hdri():
+    """Visible sky dome from a lat-long HDRI (TextureCube): tint + exposure + yaw."""
+    cube = _load("/Game/Twilight/Env/HDRI/belfast_sunset_puresky_2k")
+    if cube is None:
+        warn("HDRI missing - M_SkyHDRI skipped")
+        return None
+    mat = get_or_create_material("M_SkyHDRI")
+    setup_material(mat, shading="MSM_UNLIT", two_sided=True, is_sky=True)
+    g = G(mat)
+    cam = g.new(unreal.MaterialExpressionCameraVectorWS)
+    d = g.mul(cam, -1.0)
+    rot = g.new(unreal.MaterialExpressionRotateAboutAxis)
+    g.link(g.c3(0.0, 0.0, 1.0), rot, "NormalizedRotationAxis")
+    g.link(g.scalar("Yaw", 0.0, "Sky"), rot, "RotationAngle")
+    g.link(g.c3(0.0, 0.0, 0.0), rot, "PivotPoint")
+    g.link(d, rot, "Position")
+    dd = g.add(d, rot)
+    n = g.new(unreal.MaterialExpressionTextureSampleParameterCube, parameter_name="SkyCube", texture=cube, group="Sky")
+    g.link(dd, n, "UVs")
+    col = (n, "RGB")
+    z = g.mask(d, b=True)
+    band = g.power(g.one_minus(g.sat(g.absx(z))), g.scalar("HorizonPower", 6.0, "Sky"))
+    tinted = g.mul(col, g.lerp(g.vec("ZenithTint", (0.75, 0.62, 1.0)), g.vec("HorizonTint", (1.0, 0.62, 0.78)), band))
+    g.out("MP_EMISSIVE_COLOR", g.mul(tinted, g.scalar("Exposure", 1.0, "Sky")))
+    finish_material(mat)
+    return mat
+
+
+def build_rock_pbr():
+    """Volcanic rock (Poly Haven dark_rock, CC0), world-space triplanar for procedural terrain."""
+    T = "/Game/Twilight/Env/Textures/dark_rock_"
+    diff, nor, arm = _load(T + "diff_2k"), _load(T + "nor_gl_2k"), _load(T + "arm_2k")
+    if diff is None or nor is None:
+        warn("dark_rock textures missing - M_RockPBR skipped")
+        return None
+    mat = get_or_create_material("M_RockPBR")
+    setup_material(mat, usages=("MATUSAGE_INSTANCED_STATIC_MESHES",))
+    g = G(mat)
+    wp = g.world_pos("XYZ")
+    p = g.div(wp, g.scalar("Tiling", 1200.0, "Surface"))
+    nrm = g.new(unreal.MaterialExpressionVertexNormalWS)
+    w = g.power(g.absx(nrm), 4.0)
+    w = g.div(w, g.dot(w, g.c3(1.0, 1.0, 1.0)))
+    wx, wy, wz = g.mask(w, r=True), g.mask(w, g=True), g.mask(w, b=True)
+    uv_x = g.append(g.mask(p, g=True), g.mask(p, b=True))
+    uv_y = g.append(g.mask(p, r=True), g.mask(p, b=True))
+    uv_z = g.append(g.mask(p, r=True), g.mask(p, g=True))
+    dobj = g.tex_param_obj("RockDiff", diff)
+    def tri(obj, tex, out="RGB"):
+        a = g.sample(obj, tex, uv_x, out); b = g.sample(obj, tex, uv_y, out); c = g.sample(obj, tex, uv_z, out)
+        return g.add(g.add(g.mul(a, wx), g.mul(b, wy)), g.mul(c, wz))
+    base = tri(dobj, diff)
+    macro = g.sample(dobj, diff, g.mul(uv_z, 0.11))
+    base = g.mul(base, g.lerp(g.c1(0.75), g.c1(1.25), g.dot(macro, g.c3(0.33, 0.33, 0.33))))
+    up = g.sat(g.mul(g.sub(g.mask(nrm, b=True), 0.6), 3.0))
+    base = g.lerp(base, g.mul(base, g.vec("TopTint", (1.6, 1.3, 1.25))), g.mul(up, g.scalar("TopAmount", 0.4, "Surface")))
+    haze = g.scalar("HazeAmount", 0.0, "Haze")   # fake aerial perspective for far landmarks (Masis)
+    g.out("MP_BASE_COLOR", g.mul(g.mul(base, g.vec("Tint", (1.0, 0.92, 0.95))), g.one_minus(haze)))
+    g.out("MP_EMISSIVE_COLOR", g.mul(g.vec("HazeColor", (0.55, 0.42, 0.62), "Haze"), haze))
+    nobj = g.tex_param_obj("RockNormal", nor)
+    nz = g.sample(nobj, nor, uv_z)
+    g.out("MP_NORMAL", g.lerp(g.c3(0.0, 0.0, 1.0), nz, g.scalar("NormalStrength", 0.8, "Surface")))
+    if arm is not None:
+        aobj = g.tex_param_obj("RockARM", arm)
+        g.out("MP_ROUGHNESS", g.sat(g.mul(tri(aobj, arm, "G"), g.scalar("RoughnessScale", 1.0, "Surface"))))
+        g.out("MP_AMBIENT_OCCLUSION", tri(aobj, arm, "R"))
+    else:
+        g.out("MP_ROUGHNESS", g.c1(0.85))
+    finish_material(mat)
+    return mat
+
+
 # ----------------------------------------------------------------------------------------------
 def main():
     log("=== materials_build.py start (ROOT=%s) ===" % ROOT)
@@ -782,6 +930,10 @@ def main():
         ("M_Rock", lambda: build_rock(rock, noise)),
         ("M_VishapSkin", lambda: build_vishap(noise, scales_n)),
         ("M_Sky", build_sky),
+        ("M_Dragon", build_dragon),
+        ("M_DragonTeeth", build_dragon_teeth),
+        ("M_SkyHDRI", build_sky_hdri),
+        ("M_RockPBR", build_rock_pbr),
     ]
     for name, fn in steps:
         try:

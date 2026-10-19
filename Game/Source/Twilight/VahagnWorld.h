@@ -19,12 +19,14 @@ public:
 
 protected:
 	virtual void BuildLevel() override;
-	virtual FTwSkyPreset GetSkyPreset() const override { FTwSkyPreset P; P.EmberFloorZ = 60.f; return P; }
+	virtual FTwSkyPreset GetSkyPreset() const override { FTwSkyPreset P; P.EmberFloorZ = 60.f; P.AerialPerspectiveScale = 1.5f; P.ShadowDistance = 20000.f; P.FogMaxOpacity = 0.78f; P.FogFalloff = 0.22f; P.FogDensity = 0.016f; return P; }
 
 private:
 	void BuildSea();
 	void BuildIslands();
 	void BuildVishapakar(const FVector& Base, float Yaw, float Scale);
+	void BuildSkyDome();
+	void BuildMasis(UMaterialInterface* Mat);
 
 	void ApplyStorm(float K);
 	void StrikeLightning();
@@ -32,6 +34,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> Sea;
 	UPROPERTY() TObjectPtr<class UMaterialInstanceDynamic> SeaMat;
+	UPROPERTY() TObjectPtr<class UMaterialInstanceDynamic> SkyMat;
+	UPROPERTY() TObjectPtr<class ACameraActor> DebugCam;
 	UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> BoltSegs;
 	UPROPERTY() TObjectPtr<class UMaterialInstanceDynamic> BoltMat;
 	float Storm = 0.f;

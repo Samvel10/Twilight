@@ -5,6 +5,7 @@
 #include "Vishap.generated.h"
 
 class UStaticMeshComponent;
+class USkeletalMeshComponent;
 class UPointLightComponent;
 class UFXSystemComponent;
 class UMaterialInstanceDynamic;
@@ -64,6 +65,10 @@ private:
 	AVahagnCharacter* Player() const;
 	FVector MouthLocation() const;
 	FVector SampleTrail(float Distance, FVector* OutTangent) const;
+	// realistic dragon body (CC-BY skeletal mesh); the sphere segments stay as invisible hit volumes
+	void BuildDragon();
+	void UpdateDragon(float Dt);
+	bool CalibrateDragon();
 
 	UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Segments;
 	UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> HeadParts;
@@ -111,6 +116,20 @@ private:
 	FVector DashDir = FVector::ForwardVector;
 	bool bDashHit = false;
 	int32 SpitsLeft = 0;
+
+	// dragon visual
+	UPROPERTY() TObjectPtr<USkeletalMeshComponent> Dragon;
+	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> DragonMat;
+	bool bDragon = false;
+	bool bDragonCalibrated = false;
+	bool bDragonAnimFrame = false;
+	FVector DragonHeadCS = FVector::ZeroVector; // head bone, component space (unscaled)
+	FQuat DragonMeshFrame = FQuat::Identity;   // mesh forward/up -> X/Z
+	float DragonScale = 1.f;
+	FVector DragonFwd = FVector::ForwardVector;
+	float DragonBank = 0.f;
+	FVector DragonFallVel = FVector::ZeroVector;
+	UPROPERTY() TObjectPtr<UFXSystemComponent> DragonFire;
 
 	// dying
 	TArray<FVector> DebrisVel;
