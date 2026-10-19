@@ -107,26 +107,53 @@ void AVahagnCharacter::BeginPlay()
 
 	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 
-	if (USkeletalMesh* Manny = TwAssets::Manny())
+	// realistic body: CC-BY "Rigged for UE4 - Spartan" (Andy Woodhead), Manny clips retargeted (Tools/hero/build_hero.sh)
+	USkeletalMesh* HeroMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/Twilight/Hero/Mesh/spartan_vahagn/SkeletalMeshes/spartan_vahagn.spartan_vahagn"));
+	bRealHero = HeroMesh != nullptr;
+	if (bRealHero)
+	{
+		GetMesh()->SetSkeletalMesh(HeroMesh);
+		GetMesh()->SetRelativeScale3D(FVector(0.86f)); // the Spartan is ~1.16x Manny
+	}
+	else if (USkeletalMesh* Manny = TwAssets::Manny())
 	{
 		GetMesh()->SetSkeletalMesh(Manny);
 	}
+	auto HeroAnim = [this](const TCHAR* Name, const TCHAR* MannyPath) -> UAnimSequence*
+	{
+		if (bRealHero)
+			if (UAnimSequence* A = TwAssets::Anim(*FString::Printf(TEXT("/Game/Twilight/Hero/Anims/%s.%s"), Name, Name))) return A;
+		return TwAssets::Anim(MannyPath);
+	};
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetAnimInstanceClass(UTwPoseAnimInstance::StaticClass());
 	Poser = Cast<UTwPoseAnimInstance>(GetMesh()->GetAnimInstance());
 
-	AnimHover = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Unarmed/MM_Idle.MM_Idle"));
-	AnimFly = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Jump/MM_Fall_Loop.MM_Fall_Loop"));
-	AnimCastA = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_Attack_01.MM_Attack_01"));
-	AnimCastB = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_Attack_02.MM_Attack_02"));
-	AnimNova = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_ChargedAttack.MM_ChargedAttack"));
-	AnimHit = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Front_Lgt_01.MM_HitReact_Front_Lgt_01"));
-	AnimDeath = TwAssets::Anim(TEXT("/Game/Characters/Mannequins/Anims/Death/MM_Death_Front_01.MM_Death_Front_01"));
+	AnimHover = HeroAnim(TEXT("MM_Idle"), TEXT("/Game/Characters/Mannequins/Anims/Unarmed/MM_Idle.MM_Idle"));
+	AnimFly = HeroAnim(TEXT("MM_Fall_Loop"), TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Jump/MM_Fall_Loop.MM_Fall_Loop"));
+	AnimCastA = HeroAnim(TEXT("MM_Attack_01"), TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_Attack_01.MM_Attack_01"));
+	AnimCastB = HeroAnim(TEXT("MM_Attack_02"), TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_Attack_02.MM_Attack_02"));
+	AnimNova = HeroAnim(TEXT("MM_ChargedAttack"), TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_ChargedAttack.MM_ChargedAttack"));
+	AnimHit = HeroAnim(TEXT("MM_HitReact_Front_Lgt_01"), TEXT("/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Front_Lgt_01.MM_HitReact_Front_Lgt_01"));
+	AnimDeath = HeroAnim(TEXT("MM_Death_Front_01"), TEXT("/Game/Characters/Mannequins/Anims/Death/MM_Death_Front_01.MM_Death_Front_01"));
 	if (Poser) { Poser->SetLoop(AnimFly, 0.01f, 0.35f); Poser->SetOneShotMask(TEXT("spine_01")); } // casts move the arms, the legs keep flying
 
 	// Molten fire body
 	// molten bronze god (lit, mannequin normal maps, lava veins); falls back to the old unlit fire body
-	UMaterialInterface* HeroBase = TwAssets::Material(TEXT("M_Hero"));
+	UMaterialInterface* HeroBase = bRealHero ? nullptr : TwAssets::Material(TEXT("M_Hero"));
+	if (bRealHero)
+	{
+		// keep each slot's own look (skin, leather, bronze, cape, helmet); MIDs so hit flash / crest glow can be driven
+		for (int32 i = 0; i < GetMesh()->GetNumMaterials(); ++i)
+		{
+			UMaterialInstanceDynamic* M = GetMesh()->CreateDynamicMaterialInstance(i);
+			if (M) { M->SetScalarParameterValue(TEXT("EmissiveIntensity"), 0.f); M->SetVectorParameterValue(TEXT("FlashColor"), FLinearColor(1.f, 0.22f, 0.04f)); }
+			if (i == 0) BodyMat = M;
+			if (i == 5) BodyMat2 = M;
+		}
+	}
+	else
+	{
 	BodyMat = UMaterialInstanceDynamic::Create(HeroBase ? HeroBase : TwAssets::Material(TEXT("M_FireBody")), this);
 	if (BodyMat)
 	{
@@ -151,15 +178,19 @@ void AVahagnCharacter::BeginPlay()
 				BodyMat2 = M2;
 			}
 	}
+	}
 
 	// Flames on hands, head and chest; embers trailing from the pelvis
 	Auras.Add(TwFx::AttachFlame(GetMesh(), SockHandR, FVector::ZeroVector, 0.35f));
 	Auras.Add(TwFx::AttachFlame(GetMesh(), SockHandL, FVector::ZeroVector, 0.35f));
-	Auras.Add(TwFx::AttachFlame(GetMesh(), TEXT("head"), FVector(0, 8, 0), 0.55f));
-	Auras.Add(TwFx::AttachFlame(GetMesh(), TEXT("spine_03"), FVector::ZeroVector, 0.45f));
+	if (!bRealHero)
+	{
+		Auras.Add(TwFx::AttachFlame(GetMesh(), TEXT("head"), FVector(0, 8, 0), 0.55f));
+		Auras.Add(TwFx::AttachFlame(GetMesh(), TEXT("spine_03"), FVector::ZeroVector, 0.45f));
+		Auras.Add(TwFx::AttachFlame(GetMesh(), TEXT("foot_l"), FVector::ZeroVector, 0.3f));
+		Auras.Add(TwFx::AttachFlame(GetMesh(), TEXT("foot_r"), FVector::ZeroVector, 0.3f));
+	}
 	Auras.Add(TwFx::AttachSparks(GetMesh(), TEXT("pelvis"), FVector::ZeroVector, 0.6f));
-	Auras.Add(TwFx::AttachFlame(GetMesh(), TEXT("foot_l"), FVector::ZeroVector, 0.3f));
-	Auras.Add(TwFx::AttachFlame(GetMesh(), TEXT("foot_r"), FVector::ZeroVector, 0.3f));
 	Auras.RemoveAll([](const TObjectPtr<UFXSystemComponent>& C) { return C == nullptr; });
 
 	if (USoundBase* S = TwAssets::Sound(TEXT("sfx_flame_aura_loop"))) { FlameLoop->SetSound(S); FlameLoop->SetVolumeMultiplier(0.35f); FlameLoop->Play(); }
@@ -482,9 +513,17 @@ void AVahagnCharacter::UpdateVisuals(float Dt)
 	Glow->SetIntensity((7000.f + Charge * 14000.f) * Flicker * (bDead ? 0.2f : 1.f));
 	if (BodyMat)
 	{
-		const float EBase = TwAssets::Material(TEXT("M_Hero")) ? 1.2f : 2.6f;
-		BodyMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), EBase * (1.f + Charge * 2.f + 2.5f * DamageFlash) * Flicker);
-		if (BodyMat2) BodyMat2->SetScalarParameterValue(TEXT("EmissiveIntensity"), EBase * (1.f + Charge * 2.f + 2.5f * DamageFlash) * Flicker);
+		if (bRealHero)
+		{
+			// the god's fire lives in the crest of his helmet: it flares with the charge
+			if (BodyMat2) BodyMat2->SetScalarParameterValue(TEXT("CrestGlow"), 1.5f * (1.f + Charge * 2.f) * Flicker);
+		}
+		else
+		{
+			const float EBase = TwAssets::Material(TEXT("M_Hero")) ? 1.2f : 2.6f;
+			BodyMat->SetScalarParameterValue(TEXT("EmissiveIntensity"), EBase * (1.f + Charge * 2.f + 2.5f * DamageFlash) * Flicker);
+			if (BodyMat2) BodyMat2->SetScalarParameterValue(TEXT("EmissiveIntensity"), EBase * (1.f + Charge * 2.f + 2.5f * DamageFlash) * Flicker);
+		}
 		BodyMat->SetScalarParameterValue(TEXT("HitFlash"), DamageFlash * DamageFlash * 0.04f);
 	}
 	if (WindLoop) WindLoop->SetVolumeMultiplier(FMath::Clamp(Speed / 5600.f, 0.f, 1.f) * 0.6f);

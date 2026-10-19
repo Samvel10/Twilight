@@ -86,6 +86,7 @@ private:
 	UPROPERTY() TObjectPtr<UTwPoseAnimInstance> Poser;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> BodyMat;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> BodyMat2;
+	bool bRealHero = false;
 	UPROPERTY(VisibleAnywhere) TObjectPtr<UInstancedStaticMeshComponent> FireTrail;
 	TArray<float> TrailBirth;
 	int32 TrailNext = 0;
