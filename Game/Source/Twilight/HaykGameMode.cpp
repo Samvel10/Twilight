@@ -155,11 +155,25 @@ void AHaykGameMode::StartDuel(bool bInVsBot)
 	StreakHayk = StreakBel = 0;
 	BotMisses = 0;
 	bBelTurn = true; // BeginTurn flips to Hayk first
+	// vs Bel the bot: the battle of the legend. Bel stands behind his shield-bearers; break them, then one arrow decides
+	for (AHaykArcher* G : Guards) if (G) G->Destroy();
+	Guards.Reset();
+	GuardShooter = nullptr;
+	bDecisive = false; bFleeing = false;
+	bBattle = bVsBot;
+	if (bBattle)
+	{
+		SpawnGuards();
+		if (Hayk) Hayk->SetHealth(Difficulty == 0 ? 200.f : (Difficulty == 2 ? 130.f : 160.f));
+		if (Bel) { Bel->SetHealth(30.f); Bel->SetShielded(true); } // any hit of the three-winged arrow is fatal
+		SpecialsHayk = 0;
+	}
 	State = EHaykState::Intro;
 	StateTime = 0.f;
 	if (World) World->PlayMusic(TEXT("music_hayk"));
 	TwFx::Sound2D(GetWorld(), TEXT("sfx_war_drums_loop"), 0.5f);
-	Announce(bNight ? LOCTEXT("IntroN", "Մասիսի ստորոտ") : LOCTEXT("Intro", "Հայոց ձոր"), LOCTEXT("IntroSub", "Հայկը կանգնեց Բելի դեմ։ Մեկ նետ կարող է որոշել ազգի ճակատագիրը։"));
+	if (bBattle) Announce(bNight ? LOCTEXT("IntroN", "Մասիսի ստորոտ") : LOCTEXT("Intro", "Հայոց ձոր"), LOCTEXT("IntroSubB", "Բելը կանգնած է բլրի վրա՝ վահանակիրների հետևում։ Ճեղքի՛ր նրա պահակների շարքը։"));
+	else Announce(bNight ? LOCTEXT("IntroN", "Մասիսի ստորոտ") : LOCTEXT("Intro", "Հայոց ձոր"), LOCTEXT("IntroSub", "Հայկը կանգնեց Բելի դեմ։ Մեկ նետ կարող է որոշել ազգի ճակատագիրը։"));
 	if (AHaykPlayerController* PC = Cast<AHaykPlayerController>(UGameplayStatics::GetPlayerController(this, 0))) PC->OnDuelStarted();
 }
 
@@ -183,15 +197,73 @@ void AHaykGameMode::ToggleNight()
 
 float AHaykGameMode::BaseYawFor(AHaykArcher* A) const
 {
-	AHaykArcher* O = A == Hayk ? Bel : Hayk;
+	AHaykArcher* O = A == Hayk ? Bel.Get() : Hayk.Get();
 	if (!A || !O) return 0.f;
 	return (O->GetActorLocation() - A->GetActorLocation()).Rotation().Yaw;
+}
+
+void AHaykGameMode::SpawnGuards()
+{
+	if (!Bel || !Hayk) return;
+	const int32 N = Difficulty == 0 ? 4 : (Difficulty == 2 ? 6 : 5);
+	const FVector B = Bel->GetActorLocation();
+	const FVector ToHayk = (Hayk->GetActorLocation() - B).GetSafeNormal2D();
+	const FVector Side = FVector::CrossProduct(FVector::UpVector, ToHayk);
+	for (int32 i = 0; i < N; ++i)
+	{
+		// a shallow arc of archers on the slope in front of the king
+		const float T = N > 1 ? (i / float(N - 1)) * 2.f - 1.f : 0.f;
+		FVector P = B + ToHayk * (650.f + 120.f * FMath::Abs(T)) + Side * (T * 1100.f);
+		P.Z = AHaykWorld::TerrainZ(P.X, P.Y) + 2.f;
+		FActorSpawnParameters S;
+		S.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		S.bDeferConstruction = true;
+		const FRotator R(0.f, ToHayk.Rotation().Yaw, 0.f);
+		if (AHaykArcher* G = GetWorld()->SpawnActor<AHaykArcher>(P, R, S))
+		{
+			G->Setup(false, 1.f, true);
+			UGameplayStatics::FinishSpawningActor(G, FTransform(R, P));
+			G->SetAim(R.Yaw, 5.f);
+			Guards.Add(G);
+		}
+	}
+}
+
+int32 AHaykGameMode::AliveGuards() const
+{
+	int32 N = 0;
+	for (const AHaykArcher* G : Guards) if (G && !G->IsDead()) ++N;
+	return N;
+}
+
+AHaykArcher* AHaykGameMode::NearestGuard(const FVector& P) const
+{
+	AHaykArcher* Best = nullptr; float BestD = TNumericLimits<float>::Max();
+	for (AHaykArcher* G : Guards) if (G && !G->IsDead()) { const float D = FVector::DistSquared(G->GetChestTarget(), P); if (D < BestD) { BestD = D; Best = G; } }
+	return Best;
+}
+
+void AHaykGameMode::BeginDecisive()
+{
+	bDecisive = true;
+	if (Bel) Bel->SetShielded(false);
+	SpecialsHayk = FMath::Max(SpecialsHayk, 1);
+	TwFx::Sound2D(GetWorld(), TEXT("sfx_crowd_cheer"), 0.8f, 0.8f);
+	TwFx::Sound2D(GetWorld(), TEXT("sfx_war_drums_loop"), 0.6f, 0.9f);
+	Announce(LOCTEXT("Decisive", "Շարքը ճեղքվեց"), LOCTEXT("DecisiveSub", "Բելը բաց է։ Լարի՛ր աղեղը և արձակի՛ր եռաթև նետը։"));
 }
 
 void AHaykGameMode::BeginTurn()
 {
 	bBelTurn = !bBelTurn;
 	++Turn;
+	GuardShooter = nullptr;
+	if (bBattle && bBelTurn && !bDecisive)
+	{
+		TArray<AHaykArcher*> Alive;
+		for (AHaykArcher* G : Guards) if (G && !G->IsDead()) Alive.Add(G);
+		if (Alive.Num() > 0) GuardShooter = Alive[FMath::RandRange(0, Alive.Num() - 1)];
+	}
 	bCamCut = true;
 	State = EHaykState::Aim;
 	StateTime = 0.f;
@@ -205,13 +277,14 @@ void AHaykGameMode::BeginTurn()
 	const float Strength = FMath::FRandRange(0.f, Difficulty == 0 ? 3.f : 6.f);
 	const float Dir = FMath::FRandRange(0.f, 360.f);
 	Wind = FVector(FMath::Cos(FMath::DegreesToRadians(Dir)) * 0.5f, FMath::Sin(FMath::DegreesToRadians(Dir)), 0.f).GetSafeNormal() * Strength;
+	if (bDecisive && !bBelTurn && SpecialsHayk > 0) bSpecialArmed = true;
 	AHaykArcher* S = Shooter();
 	if (S) S->SetAim(BaseYawFor(S), 12.f);
 	if (Bel && Hayk)
 	{
 		if (!bBelTurn) Bel->SetAim(BaseYawFor(Bel), 5.f); else Hayk->SetAim(BaseYawFor(Hayk), 5.f);
 	}
-	const FText Who = bBelTurn ? (bVsBot ? LOCTEXT("BelTurn", "Բելի հերթն է") : LOCTEXT("P2Turn", "Խաղացող 2 · Բել")) : (bVsBot ? LOCTEXT("YourTurn", "Քո հերթն է") : LOCTEXT("P1Turn", "Խաղացող 1 · Հայկ"));
+	const FText Who = (bBelTurn && GuardShooter.IsValid()) ? LOCTEXT("GuardTurn", "Բելի նետաձիգներն են կրակում") : bBelTurn ? (bVsBot ? LOCTEXT("BelTurn", "Բելի հերթն է") : LOCTEXT("P2Turn", "Խաղացող 2 · Բել")) : (bVsBot ? LOCTEXT("YourTurn", "Քո հերթն է") : LOCTEXT("P1Turn", "Խաղացող 1 · Հայկ"));
 	Announce(Who, FText::GetEmpty());
 }
 
@@ -297,6 +370,12 @@ void AHaykGameMode::Shoot(float InPower)
 void AHaykGameMode::FinishImpact()
 {
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
+	if (bBattle && !bDecisive && AliveGuards() <= 1 && Bel && !Bel->IsDead()) BeginDecisive();
+	if (bBattle && Bel && Bel->IsDead() && !bFleeing)
+	{
+		bFleeing = true; // the leaderless army breaks and runs
+		for (AHaykArcher* G : Guards) if (G && !G->IsDead()) G->SetAim(G->GetAimYaw() + 180.f, 0.f);
+	}
 	if ((Hayk && Hayk->IsDead()) || (Bel && Bel->IsDead()))
 	{
 		bHaykWon = Bel && Bel->IsDead();
@@ -320,8 +399,10 @@ void AHaykGameMode::SolveBot()
 	AHaykArcher* T = Target();
 	if (!S || !T) return;
 	const FVector Start = S->GetArrowSpawn();
+	const float BaseOverride = 0.f; (void)BaseOverride;
+	if (bBattle && !bDecisive && S == Hayk) if (AHaykArcher* G = NearestGuard(Bel ? Bel->GetActorLocation() : S->GetActorLocation())) T = G;
 	const FVector Aim = FMath::FRand() < 0.18f + 0.1f * Difficulty ? T->GetHeadTarget() : T->GetChestTarget();
-	const float Base = BaseYawFor(S);
+	const float Base = (Aim - Start).Rotation().Yaw; // straight at the chosen target (guards stand off-axis)
 	float BestMiss = TNumericLimits<float>::Max();
 	const float Powers[3] = { 0.82f, 0.92f, 1.f };
 	for (float Pw : Powers)
@@ -403,6 +484,17 @@ void AHaykGameMode::Tick(float Dt)
 		if (State == EHaykState::End && StateTime > 6.f) StartDuel(true);
 	}
 
+	if (bFleeing)
+	{
+		// Bel's army runs from the field
+		for (AHaykArcher* G : Guards)
+		{
+			if (!G || G->IsDead()) continue;
+			FVector P = G->GetActorLocation() + FRotator(0.f, G->GetAimYaw(), 0.f).Vector() * 520.f * Dt;
+			P.Z = AHaykWorld::TerrainZ(P.X, P.Y) + 2.f;
+			G->SetActorLocation(P);
+		}
+	}
 	switch (State)
 	{
 	case EHaykState::Intro:
@@ -467,7 +559,18 @@ void AHaykGameMode::Tick(float Dt)
 			StateTime = 0.f;
 			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), A->GetResult() == EArrowResult::HitArcher ? 0.35f : 1.f);
 			const bool bByBel = bBelTurn;
-			if (A->GetResult() == EArrowResult::HitArcher && A->GetHitArcher() == Target())
+			if (bBattle && !bByBel && A->GetResult() == EArrowResult::HitArcher && A->GetHitArcher() && A->GetHitArcher()->IsSoldier())
+			{
+				++HitsHayk;
+				TwFx::Sound2D(GetWorld(), TEXT("sfx_crowd_cheer"), 0.45f, 1.1f);
+				const int32 Left = AliveGuards();
+				Announce(LOCTEXT("GuardDown", "Պահակն ընկավ"), Left > 1 ? FText::Format(LOCTEXT("GuardsLeft", "Բելի շուրջ մնաց {0} նետաձիգ"), FText::AsNumber(Left)) : LOCTEXT("GuardsBroken", "Շարքը ճեղքվում է…"));
+			}
+			else if (bBattle && !bByBel && A->GetResult() == EArrowResult::HitArcher && A->GetHitArcher() == Bel && Bel->IsShielded())
+			{
+				Announce(LOCTEXT("ShieldWall", "Վահանների պատ"), LOCTEXT("ShieldWallSub", "Վահանակիրները պաշտպանում են Բելին։ Նախ խոցի՛ր պահակներին։"));
+			}
+			else if (A->GetResult() == EArrowResult::HitArcher && A->GetHitArcher() == Target())
 			{
 				int32& Hits = bByBel ? HitsBel : HitsHayk;
 				int32& Heads = bByBel ? HeadsBel : HeadsHayk;
@@ -489,12 +592,14 @@ void AHaykGameMode::Tick(float Dt)
 			{
 				(bByBel ? StreakBel : StreakHayk) = 0;
 				if (bByBel) ++BotMisses;
-				const float MissBy = Target() ? FVector::Dist(A->GetImpactPoint(), Target()->GetChestTarget()) / 100.f : 0.f;
+				AHaykArcher* MissRef = (bBattle && !bByBel && !bDecisive) ? NearestGuard(A->GetImpactPoint()) : Target();
+				if (!MissRef) MissRef = Target();
+				const float MissBy = MissRef ? FVector::Dist(A->GetImpactPoint(), MissRef->GetChestTarget()) / 100.f : 0.f;
 				// say which way it missed, so the next shot can be corrected: long, short or to the side
 				FText How = LOCTEXT("MissBy", "{0} մ կողքով");
-				if (Target() && Shooter())
+				if (MissRef && Shooter())
 				{
-					const FVector Tc = Target()->GetChestTarget();
+					const FVector Tc = MissRef->GetChestTarget();
 					const FVector Sd = (Tc - Shooter()->GetActorLocation()).GetSafeNormal2D();
 					const FVector Off = A->GetImpactPoint() - Tc;
 					const float Along = FVector::DotProduct(Off, Sd);

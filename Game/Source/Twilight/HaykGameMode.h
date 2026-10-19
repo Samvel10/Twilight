@@ -59,6 +59,10 @@ public:
 	void SteerArrow(const FVector2D& In);
 
 	// --- HUD queries
+	bool IsBattle() const { return bBattle; }
+	bool IsDecisive() const { return bDecisive; }
+	int32 GetGuardsAlive() const { return AliveGuards(); }
+	int32 GetGuardsTotal() const { return Guards.Num(); }
 	EHaykState GetState() const { return State; }
 	AHaykArcher* GetHayk() const { return Hayk; }
 	AHaykArcher* GetBel() const { return Bel; }
@@ -86,8 +90,13 @@ private:
 	void ThinkBot(float Dt);
 	void SolveBot();
 	void Announce(const FText& T, const FText& S);
-	AHaykArcher* Shooter() const { return bBelTurn ? Bel : Hayk; }
-	AHaykArcher* Target() const { return bBelTurn ? Hayk : Bel; }
+	AHaykArcher* Shooter() const { return bBelTurn ? (GuardShooter.IsValid() ? GuardShooter.Get() : Bel.Get()) : Hayk.Get(); }
+	AHaykArcher* Target() const { return bBelTurn ? Hayk.Get() : Bel.Get(); }
+	// --- the battle of the myth (vs bot): Bel's bodyguards first, then one decisive arrow
+	void SpawnGuards();
+	int32 AliveGuards() const;
+	AHaykArcher* NearestGuard(const FVector& P) const;
+	void BeginDecisive();
 	float BaseYawFor(AHaykArcher* A) const;
 
 	UPROPERTY() TObjectPtr<AHaykWorld> World;
@@ -96,6 +105,9 @@ private:
 	UPROPERTY() TObjectPtr<ACameraActor> Cam;
 	UPROPERTY() TObjectPtr<AHaykPreview> Preview;
 	TWeakObjectPtr<AHaykArrow> Arrow;
+	UPROPERTY() TArray<TObjectPtr<AHaykArcher>> Guards;
+	TWeakObjectPtr<AHaykArcher> GuardShooter;
+	bool bBattle = false, bDecisive = false, bFleeing = false;
 
 	EHaykState State = EHaykState::Menu;
 	bool bVsBot = true;

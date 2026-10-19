@@ -25,7 +25,12 @@ class TWILIGHT_API AHaykArcher : public AActor
 public:
 	AHaykArcher();
 
-	void Setup(bool bInBel, float InMaxHealth);
+	void Setup(bool bInBel, float InMaxHealth, bool bInSoldier = false);
+	/** Bel's shield-bearers: while true, arrows on him are blocked by the shield wall. */
+	void SetShielded(bool b) { bShielded = b; }
+	bool IsShielded() const { return bShielded; }
+	bool IsSoldier() const { return bSoldier; }
+	void SetHealth(float H) { MaxHealth = Health = H; }
 	virtual void Tick(float Dt) override;
 
 	/** Aim the body (yaw) and bow (pitch) in degrees, world yaw. */
@@ -89,6 +94,8 @@ private:
 	UPROPERTY() TObjectPtr<UAnimSequence> AnimCheer;
 
 	bool bBel = false;
+	bool bSoldier = false;
+	bool bShielded = false;
 	float Health = 100.f, MaxHealth = 100.f;
 	float AimYaw = 0.f, AimPitch = 0.f;
 	float Draw = 0.f;

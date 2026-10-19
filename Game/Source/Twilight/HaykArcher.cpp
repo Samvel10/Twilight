@@ -71,11 +71,12 @@ AHaykArcher::AHaykArcher()
 	Rim->SetCastShadows(false);
 }
 
-void AHaykArcher::Setup(bool bInBel, float InMaxHealth)
+void AHaykArcher::Setup(bool bInBel, float InMaxHealth, bool bInSoldier)
 {
 	bBel = bInBel;
+	bSoldier = bInSoldier;
 	MaxHealth = Health = InMaxHealth;
-	Scale = bBel ? 1.9f : 1.f;
+	Scale = bBel ? 1.9f : (bSoldier ? 1.05f : 1.f);
 }
 
 void AHaykArcher::BeginPlay()
@@ -102,8 +103,8 @@ void AHaykArcher::BeginPlay()
 	BodyMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_VishapSkin")), this);
 	if (BodyMat)
 	{
-		BodyMat->SetVectorParameterValue(TEXT("SkinColor"), bBel ? FLinearColor(0.025f, 0.02f, 0.02f) : FLinearColor(0.32f, 0.17f, 0.07f));
-		BodyMat->SetVectorParameterValue(TEXT("VeinColor"), bBel ? FLinearColor(1.f, 0.08f, 0.02f) : FLinearColor(1.f, 0.7f, 0.25f));
+		BodyMat->SetVectorParameterValue(TEXT("SkinColor"), (bBel || bSoldier) ? FLinearColor(0.025f, 0.02f, 0.02f) : FLinearColor(0.32f, 0.17f, 0.07f));
+		BodyMat->SetVectorParameterValue(TEXT("VeinColor"), (bBel || bSoldier) ? FLinearColor(1.f, 0.08f, 0.02f) : FLinearColor(1.f, 0.7f, 0.25f));
 		BodyMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBel ? 4.f : 1.2f); BodyMat->SetScalarParameterValue(TEXT("RimIntensity"), 0.35f); BodyMat->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(1.f, 0.55f, 0.25f));
 		BodyMat->SetScalarParameterValue(TEXT("Metallic"), 0.6f);
 		BodyMat->SetVectorParameterValue(TEXT("FlashColor"), FLinearColor(1.f, 0.22f, 0.04f)); // a red-hot hit, not a cream wash
@@ -370,6 +371,13 @@ EArcherZone AHaykArcher::ZoneOf(const UPrimitiveComponent* C) const
 float AHaykArcher::ApplyHit(EArcherZone Zone, bool bSpecial, const FVector& Where)
 {
 	if (IsDead() || Zone == EArcherZone::None) return 0.f;
+	if (bShielded)
+	{
+		// the shield wall of his bodyguards takes the arrow
+		TwFx::Burst(GetWorld(), TwFx::EFx::Sparks, Where, 0.8f);
+		TwFx::Sound(GetWorld(), TEXT("sfx_arrow_hit_wood"), Where, 1.f, 0.8f);
+		return 0.f;
+	}
 	float D = Zone == EArcherZone::Head ? 40.f : (Zone == EArcherZone::Torso ? 22.f : 12.f);
 	if (bSpecial) D *= 1.8f;
 	Health = FMath::Max(0.f, Health - D);
