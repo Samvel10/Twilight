@@ -1,4 +1,10 @@
 #include "VahagnCharacter.h"
+#include "Misc/Parse.h"
+#include "Misc/CommandLine.h"
+#include "Rendering/SkeletalMeshRenderData.h"
+#include "Engine/SkeletalMesh.h"
+#include "Engine/StaticMesh.h"
+#include "Components/StaticMeshComponent.h"
 #include "Engine/Texture.h"
 #include "Twilight.h"
 #include "TwAssets.h"
@@ -142,7 +148,55 @@ void AVahagnCharacter::BeginPlay()
 	// Molten fire body
 	// molten bronze god (lit, mannequin normal maps, lava veins); falls back to the old unlit fire body
 	UMaterialInterface* HeroBase = bRealHero ? nullptr : TwAssets::Material(TEXT("M_Hero"));
-	if (bRealHero)
+	if (bRealHero && !FParse::Param(FCommandLine::Get(), TEXT("TwHelmet")))
+	{
+		// the myth's Vahagn: "hair of fire, a beard of flame, eyes like suns" (fire skin + flame tongues, helmet off)
+		if (UMaterialInterface* FireSkin = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Twilight/FireHair/Materials/MI_FH_VahagnBodyFire.MI_FH_VahagnBodyFire")))
+			GetMesh()->SetMaterial(0, FireSkin);
+		for (int32 i = 0; i < GetMesh()->GetNumMaterials(); ++i)
+		{
+			UMaterialInstanceDynamic* M = GetMesh()->CreateDynamicMaterialInstance(i);
+			if (M) { M->SetScalarParameterValue(TEXT("EmissiveIntensity"), 0.f); M->SetVectorParameterValue(TEXT("FlashColor"), FLinearColor(1.f, 0.22f, 0.04f)); }
+			if (i == 0) BodyMat = M;
+		}
+		BodyMat2 = nullptr;
+		if (BodyMat) { BodyMat->SetVectorParameterValue(TEXT("EyeColor"), FLinearColor(1.f, 0.6f, 0.18f)); BodyMat->SetScalarParameterValue(TEXT("EyeIntensity"), 30.f); }
+		// helmet off: hide the sections of material slot 5 at every LOD
+		if (const FSkeletalMeshRenderData* RD = GetMesh()->GetSkeletalMeshRenderData())
+			for (int32 Lod = 0; Lod < RD->LODRenderData.Num(); ++Lod)
+				for (int32 S = 0; S < RD->LODRenderData[Lod].RenderSections.Num(); ++S)
+					if (RD->LODRenderData[Lod].RenderSections[S].MaterialIndex == 5)
+						GetMesh()->ShowMaterialSection(5, S, false, Lod);
+		// flame mesh authored in hero component space: undo the head bone's reference pose
+		if (UStaticMesh* HairMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Twilight/FireHair/Meshes/SM_VahagnFireHair.SM_VahagnFireHair")))
+		{
+			FireHair = NewObject<UStaticMeshComponent>(this, TEXT("FireHair"));
+			FireHair->SetStaticMesh(HairMesh);
+			FireHair->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			FireHair->SetCastShadow(false);
+			FireHair->SetupAttachment(GetMesh(), TEXT("head"));
+			const FReferenceSkeleton& Ref = GetMesh()->GetSkeletalMeshAsset()->GetRefSkeleton();
+			FTransform HeadCS = FTransform::Identity;
+			for (int32 B = Ref.FindBoneIndex(TEXT("head")); B != INDEX_NONE; B = Ref.GetParentIndex(B))
+				HeadCS = HeadCS * Ref.GetRefBonePose()[B];
+			FireHair->SetRelativeTransform(HeadCS.Inverse());
+			FireHair->RegisterComponent();
+			FireHairMat = FireHair->CreateDynamicMaterialInstance(0);
+			FireHairLight = NewObject<UPointLightComponent>(this, TEXT("FireHairLight"));
+			FireHairLight->SetupAttachment(FireHair);
+			FireHairLight->SetRelativeLocation(FVector(0.f, 24.f, 214.f));
+			FireHairLight->SetIntensityUnits(ELightUnits::Unitless);
+			FireHairLight->SetIntensity(700.f);
+			FireHairLight->SetLightColor(FLinearColor(1.f, 0.45f, 0.15f));
+			FireHairLight->SetAttenuationRadius(130.f);
+			FireHairLight->SetSourceRadius(12.f);
+			FireHairLight->SetCastShadows(false);
+			FireHairLight->SetAffectTranslucentLighting(false);
+			FireHairLight->RegisterComponent();
+		}
+		Glow->SetRelativeLocation(FVector(0.f, 0.f, 95.f)); // the fire lives in the head now
+	}
+	else if (bRealHero)
 	{
 		// keep each slot's own look (skin, leather, bronze, cape, helmet); MIDs so hit flash / crest glow can be driven
 		for (int32 i = 0; i < GetMesh()->GetNumMaterials(); ++i)
@@ -572,7 +626,17 @@ void AVahagnCharacter::UpdateVisuals(float Dt)
 	// fire glow
 	const float T = GetWorld()->GetTimeSeconds();
 	const float Flicker = 0.85f + 0.15f * FMath::Sin(T * 23.f) * FMath::Sin(T * 7.3f);
-	Glow->SetIntensity((7000.f + Charge * 14000.f) * Flicker * (bDead ? 0.2f : 1.f));
+	Glow->SetIntensity(((FireHair ? 2200.f : 7000.f) + Charge * 14000.f) * Flicker * (bDead ? 0.2f : 1.f));
+	if (FireHairMat)
+	{
+		// the flames stream up and back with speed and leap with the charge
+		const float K = FMath::Clamp(Speed / 2700.f, 0.f, 1.3f);
+		const FVector WantWind = -V.GetSafeNormal() * 25.f * K + FVector(0.f, 0.f, 60.f * K + 25.f * Charge);
+		FireWind = FMath::VInterpTo(FireWind, WantWind, Dt, 3.f);
+		FireHairMat->SetVectorParameterValue(TEXT("Wind"), FLinearColor(FireWind.X, FireWind.Y, FireWind.Z, 0.f));
+		FireHairMat->SetScalarParameterValue(TEXT("Intensity"), 12.f * (1.f + 0.6f * Charge) * (bDead ? 0.25f : 1.f));
+	}
+	if (FireHairLight) FireHairLight->SetIntensity(700.f * (1.f + Charge) * Flicker * (bDead ? 0.2f : 1.f));
 	if (BodyMat)
 	{
 		if (bRealHero)

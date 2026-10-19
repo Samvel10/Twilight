@@ -13,6 +13,8 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "TwFlash.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 
 namespace TwFx
 {
@@ -59,12 +61,25 @@ namespace TwFx
 		if (UParticleSystem* P = Cascade ? TwAssets::Cascade(Cascade) : nullptr)
 		{
 			UParticleSystemComponent* C = UGameplayStatics::SpawnEmitterAtLocation(World, P, Loc, Rot, FVector(Scale), true, EPSCPoolMethod::AutoRelease);
+			if (Type == EFx::FireballImpact || Type == EFx::BigExplosion || Type == EFx::VishapDeath || Type == EFx::Nova)
+			{
+				// the fireball itself: a soft additive bloom of flame (no dark tail)
+				FActorSpawnParameters FP;
+				FP.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				if (ATwFlash* F = World->SpawnActor<ATwFlash>(Loc, FRotator::ZeroRotator, FP))
+					F->Init(FLinearColor(1.f, 0.42f, 0.1f), 3.6f * Scale, Type == EFx::FireballImpact ? 0.45f : 0.8f);
+			}
 			// fire explosions without the black smoke that clutters the sunset sky
 			if (C && Type != EFx::Smoke && Type != EFx::Splash)
 			{
 				for (UParticleEmitter* E : P->Emitters)
 				{
-					if (E && E->EmitterName.ToString().Contains(TEXT("smoke"), ESearchCase::IgnoreCase)) C->SetEmitterEnable(E->EmitterName, false);
+					if (!E) continue;
+					const FString EN = E->EmitterName.ToString();
+					static FString Off = [] { FString V; FParse::Value(FCommandLine::Get(), TEXT("TwFxOff="), V); return V; }();
+					// the FireBall sub-UV sequence ends in dark puffs that read as black debris against a bright sky
+					if (EN.Contains(TEXT("smoke"), ESearchCase::IgnoreCase) || EN.Contains(TEXT("FireBall"), ESearchCase::IgnoreCase)
+						|| (!Off.IsEmpty() && EN.Contains(Off, ESearchCase::IgnoreCase))) C->SetEmitterEnable(E->EmitterName, false);
 				}
 			}
 		}

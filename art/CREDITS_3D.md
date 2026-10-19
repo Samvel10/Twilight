@@ -19,3 +19,4 @@
 | "Simple grass chunks" | 3dhdscan (Daniel Skl) | CC BY 4.0 | scanned grass tufts |
 | "Juniper" | evolveduk | CC BY 4.0 | junipers (LODs) |
 | kloppenheim_06_puresky HDRI, aerial_grass_rock, rocky_terrain_02, lichen_rock, aerial_rocks_01, snow_02, river_small_rocks, boulder/rock scans | Poly Haven | CC0 | highlands sky, terrain layers, rocks |
+| Vahagn fire hair (SM_VahagnFireHair, M_FH_*, T_FH_*) | Twilight (procedural, made for this game) | own work | "hair of fire, beard of flame, eyes like suns"; Spartan body modified: helmet removed, fire skin |

@@ -91,6 +91,11 @@ private:
 	UPROPERTY() TObjectPtr<UTwPoseAnimInstance> Poser;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> BodyMat;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> BodyMat2;
+	// "hair of fire, beard of flame, eyes like suns": flame-tongue mesh on the head bone + its light
+	UPROPERTY() TObjectPtr<class UStaticMeshComponent> FireHair;
+	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> FireHairMat;
+	UPROPERTY() TObjectPtr<UPointLightComponent> FireHairLight;
+	FVector FireWind = FVector::ZeroVector;
 	bool bRealHero = false;
 	bool bFreeLook = false, bFrontView = false, bMenuFraming = false;
 	float OrbitYaw = 0.f, OrbitPitch = 0.f; // free-look offset from the flight direction

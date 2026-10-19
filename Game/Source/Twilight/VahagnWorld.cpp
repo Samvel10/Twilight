@@ -1,5 +1,6 @@
 #include "VahagnWorld.h"
 #include "Engine/LevelStreamingDynamic.h"
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "Engine/TextureCube.h"
 #include "Engine/DirectionalLight.h"
 #include "Engine/SkyLight.h"
@@ -82,7 +83,23 @@ void AVahagnWorld::AdoptStreamedEnv()
 			if (M && M->GetName().Contains(TEXT("HLSky"))) { A->Destroy(); ++Removed; } // our own HDRI dome (storm-tintable) replaces it
 		}
 	}
-	UE_LOG(LogTwilight, Display, TEXT("[TwEnv] adopted %d actors, removed %d lights/fog/cams, sky=%d"), L->Actors.Num(), Removed, SkyMat ? 1 : 0);
+	// the kit's pines/junipers were planted on the fine DEM and float as dark cones above the coarser rings
+	// around this arena (they read as flocks of crows in the sky): the shore stays open grassland
+	int32 Kept = 0, Dropped = 0;
+	for (AActor* A : L->Actors)
+	{
+		if (!A) continue;
+		TArray<UHierarchicalInstancedStaticMeshComponent*> Hs;
+		A->GetComponents(Hs);
+		for (UHierarchicalInstancedStaticMeshComponent* H : Hs)
+		{
+			if (!H || !H->GetStaticMesh()) continue;
+			const FString N = H->GetStaticMesh()->GetName();
+			if (N.Contains(TEXT("Pine")) || N.Contains(TEXT("Juniper"))) { Dropped += H->GetInstanceCount(); H->DestroyComponent(); }
+			else Kept += H->GetInstanceCount();
+		}
+	}
+	UE_LOG(LogTwilight, Display, TEXT("[TwEnv] adopted %d actors, removed %d lights/fog/cams, sky=%d, instances kept %d, trees dropped %d"), L->Actors.Num(), Removed, SkyMat ? 1 : 0, Kept, Dropped);
 	if (SkyLight) SkyLight->RecaptureSky();
 }
 
