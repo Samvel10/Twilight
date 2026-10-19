@@ -1,0 +1,393 @@
+Opening shared memory
+Shared memory doesn't exist, checking legacy lock file
+Checking for a '/tmp/UnrealTraceServer.pid' lock file
+Forking process
+Wait until we know the daemon has started.
+Parent received signal 10
+Daemon signalled successful start
+Forked complete (ret=0)
+- Existing per-process limit (soft=1048576, hard=1048576) is enough for us (need only 1048576)
+Increasing per-process limit of core file size to infinity.
+LogInit: Display: Running engine for game: TwilightAssets
+LogCore: Display: Requested channels: 'cpu,gpu,frame,log,bookmark,screenshot,region'
+LogTrace: Display: Control listening on port 1985
+LogCsvProfiler: Display: Metadata set : platform="Linux"
+LogCsvProfiler: Display: Metadata set : config="Development"
+LogCsvProfiler: Display: Metadata set : buildversion="UE5-CL-0"
+LogCsvProfiler: Display: Metadata set : engineversion="5.8.2-0+UE5"
+LogCsvProfiler: Display: Metadata set : enginereleaseversion="5.8.2"
+LogCsvProfiler: Display: Metadata set : os="Ubuntu 24.04.2 LTS 7.0.0-38-generic"
+LogCsvProfiler: Display: Metadata set : cpu="GenuineIntel|13th Gen Intel(R) Core(TM) i7-13700H"
+LogCsvProfiler: Display: Metadata set : pgoenabled="0"
+LogCsvProfiler: Display: Metadata set : pgoprofilingenabled="0"
+LogCsvProfiler: Display: Metadata set : ltoenabled="0"
+LogCsvProfiler: Display: Metadata set : asan="0"
+LogCsvProfiler: Display: Metadata set : mergedmodules="0"
+LogCsvProfiler: Display: Metadata set : compacttset="0"
+LogCsvProfiler: Display: Metadata set : commandline="" /var/www/html/Twilight/Game/TwilightAssets.uproject -ExecutePythonScript=/var/www/html/Twilight/Game/Tools/import_islands_real.py -unattended -nop4 -nosplash -nosound -nullrhi -stdout""
+LogCsvProfiler: Display: Metadata set : loginid="b08793d2f1ca41aabefbcd2eb084d5a9-000003e8"
+LogCsvProfiler: Display: Metadata set : llm="0"
+Failed to find game directory: /home/samo/UnrealEngine-5.8/TwilightAssets/Binaries
+LogCsvProfiler: Display: Metadata set : zenstreaming="0"
+LogCsvProfiler: Display: Metadata set : systemresolution.resx="1280"
+LogCsvProfiler: Display: Metadata set : systemresolution.resy="720"
+LogAudio: Display: Audio Device Manager not initializing due to all audio being disabled. If this is not intentional, please check command line arguments for "-nosound".
+LogAssetRegistry: Display: FindShardedCacheFiles: 1 via .ref, 0 via migration fallback, 1 total
+Setting up bundled DotNet SDK
+Running command : dotnet Engine/Binaries/DotNET/UnrealBuildTool/UnrealBuildTool.dll -Mode=ValidatePlatforms -OutputSDKs -AllPlatforms -project=/var/www/html/Twilight/Game/TwilightAssets.uproject -log=/var/www/html/Twilight/Game/Saved/Logs/AutoSDKInfo.txt -verbose -timestamps -progress
+LogAssetRegistry: Display: CleanupOrphanedCacheFiles (PreLoad): 1 .ref files found, 1 referenced binaries
+LogAssetRegistry: Display: CleanupOrphanedCacheFiles: 1 total binaries, 1 referenced (kept), 0 old-style pre-migration (kept), 0 orphans deleted, 0 orphans locked (kept)
+LogAssetRegistry: Display: LoadCacheFiles: loading 1 cache files, memory-mapping=enabled
+Log file: /var/www/html/Twilight/Game/Saved/Logs/AutoSDKInfo.txt
+##PlatformValidate: Win64 INVALID <UNKNOWN>
+##PlatformValidate: Mac INVALID <UNKNOWN>
+##PlatformValidate: IOS INVALID <UNKNOWN>
+##PlatformValidate: Android INVALID r27c
+##PlatformValidate: Linux VALID v26_clang-20.1.8-rockylinux8
+##PlatformValidate: LinuxArm64 VALID v26_clang-20.1.8-rockylinux8
+##PlatformValidate: TVOS INVALID <UNKNOWN>
+##PlatformValidate: VisionOS INVALID <UNKNOWN>
+Unable to find required SDK version 'MainVersion' for platform Win64. Check your SDK.json files
+Unable to find required SDK version 'MainVersion' for platform Mac. Check your SDK.json files
+Unable to find required SDK version 'MainVersion' for platform IOS. Check your SDK.json files
+Unable to find required SDK version 'MainVersion' for platform TVOS. Check your SDK.json files
+Unable to find required SDK version 'MainVersion' for platform VisionOS. Check your SDK.json files
+Trace written to file /home/samo/UnrealEngine-5.8/Engine/Programs/UnrealBuildTool/Trace.uba with size 336b
+LogConfig: Display: Loading Mac ini files took 0.15 seconds
+LogAssetRegistry: Display: Asset registry cache read as 121.6 MiB from ../../../../../../var/www/html/Twilight/Game/Intermediate/CachedAssetRegistry/CachedAssetRegistry_0_01A152AFDD797E1FA0520F378A5D66A8.bin (memory-mapped=no, platform unsupported)
+LogConfig: Display: Loading Android ini files took 0.23 seconds
+LogConfig: Display: Loading IOS ini files took 0.27 seconds
+LogConfig: Display: Loading VulkanPC ini files took 0.28 seconds
+LogConfig: Display: Loading Windows ini files took 0.38 seconds
+LogConfig: Display: Loading VisionOS ini files took 0.38 seconds
+LogConfig: Display: Loading TVOS ini files took 0.40 seconds
+LogConfig: Display: Loading Unix ini files took 0.40 seconds
+LogConfig: Display: Loading Linux ini files took 0.40 seconds
+LogConfig: Display: Loading LinuxArm64 ini files took 0.44 seconds
+Shutdown handler: initialize.
+RenderDocPlugin: Display: RenderDoc plugin will not be loaded. Use '-AttachRenderDoc' on the cmd line or enable 'renderdoc.AutoAttach' in the plugin settings.
+LogAsyncCompilation: Display: MemorySharingInfo: UsedMemory=5371MiB, MaxMemoryAvailable=39906MiB
+LogAnalytics: Display: Provider StudioTelemetry.Provider.Log is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.CSV is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.Horde is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.Log is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.CSV is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.Horde is disabled for this application
+LogStreaming: Display: AsyncLoading2 - Created: Async Loading Thread: false, Async Post Load: false, Multithreaded: false
+[2026.10.19-07.18.03:829][  0]LogCsvProfiler: Display: Metadata set : systemresolution.resx="1600"
+[2026.10.19-07.18.03:829][  0]LogCsvProfiler: Display: Metadata set : systemresolution.resy="900"
+[2026.10.19-07.18.03:831][  0]LogHAL: Display: Platform has ~ 31 GB [33254993920 / 34359738368 / 31], which maps to Larger [LargestMinGB=32, LargerMinGB=12, DefaultMinGB=8, SmallerMinGB=6, SmallestMinGB=0)
+[2026.10.19-07.18.03:831][  0]LogCsvProfiler: Display: Metadata set : extradevelopmentmemorymb="0"
+[2026.10.19-07.18.03:832][  0]LogObj: Display: Attempting to load config data for Default__DownlinkBandwidthManagerConfig before the Class has been constructed/registered/linked (likely during module loading or early startup). This will result in the load silently failing and should be fixed.
+[2026.10.19-07.18.04:164][  0]LogObj: Display: Attempting to load config data for Default__SlateThemeManager before the Class has been constructed/registered/linked (likely during module loading or early startup). This will result in the load silently failing and should be fixed.
+[2026.10.19-07.18.04:508][  0]LogCsvProfiler: Display: Metadata set : verbatimrhiname="Null"
+[2026.10.19-07.18.04:508][  0]LogCsvProfiler: Display: Metadata set : rhiname="Null"
+[2026.10.19-07.18.04:508][  0]LogCsvProfiler: Display: Metadata set : rhifeaturelevel="SM6"
+[2026.10.19-07.18.04:508][  0]LogCsvProfiler: Display: Metadata set : shaderplatform="VULKAN_SM6"
+[2026.10.19-07.18.04:508][  0]LogCsvProfiler: Display: Metadata set : gpu=""
+[2026.10.19-07.18.04:508][  0]LogCsvProfiler: Display: Metadata set : gpudriver=""
+[2026.10.19-07.18.04:517][  0]LogTextureFormatASTC: Display: ASTCEnc version 5.0.1 library loaded
+[2026.10.19-07.18.04:517][  0]LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatASTC
+[2026.10.19-07.18.04:517][  0]LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatETC2
+[2026.10.19-07.18.04:517][  0]LogTextureFormatOodle: Display: Oodle Texture TFO init; latest sdk version = 2.9.16
+[2026.10.19-07.18.04:517][  0]LogTextureFormatOodle: Display: Oodle Texture loading DLL: liboo2texlinux64.2.9.16.so
+[2026.10.19-07.18.04:517][  0]LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatOodle
+[2026.10.19-07.18.04:517][  0]LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatUncompressed
+[2026.10.19-07.18.04:552][  0]LogTargetPlatformManager: Display: Loaded TargetPlatform 'Linux'
+[2026.10.19-07.18.04:552][  0]LogTargetPlatformManager: Display: Loaded TargetPlatform 'LinuxEditor'
+[2026.10.19-07.18.04:552][  0]LogTargetPlatformManager: Display: Loaded TargetPlatform 'LinuxServer'
+[2026.10.19-07.18.04:552][  0]LogTargetPlatformManager: Display: Loaded TargetPlatform 'LinuxClient'
+[2026.10.19-07.18.04:561][  0]LogTargetPlatformManager: Display: Failed to SetupSDK for platform 'Android'
+[2026.10.19-07.18.04:561][  0]LogTargetPlatformManager: Display: Building Assets For LinuxEditor
+[2026.10.19-07.18.04:587][  0]LogZenServiceInstance: Display: Launching zen utility '/home/samo/UnrealEngine-5.8/Engine/Binaries/Linux/zen service status'.
+[2026.10.19-07.18.05:174][  0]LogZenServiceInstance: Display: Writing plugin version info to '/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install/zen_plugin_versions.json'
+[2026.10.19-07.18.05:174][  0]LogZenServiceInstance: Display: Read zen version cache file from '/home/samo/UnrealEngine-5.8/Engine/Saved/Zen/zen.version', version: '5.8.13-202605190912-linux-x86_64-release-094f62c2'
+[2026.10.19-07.18.05:174][  0]LogZenServiceInstance: Display: Read zen version cache file from '/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install/zen.version', version: '5.8.13-202605190912-linux-x86_64-release-094f62c2'
+[2026.10.19-07.18.05:174][  0]LogZenServiceInstance: Display: Installed service at '/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install/zenserver' is up to date
+[2026.10.19-07.18.05:175][  0]LogZenServiceInstance: Display: Launching executable '/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install/zenserver', working dir '/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install', data dir '/home/samo/.config/Epic/UnrealEngine/Common/Zen/Data', args '--port 8558 --data-dir /home/samo/.config/Epic/UnrealEngine/Common/Zen/Data --http asio --gc-cache-duration-seconds 1209600 --gc-interval-seconds 21600 --gc-low-diskspace-threshold 2147483648 --cache-bucket-limit-overwrites --quiet --restrict-content-types --allow-external-oidctoken-exe=false --plugins-config "/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install/zen_plugins_v1.json" --security-config-path "/home/samo/.config/Epic/UnrealEngine/Common/Zen/Install/security-config.json" --owner-pid 2885441  --child-id Zen_2885441_Startup --detach'
+[2026.10.19-07.18.05:255][  0]LogZenServiceInstance: Display: Unreal Zen Storage Server HTTP service at http://[::1]:8558 status: OK!.
+[2026.10.19-07.18.05:256][  0]LogDerivedDataCache: Display: ZenLocal: Using ZenServer HTTP service at [::1] with namespace ue.ddc. Status: OK!.
+[2026.10.19-07.18.05:257][  0]LogDerivedDataCache: Display: ../../../Engine/DerivedDataCache: Performance: Latency=0.00ms. RandomReadSpeed=4467.52MBs, RandomWriteSpeed=1636.48MBs. Assigned SpeedClass 'Local'
+[2026.10.19-07.18.05:260][  0]LogUbaHorde: Display: UBA/Horde Configuration [Uba.Provider.Horde]: Not Enabled
+[2026.10.19-07.18.05:260][  0]LogShaderCompilers: Display: No distributed shader compiler controller found
+[2026.10.19-07.18.05:260][  0]LogShaderCompilers: Display: Using 10 local workers for shader compilation
+[2026.10.19-07.18.05:260][  0]LogShaderCompilers: Display: Compiling shader autogen file: ../../../../../../var/www/html/Twilight/Game/Intermediate/ShaderAutogen/VULKAN_SM6/AutogenShaderHeaders.ush
+[2026.10.19-07.18.05:260][  0]LogShaderCompilers: Display: Autogen file is unchanged, skipping write.
+[2026.10.19-07.18.05:702][  0]LogAssetRegistry: Display: AssetDataGatherer spent 0.000s loading caches from ../../../../../../var/www/html/Twilight/Game/Intermediate/CachedAssetRegistry.
+[2026.10.19-07.18.05:998][  0]LogEditorDomain: Display: EditorDomain is Disabled
+[2026.10.19-07.18.06:207][  0]LogDeviceProfileManager: Display: Deviceprofile LinuxArm64Editor not found.
+[2026.10.19-07.18.06:207][  0]LogDeviceProfileManager: Display: Deviceprofile LinuxArm64 not found.
+[2026.10.19-07.18.06:247][  0]LogCsvProfiler: Display: Metadata set : deviceprofile="LinuxEditor"
+[2026.10.19-07.18.06:249][  0]LogStreaming: Display: FlushAsyncLoading(1): 1 QueuedPackages, 0 AsyncPackages
+[2026.10.19-07.18.06:259][  0]LogTextureEncodingSettings: Display: Texture Encode Speed: FinalIfAvailable (editor).
+[2026.10.19-07.18.06:259][  0]LogTextureEncodingSettings: Display: Oodle Texture Encode Speed settings: Fast: RDO Off Lambda=0, Effort=Normal Final: RDO Off Lambda=0, Effort=Normal
+[2026.10.19-07.18.06:259][  0]LogTextureEncodingSettings: Display: Shared linear texture encoding: Disabled
+[2026.10.19-07.18.06:295][  0]LogMeshReduction: Display: HLOD mesh reduction module (r.ProxyLODMeshReductionModule) set to "ProxyLODMeshReduction" which doesn't exist.
+[2026.10.19-07.18.06:305][  0]LogMeshReduction: Display: Using QuadricMeshReduction for automatic static mesh reduction
+[2026.10.19-07.18.06:305][  0]LogMeshReduction: Display: Using SkeletalMeshReduction for automatic skeletal mesh reduction
+[2026.10.19-07.18.06:305][  0]LogMeshReduction: Display: No automatic mesh merging module available
+[2026.10.19-07.18.06:305][  0]LogMeshReduction: Display: No distributed automatic mesh merging module available
+[2026.10.19-07.18.06:529][  0]LogShaderCompilers: Display: Compiling shader autogen file: ../../../../../../var/www/html/Twilight/Game/Intermediate/ShaderAutogen/VULKAN_SM5/AutogenShaderHeaders.ush
+[2026.10.19-07.18.06:529][  0]LogShaderCompilers: Display: Autogen file is unchanged, skipping write.
+[2026.10.19-07.18.06:529][  0]LogVirtualization: Display: VirtualizationSystem name found in ini file: None
+[2026.10.19-07.18.06:529][  0]LogVirtualization: Display: FNullVirtualizationSystem mounted, virtualization will be disabled
+[2026.10.19-07.18.06:706][  0]LogWorldPartition: Display: FWorldPartitionClassDescRegistry::Initialize started...
+[2026.10.19-07.18.06:708][  0]LogWorldPartition: Display: FWorldPartitionClassDescRegistry::Initialize took 1.515 ms
+[2026.10.19-07.18.07:209][  0]LogMetaSound: Display: MetaSound Page Target Initialized to 'Default'
+[2026.10.19-07.18.07:216][  0]LogAudio: Display: Registering Engine Module Parameter Interfaces...
+[2026.10.19-07.18.07:352][  0]LogUdpMessaging: Display: Unicast socket bound to '0.0.0.0:56749'.
+[2026.10.19-07.18.07:352][  0]LogUdpMessaging: Display: Added local interface '192.168.18.69' to multicast group '230.0.0.1:6666'
+[2026.10.19-07.18.07:352][  0]LogUdpMessaging: Display: Added local interface '172.18.0.1' to multicast group '230.0.0.1:6666'
+[2026.10.19-07.18.07:352][  0]LogUdpMessaging: Display: Added local interface '172.17.0.1' to multicast group '230.0.0.1:6666'
+[2026.10.19-07.18.07:352][  0]LogUdpMessaging: Display: Added local interface '127.0.0.1' to multicast group '230.0.0.1:6666'
+[2026.10.19-07.18.07:353][  0]LogUdpMessaging: Display: Using asynchronous task graph for message deserialization.
+[2026.10.19-07.18.08:468][  0]LogAudioCaptureCore: Display: No Audio Capture implementations found. Audio input will be silent.
+[2026.10.19-07.18.08:469][  0]LogAudioCaptureCore: Display: No Audio Capture implementations found. Audio input will be silent.
+[2026.10.19-07.18.09:350][  0]LogAnalytics: Display: [UEEditor.UnrealEngine.Release] AnalyticsET::StartSession ( APIServer = https://datarouter.ol.epicgames.com/datarouter/api/v1/public/data. AppVersion = 5.8.2-0+UE5 )
+[2026.10.19-07.18.09:382][  0]LogCsvProfiler: Display: Metadata set : largeworldcoordinates="1"
+[2026.10.19-07.18.09:410][  0]LogSourceControl: Display: Uncontrolled Changelist persistency file loaded ../../../../../../var/www/html/Twilight/Game/Saved/SourceControl/UncontrolledChangelists.json
+[2026.10.19-07.18.09:904][  0]LogPython: Display: No pip-enabled plugins with python dependencies found, skipping
+[2026.10.19-07.18.10:045][  0]LogCsvProfiler: Display: Metadata set : raytracing="0"
+[2026.10.19-07.18.10:388][  0]LogCore: Display: AudioInsights module auto-connecting to local trace server...
+[2026.10.19-07.18.10:458][  0]LogInit: Display: Engine is initialized. Leaving FEngineLoop::Init()
+[2026.10.19-07.18.13:051][  0]LogPlacementMode: Display: The Asset Registry is not yet fully loaded so some placeable classes might be missing.
+[2026.10.19-07.18.13:335][  0]LogSlate: Display: Synchronously lazy loading font file '../../../Engine/Content/Slate/Fonts/Roboto-Regular.ttf' with subface index 0 in Game thread.
+[2026.10.19-07.18.13:335][  0]LogSlate: Display: Took 0.000075 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Regular.ttf' (155K) on Game thread.
+[2026.10.19-07.18.13:335][  0]LogSlate: Display: Freetype font face in memory successfully created with synchronously loaded raw font file '../../../Engine/Content/Slate/Fonts/Roboto-Regular.ttf' subface 0 in Game thread.
+[2026.10.19-07.18.13:335][  0]LogSlate: Display: Font face '../../../Engine/Content/Slate/Fonts/Roboto-Regular.ttf' subface index 0 successfully added to font face map in Game thread.
+[2026.10.19-07.18.14:375][  0]LogPython: Display: Running start-up script /home/samo/UnrealEngine-5.8/Engine/Plugins/Animation/ControlRig/Content/Python/init_unreal.py... started...
+[2026.10.19-07.18.14:458][  0]LogPython: Display: Running start-up script /home/samo/UnrealEngine-5.8/Engine/Plugins/Animation/ControlRig/Content/Python/init_unreal.py... took 82.696 ms
+[2026.10.19-07.18.14:458][  0]LogPython: Display: Running start-up script /home/samo/UnrealEngine-5.8/Engine/Plugins/Animation/IKRig/Content/Python/init_unreal.py... started...
+[2026.10.19-07.18.14:459][  0]LogPython: Display: Running start-up script /home/samo/UnrealEngine-5.8/Engine/Plugins/Animation/IKRig/Content/Python/init_unreal.py... took 1.227 ms (total: 83.924 ms)
+[2026.10.19-07.18.14:461][  0]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.14:742][  1]LogAssetRegistry: Display: Starting OnFilesLoaded.Broadcast
+[2026.10.19-07.18.14:751][  1]LogPlacementMode: Display: The Asset Registry is done with its initial scan, the list of placeable classes has been updated.
+[2026.10.19-07.18.14:769][  1]LogAssetRegistry: Display: Completed OnFilesLoaded.Broadcast: 0.027s
+[2026.10.19-07.18.14:778][  1]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.14:891][  2]LogStreaming: Display: FlushAsyncLoading(353): 1 QueuedPackages, 0 AsyncPackages
+[2026.10.19-07.18.14:898][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.14:898][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.14:898][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.14:902][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.14:902][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.14:903][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.14:904][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.14:904][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.14:946][  2]LogInterchangeEngine: Display: Interchange start importing source [/var/www/html/Twilight/art/models/boulder_01/textures/boulder_01_arm_2k.jpg]
+[2026.10.19-07.18.14:982][  2]LogInterchangeEngine: Display: Interchange import completed [/var/www/html/Twilig.../boulder_01/textures/boulder_01_arm_2k.jpg]
+[2026.10.19-07.18.14:991][  2]LogInterchangeEngine: Display: Interchange start importing source [/var/www/html/Twilight/art/models/boulder_01/textures/boulder_01_diff_2k.jpg]
+[2026.10.19-07.18.15:036][  2]LogInterchangeEngine: Display: Interchange import completed [/var/www/html/Twilig.../boulder_01/textures/boulder_01_diff_2k.jpg]
+[2026.10.19-07.18.15:049][  2]LogInterchangeEngine: Display: Interchange start importing source [/var/www/html/Twilight/art/models/boulder_01/textures/boulder_01_nor_gl_2k.jpg]
+[2026.10.19-07.18.15:101][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:102][  2]LogInterchangePipeline: Display: Auto-detected normal map
+[2026.10.19-07.18.15:103][  2]LogInterchangeEngine: Display: Interchange import completed [/var/www/html/Twilig.../boulder_01/textures/boulder_01_nor_gl_2k.jpg]
+[2026.10.19-07.18.15:105][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:147][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:147][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:148][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:148][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:148][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:151][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:151][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:152][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:152][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:152][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:155][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:155][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:156][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:156][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:156][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:161][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:161][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:162][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:162][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:162][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:164][  2]LogInterchangeEngine: Display: Interchange start importing source [/var/www/html/Twilight/art/textures/aerial_rocks_02/aerial_rocks_02_arm_2k.jpg]
+[2026.10.19-07.18.15:185][  2]LogInterchangeEngine: Display: Interchange import completed [/var/www/html/Twilig...ures/aerial_rocks_02/aerial_rocks_02_arm_2k.jpg]
+[2026.10.19-07.18.15:249][  2]LogInterchangeEngine: Display: Interchange start importing source [/var/www/html/Twilight/art/textures/aerial_rocks_02/aerial_rocks_02_diff_2k.jpg]
+[2026.10.19-07.18.15:289][  2]LogInterchangeEngine: Display: Interchange import completed [/var/www/html/Twilig...ures/aerial_rocks_02/aerial_rocks_02_diff_2k.jpg]
+[2026.10.19-07.18.15:349][  2]LogInterchangeEngine: Display: Interchange start importing source [/var/www/html/Twilight/art/textures/aerial_rocks_02/aerial_rocks_02_nor_gl_2k.jpg]
+[2026.10.19-07.18.15:403][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:404][  2]LogInterchangePipeline: Display: Auto-detected normal map
+[2026.10.19-07.18.15:405][  2]LogInterchangeEngine: Display: Interchange import completed [/var/www/html/Twilig...ures/aerial_rocks_02/aerial_rocks_02_nor_gl_2k.jpg]
+[2026.10.19-07.18.15:405][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:448][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:449][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:450][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:450][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:450][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:453][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:453][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:454][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:454][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:454][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:457][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:457][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:459][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:460][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:460][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:466][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:466][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:467][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:467][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:467][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:493][  2]LogInterchangeEngine: Display: Interchange import: Using stack [OverridePipeline] to import.
+[2026.10.19-07.18.15:493][  2]LogInterchangeEngine: Display: Interchange start importing source [/var/www/html/Twilight/art/models/boulder_01/boulder_01_2k.gltf]
+[2026.10.19-07.18.15:544][  2]LogAssetRegistry: Display: Asset registry cache written as 121.6 MiB to ../../../../../../var/www/html/Twilight/Game/Intermediate/CachedAssetRegistry/CachedAssetRegistry_*.ref
+[2026.10.19-07.18.15:544][  2]LogAssetRegistry: Display: CleanupOrphanedCacheFiles (PostWrite): 1 .ref files found, 1 referenced binaries
+[2026.10.19-07.18.15:546][  2]LogAssetRegistry: Display:   CachedAssetRegistry_0_01A152AFDD797E1FA0520F378A5D66A8.bin: deleted (orphaned, unreferenced by any .ref)
+[2026.10.19-07.18.15:546][  2]LogAssetRegistry: Display: CleanupOrphanedCacheFiles: 2 total binaries, 1 referenced (kept), 0 old-style pre-migration (kept), 1 orphans deleted, 0 orphans locked (kept)
+[2026.10.19-07.18.15:831][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.15:927][  2]LogInterchangeEngine: Display: Interchange import completed [/var/www/html/Twilig...rt/models/boulder_01/boulder_01_2k.gltf]
+[2026.10.19-07.18.16:039][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.16:136][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.16:136][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.16:138][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.16:138][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.16:138][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.16:156][  2]LogStaticMesh: Display: Waiting for static meshes to be ready 0/1 (/Game/Twilight/Env/Scan/boulder_01/boulder_01_2k/StaticMeshes/boulder_01_2k) ...
+[2026.10.19-07.18.16:190][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.16:190][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.16:190][  2]LogPython: Warning: boulder_01 tris per LOD: [19836, 9918, 4364, 1586]
+[2026.10.19-07.18.16:195][  2]LogInit: Warning: Querying IsUsingWayland before SDL is initialized
+[2026.10.19-07.18.16:196][  2]LogSourceControl: Display: Uncontrolled Changelist persistency file saved ../../../../../../var/www/html/Twilight/Game/Saved/SourceControl/UncontrolledChangelists.json
+[2026.10.19-07.18.16:223][  3]LogAnalytics: Display: [UEEditor.UnrealEngine.Release] AnalyticsET::EndSession
+[2026.10.19-07.18.17:449][  3]LogAssetRegistry: Display: CleanupOrphanedCacheFiles (PostWrite): 1 .ref files found, 1 referenced binaries
+[2026.10.19-07.18.17:449][  3]LogAssetRegistry: Display: CleanupOrphanedCacheFiles: 1 total binaries, 1 referenced (kept), 0 old-style pre-migration (kept), 0 orphans deleted, 0 orphans locked (kept)
+Ensure condition failed: Internal::EditorModeToolsSingleton.IsValid() [File:./Editor/UnrealEd/Private/UnrealEdGlobals.cpp] [Line: 196] 
+The level editor is not started up yet. If you need to access the global mode manager early in the startup phase, please use FLevelEditorModule::OnLevelEditorCreated to gate the access.
+[2026.10.19-07.18.17:520][  3]LogOutputDevice: Warning: 
+
+Script Stack (0 frames) :
+
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: === Handled ensure: ===
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: 
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: Ensure condition failed: Internal::EditorModeToolsSingleton.IsValid()  [File:./Editor/UnrealEd/Private/UnrealEdGlobals.cpp] [Line: 196] 
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: The level editor is not started up yet. If you need to access the global mode manager early in the startup phase, please use FLevelEditorModule::OnLevelEditorCreated to gate the access.
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: Stack: 
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x0000780467b27648 libUnrealEditor-UnrealEd.so!GLevelEditorModeTools()::$_0::operator()() const [/home/samo/UnrealEngine-5.8/Engine/Source/./Editor/UnrealEd/Private/UnrealEdGlobals.cpp:196]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x000078046779bf30 libUnrealEditor-UnrealEd.so!GLevelEditorModeTools() [/home/samo/UnrealEngine-5.8/Engine/Source/./Editor/UnrealEd/Private/UnrealEdGlobals.cpp:196]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x0000780458bc8e1f libUnrealEditor-LevelEditor.so!SLevelEditor::~SLevelEditor() [/home/samo/UnrealEngine-5.8/Engine/Source/./Editor/LevelEditor/Private/SLevelEditor.cpp:463]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804686e3b94 libUnrealEditor-SlateCore.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x000078046882a294 libUnrealEditor-SlateCore.so!FSlotBase::~FSlotBase() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x0000780468970438 libUnrealEditor-SlateCore.so!SCompoundWidget::~SCompoundWidget() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/SlateCore/Public/Layout/Children.h:301]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804686e3b94 libUnrealEditor-SlateCore.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x000078046882a294 libUnrealEditor-SlateCore.so!FSlotBase::~FSlotBase() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804689a2a78 libUnrealEditor-SlateCore.so!SOverlay::FOverlaySlot::~FOverlaySlot() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/SlateCore/Public/Layout/WidgetSlotWithAttributeSupport.h:44]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804689955b7 libUnrealEditor-SlateCore.so!DestructItems<TUniquePtr<SOverlay::FOverlaySlot, TDefaultDelete<SOverlay::FOverlaySlot> >, int> [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/UniquePtr.h:63]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x0000780468970cc4 libUnrealEditor-SlateCore.so!SOverlay::~SOverlay() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Array.h:1240]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804686e3b94 libUnrealEditor-SlateCore.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x000078046882a294 libUnrealEditor-SlateCore.so!FSlotBase::~FSlotBase() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x000078046e998f88 libUnrealEditor-Engine.so!SVerticalBox::FSlot::~FSlot() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/SlateCore/Public/Layout/WidgetSlotWithAttributeSupport.h:44]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804689948c7 libUnrealEditor-SlateCore.so!DestructItems<TUniquePtr<SBoxPanel::FSlot, TDefaultDelete<SBoxPanel::FSlot> >, int> [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/UniquePtr.h:63]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x0000780468985544 libUnrealEditor-SlateCore.so!SBoxPanel::~SBoxPanel() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Array.h:1240]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804686e3b94 libUnrealEditor-SlateCore.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x000078046882a294 libUnrealEditor-SlateCore.so!FSlotBase::~FSlotBase() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x0000780468970438 libUnrealEditor-SlateCore.so!SCompoundWidget::~SCompoundWidget() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/SlateCore/Public/Layout/Children.h:301]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804686e3b94 libUnrealEditor-SlateCore.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x000078046882a294 libUnrealEditor-SlateCore.so!FSlotBase::~FSlotBase() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x000078046930a84a libUnrealEditor-Slate.so!SSplitter::FSlot::~FSlot() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/SlateCore/Public/Layout/WidgetSlotWithAttributeSupport.h:44]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x0000780469034d37 libUnrealEditor-Slate.so!DestructItems<TUniquePtr<SSplitter::FSlot, TDefaultDelete<SSplitter::FSlot> >, int> [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/UniquePtr.h:63]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x0000780469034cac libUnrealEditor-Slate.so!SharedPointerInternals::TIntrusiveReferenceController<SSplitter, (ESPMode)1>::DestroyObject() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Array.h:1240]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804686e3b94 libUnrealEditor-SlateCore.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x000078046882a294 libUnrealEditor-SlateCore.so!FSlotBase::~FSlotBase() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804689a2a78 libUnrealEditor-SlateCore.so!SOverlay::FOverlaySlot::~FOverlaySlot() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/SlateCore/Public/Layout/WidgetSlotWithAttributeSupport.h:44]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804689955b7 libUnrealEditor-SlateCore.so!DestructItems<TUniquePtr<SOverlay::FOverlaySlot, TDefaultDelete<SOverlay::FOverlaySlot> >, int> [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/UniquePtr.h:63]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x0000780468970cc4 libUnrealEditor-SlateCore.so!SOverlay::~SOverlay() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Array.h:1240]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804686e3b94 libUnrealEditor-SlateCore.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x000078046882a294 libUnrealEditor-SlateCore.so!FSlotBase::~FSlotBase() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x000078046ee4ae58 libUnrealEditor-Engine.so!SHorizontalBox::FSlot::~FSlot() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/SlateCore/Public/Layout/WidgetSlotWithAttributeSupport.h:44]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804689948c7 libUnrealEditor-SlateCore.so!DestructItems<TUniquePtr<SBoxPanel::FSlot, TDefaultDelete<SBoxPanel::FSlot> >, int> [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/UniquePtr.h:63]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x0000780468985544 libUnrealEditor-SlateCore.so!SBoxPanel::~SBoxPanel() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Array.h:1240]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804686e3b94 libUnrealEditor-SlateCore.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x000078046882a294 libUnrealEditor-SlateCore.so!FSlotBase::~FSlotBase() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804689a2a78 libUnrealEditor-SlateCore.so!SOverlay::FOverlaySlot::~FOverlaySlot() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/SlateCore/Public/Layout/WidgetSlotWithAttributeSupport.h:44]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804689955b7 libUnrealEditor-SlateCore.so!DestructItems<TUniquePtr<SOverlay::FOverlaySlot, TDefaultDelete<SOverlay::FOverlaySlot> >, int> [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/UniquePtr.h:63]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x0000780468970cc4 libUnrealEditor-SlateCore.so!SOverlay::~SOverlay() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Array.h:1240]
+[2026.10.19-07.18.17:588][  3]LogOutputDevice: Error: [Callstack] 0x00007804686e3b94 libUnrealEditor-SlateCore.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000078046882a294 libUnrealEditor-SlateCore.so!FSlotBase::~FSlotBase() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x0000780468970438 libUnrealEditor-SlateCore.so!SCompoundWidget::~SCompoundWidget() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/SlateCore/Public/Layout/Children.h:301]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804686e3b94 libUnrealEditor-SlateCore.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000078046882a294 libUnrealEditor-SlateCore.so!FSlotBase::~FSlotBase() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000078046e998f88 libUnrealEditor-Engine.so!SVerticalBox::FSlot::~FSlot() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/SlateCore/Public/Layout/WidgetSlotWithAttributeSupport.h:44]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804689948c7 libUnrealEditor-SlateCore.so!DestructItems<TUniquePtr<SBoxPanel::FSlot, TDefaultDelete<SBoxPanel::FSlot> >, int> [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/UniquePtr.h:63]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x0000780468985544 libUnrealEditor-SlateCore.so!SBoxPanel::~SBoxPanel() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Array.h:1240]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804686e3b94 libUnrealEditor-SlateCore.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000078046882a294 libUnrealEditor-SlateCore.so!FSlotBase::~FSlotBase() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000078046e998f88 libUnrealEditor-Engine.so!SVerticalBox::FSlot::~FSlot() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/SlateCore/Public/Layout/WidgetSlotWithAttributeSupport.h:44]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804689948c7 libUnrealEditor-SlateCore.so!DestructItems<TUniquePtr<SBoxPanel::FSlot, TDefaultDelete<SBoxPanel::FSlot> >, int> [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/UniquePtr.h:63]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x0000780468985544 libUnrealEditor-SlateCore.so!SBoxPanel::~SBoxPanel() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Array.h:1240]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804686e3b94 libUnrealEditor-SlateCore.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000078046882a294 libUnrealEditor-SlateCore.so!FSlotBase::~FSlotBase() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804689a2a78 libUnrealEditor-SlateCore.so!SOverlay::FOverlaySlot::~FOverlaySlot() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/SlateCore/Public/Layout/WidgetSlotWithAttributeSupport.h:44]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804689955b7 libUnrealEditor-SlateCore.so!DestructItems<TUniquePtr<SOverlay::FOverlaySlot, TDefaultDelete<SOverlay::FOverlaySlot> >, int> [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/UniquePtr.h:63]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x0000780468970cc4 libUnrealEditor-SlateCore.so!SOverlay::~SOverlay() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/Array.h:1240]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804686e3b94 libUnrealEditor-SlateCore.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000078046882a294 libUnrealEditor-SlateCore.so!FSlotBase::~FSlotBase() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804689833ad libUnrealEditor-SlateCore.so!SWindow::~SWindow() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/SlateCore/Public/Layout/Children.h:301]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804533b6484 libUnrealEditor-StatusBar.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804533efd98 libUnrealEditor-StatusBar.so!TCommonDelegateInstanceState<void (), FNotThreadSafeNotCheckedDelegateUserPolicy, TSharedPtr<SWindow, (ESPMode)1> >::~TCommonDelegateInstanceState() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000078046cae7307 libUnrealEditor-Engine.so!UE::Core::Private::TDestructorCaller<TDelegate<void (), FNotThreadSafeNotCheckedDelegateUserPolicy> >::Destruct(void*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Delegates/DelegateBase.h:421]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000078046ed8257c libUnrealEditor-Engine.so!TSparseArray<FTimerData, FDefaultSparseArrayAllocator>::DestroyElements(int, int) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Misc/TVariantMeta.h:194]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000078046ed67e0e libUnrealEditor-Engine.so!TSparseArray<FTimerData, FDefaultSparseArrayAllocator>::~TSparseArray() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Containers/SparseArray.h:986]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000078046ed298f9 libUnrealEditor-Engine.so!FTimerManager::~FTimerManager() [/home/samo/UnrealEngine-5.8/Engine/Source/./Runtime/Engine/Private/TimerManager.cpp:362]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804663950d4 libUnrealEditor-UnrealEd.so!SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>::ReleaseSharedReferenceNoInline(SharedPointerInternals::TReferenceControllerBase<(ESPMode)1>*) [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:228]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x0000780466b6efdd libUnrealEditor-UnrealEd.so!UEditorEngine::~UEditorEngine() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/SharedPointerInternals.h:614]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x0000780470705d18 libUnrealEditor-CoreUObject.so!FObjectPurge::DestroyObjects(bool, double, double) [/home/samo/UnrealEngine-5.8/Engine/Source/./Runtime/CoreUObject/Private/UObject/GarbageCollection.cpp:959]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804706e9f10 libUnrealEditor-CoreUObject.so!IncrementalPurgeGarbage(bool, double) [/home/samo/UnrealEngine-5.8/Engine/Source/./Runtime/CoreUObject/Private/UObject/GarbageCollection.cpp:5199]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00007804706ed4aa libUnrealEditor-CoreUObject.so!PurgeAllUObjectsOnExit() [/home/samo/UnrealEngine-5.8/Engine/Source/./Runtime/CoreUObject/Private/UObject/GarbageCollection.cpp:6516]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000078047088c61b libUnrealEditor-CoreUObject.so!StaticExit() [/home/samo/UnrealEngine-5.8/Engine/Source/./Runtime/CoreUObject/Private/UObject/Obj.cpp:5983]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x0000780471838f04 libUnrealEditor-Core.so!TBaseStaticDelegateInstance<void (), FDefaultDelegateUserPolicy>::ExecuteIfSafe() const [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Templates/Invoke.h:46]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000000000025d9f9 UnrealEditor-Cmd!void TMulticastDelegateBase<FDefaultDelegateUserPolicy>::Broadcast<IBaseDelegateInstance<void (), FDefaultDelegateUserPolicy> >() const [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Delegates/MulticastDelegateBase.h:306]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x00000000002526c3 UnrealEditor-Cmd!FEngineLoop::AppPreExit() [/home/samo/UnrealEngine-5.8/Engine/Source/Runtime/Core/Public/Delegates/DelegateSignatureImpl.inl:1135]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000000000023ce8e UnrealEditor-Cmd!FEngineLoop::Exit() [/home/samo/UnrealEngine-5.8/Engine/Source/./Runtime/Launch/Private/LaunchEngineLoop.cpp:5123]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x000000000023d299 UnrealEditor-Cmd!GuardedMain(char16_t const*) [/home/samo/UnrealEngine-5.8/Engine/Source/./Runtime/Launch/Private/Launch.cpp:71]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x0000780472689fbd libUnrealEditor-UnixCommonStartup.so!CommonUnixMain(int, char**, int (*)(char16_t const*), void (*)()) [/home/samo/UnrealEngine-5.8/Engine/Source/./Runtime/Unix/UnixCommonStartup/Private/UnixCommonStartup.cpp:324]
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x0000780464c2a1ca libc.so.6!UnknownFunction(0x2a1c9)
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x0000780464c2a28b libc.so.6!__libc_start_main(+0x8a)
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: [Callstack] 0x0000000000234dfa UnrealEditor-Cmd!_start(+0x29)
+[2026.10.19-07.18.17:589][  3]LogOutputDevice: Error: 
+[2026.10.19-07.18.17:618][  3]LogHAL: Error: FUnixPlatformProcess::CreateProc: File does not exist (/home/samo/UnrealEngine-5.8/Engine/Binaries/Linux/CrashReportClientEditor)
+[2026.10.19-07.18.17:618][  3]LogOutputDevice: Warning: 
+
+Script Stack (0 frames) :
+
+Fatal error: [File:./Runtime/CoreUObject/Private/UObject/UObjectGlobals.cpp] [Line: 3302] 
+Object is not packaged: ModeManagerInteractiveToolsContext None
+Signal 11 caught.
+Malloc Size=262146 LargeMemoryPoolOffset=262162 
+Malloc Size=36682 LargeMemoryPoolOffset=298874 
+Malloc Size=262146 LargeMemoryPoolOffset=561042 
+Malloc Size=65536 LargeMemoryPoolOffset=626608 
+Malloc Size=32770 LargeMemoryPoolOffset=659394 
+Malloc Size=65536 LargeMemoryPoolOffset=724960 
+Malloc Size=65536 LargeMemoryPoolOffset=790512 
+Malloc Size=101658 LargeMemoryPoolOffset=892186 
+Malloc Size=102093 LargeMemoryPoolOffset=994301 
+Malloc Size=323493 LargeMemoryPoolOffset=1317813 
+CommonUnixCrashHandler: Signal=11
+[2026.10.19-07.18.18:711][  3]LogHAL: Error: FUnixPlatformProcess::CreateProc: File does not exist (/home/samo/UnrealEngine-5.8/Engine/Binaries/Linux/CrashReportClientEditor)
+Engine crash handling finished; re-raising signal 11 for the default handler. Good bye.
+timeout: the monitored command dumped core
+Opening shared memory
+Shared memory doesn't exist, checking legacy lock file
+Checking for a '/tmp/UnrealTraceServer.pid' lock file
+Forking process
+Opening shared memory
+Starting the store
+Reading settings from '/home/samo/UnrealEngine/UnrealTrace/Settings.ini'
+
+Unable to open settings file /home/samo/UnrealEngine/UnrealTrace/Settings.ini.
+
+Store settings (/home/samo/UnrealEngine/UnrealTrace/Settings.ini):
+ - Store port: 1989
+ - Recorder port: 1981
+ - Thread count: 0
+ - Sponsored mode: 1
+ - Directory: '/home/samo/UnrealEngine/UnrealTrace/Store/001'
+Signalling parent 2885442
+Terminating server, no sponsors or connections active.
+Listening cancelled, closing port...
+Listening cancelled, closing port...
+Received signal 15
+Daemon is exiting without errors.

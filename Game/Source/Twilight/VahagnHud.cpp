@@ -503,7 +503,7 @@ void SVahagnHud::PaintGameplay(const FGeometry& Geo, FSlateWindowElementList& Ou
 	if (MS == EVahagnMatch::Intro || (MS == EVahagnMatch::Playing && GM->GetMatchTime() < 14.f))
 	{
 		Text(Out, L + 6, Geo, FVector2D(Size.X - 40 * S, Size.Y - 50 * S),
-			LOCTEXT("Hint", "Ձախ կոճակ՝ կրակ · Աջ կոճակ՝ լիցքավորված հարված · Shift՝ արագացում · Space/Ctrl՝ վեր/վար · Q՝ պոռթկում · Esc՝ դադար"),
+			LOCTEXT("Hint", "Ձախ կոճակ՝ կրակ · Աջ կոճակ՝ լիցքավորված հարված · Shift՝ արագացում · Space/Ctrl՝ վեր/վար · Q՝ պոռթկում · Alt+մկնիկ՝ 360° տեսախցիկ · F՝ դիմացից · R՝ պտույտ · Esc՝ դադար"),
 			TwAssets::Font(15 * S, false, false), FLinearColor(1, 1, 1, 0.75f), 1.f);
 	}
 }

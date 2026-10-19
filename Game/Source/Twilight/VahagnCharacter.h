@@ -68,6 +68,11 @@ public:
 	void InBoostStart();
 	void InBoostStop();
 	void InNova();
+	// camera: hold = free 360 orbit around the hero; toggle = front view; quick cinematic 360 spin
+	void InFreeLook(bool bOn) { bFreeLook = bOn; }
+	void InFrontView() { bFrontView = !bFrontView; }
+	void InSpin() { if (SpinLeft <= 0.f) SpinLeft = 1.f; }
+	bool IsCameraOffAxis() const { return FMath::Abs(FRotator::NormalizeAxis(CamYawNow)) > 25.f || FMath::Abs(CamPitchNow) > 25.f; }
 
 	static constexpr float ArenaRadius = 52000.f;
 	static constexpr float MinAltitude = 800.f;
@@ -87,6 +92,12 @@ private:
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> BodyMat;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> BodyMat2;
 	bool bRealHero = false;
+	bool bFreeLook = false, bFrontView = false, bMenuFraming = false;
+	float OrbitYaw = 0.f, OrbitPitch = 0.f; // free-look offset from the flight direction
+	float SpinLeft = 0.f;                   // >0 while a cinematic 360 spin plays
+	float CamYawNow = 0.f, CamPitchNow = 0.f; // smoothed applied offset
+	void UpdateCameraRig(float Dt);
+	void GetAimView(FVector& OutLoc, FVector& OutFwd) const;
 	UPROPERTY(VisibleAnywhere) TObjectPtr<UInstancedStaticMeshComponent> FireTrail;
 	TArray<float> TrailBirth;
 	int32 TrailNext = 0;

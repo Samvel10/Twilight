@@ -64,6 +64,10 @@ private:
 	void OnBoost(const FInputActionValue& V);
 	void OnBoostDone(const FInputActionValue& V);
 	void OnNova(const FInputActionValue& V);
+	void OnFreeLook(const FInputActionValue& V);
+	void OnFreeLookDone(const FInputActionValue& V);
+	void OnFrontView(const FInputActionValue& V);
+	void OnSpin(const FInputActionValue& V);
 	void OnPause(const FInputActionValue& V);
 
 	UPROPERTY() TObjectPtr<UInputMappingContext> Context;
@@ -74,6 +78,9 @@ private:
 	UPROPERTY() TObjectPtr<UInputAction> IA_Charge;
 	UPROPERTY() TObjectPtr<UInputAction> IA_Boost;
 	UPROPERTY() TObjectPtr<UInputAction> IA_Nova;
+	UPROPERTY() TObjectPtr<UInputAction> IA_FreeLook;
+	UPROPERTY() TObjectPtr<UInputAction> IA_FrontView;
+	UPROPERTY() TObjectPtr<UInputAction> IA_Spin;
 	UPROPERTY() TObjectPtr<UInputAction> IA_Pause;
 
 	TSharedPtr<SVahagnHud> Hud;

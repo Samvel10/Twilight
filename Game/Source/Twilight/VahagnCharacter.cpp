@@ -228,8 +228,52 @@ void AVahagnCharacter::InLook(const FInputActionValue& V)
 {
 	if (!bControl || bAutopilot) return;
 	const FVector2D L = V.Get<FVector2D>();
+	if (bFreeLook)
+	{
+		// orbit the camera around the hero (fast, unlimited yaw); the flight direction stays as it is
+		OrbitYaw += L.X * 2.2f;
+		OrbitPitch = FMath::Clamp(OrbitPitch - L.Y * 2.2f, -70.f, 70.f);
+		return;
+	}
 	AddControllerYawInput(L.X);
 	AddControllerPitchInput(L.Y);
+}
+
+void AVahagnCharacter::GetAimView(FVector& OutLoc, FVector& OutFwd) const
+{
+	// aim always follows the flight direction (control rotation), even when the camera orbits or looks from the front
+	const FRotator R = Controller ? Controller->GetControlRotation() : GetActorRotation();
+	if (!IsCameraOffAxis() && Camera) { OutLoc = Camera->GetComponentLocation(); OutFwd = Camera->GetForwardVector(); return; }
+	OutFwd = R.Vector();
+	OutLoc = GetActorLocation() + FVector(0, 0, 110.f) - OutFwd * 560.f;
+}
+
+void AVahagnCharacter::UpdateCameraRig(float Dt)
+{
+	if (!Boom || !Controller) return;
+	// release free-look -> glide back behind the hero
+	if (!bFreeLook)
+	{
+		OrbitYaw = FMath::FInterpTo(FRotator::NormalizeAxis(OrbitYaw), 0.f, Dt, 3.f);
+		OrbitPitch = FMath::FInterpTo(OrbitPitch, 0.f, Dt, 3.f);
+	}
+	float SpinYaw = 0.f;
+	if (SpinLeft > 0.f)
+	{
+		SpinLeft = FMath::Max(0.f, SpinLeft - Dt / 1.1f);
+		const float T = 1.f - SpinLeft;
+		SpinYaw = 360.f * T * T * (3.f - 2.f * T); // ease in/out full turn
+	}
+	const float WantYaw = OrbitYaw + (bFrontView ? 180.f : 0.f);
+	CamYawNow = FMath::FInterpTo(CamYawNow, WantYaw, Dt, bFreeLook ? 18.f : 6.f);
+	CamPitchNow = FMath::FInterpTo(CamPitchNow, OrbitPitch + (bFrontView ? -8.f : 0.f), Dt, bFreeLook ? 18.f : 6.f);
+	const FRotator Ctl = Controller->GetControlRotation();
+	Boom->SetUsingAbsoluteRotation(true);
+	Boom->bUsePawnControlRotation = false;
+	Boom->SetWorldRotation(FRotator(FMath::Clamp(Ctl.Pitch + CamPitchNow, -85.f, 85.f), Ctl.Yaw + CamYawNow + SpinYaw, 0.f));
+	// in front view the over-the-shoulder offset would hide the face: centre it
+	const FVector WantOffset = bFrontView ? FVector(0.f, 0.f, 70.f) : FVector(0.f, 85.f, 110.f);
+	Boom->SocketOffset = FMath::VInterpTo(Boom->SocketOffset, WantOffset, Dt, 4.f);
 }
 void AVahagnCharacter::InFireStart() { if (bControl) bFireHeld = true; }
 void AVahagnCharacter::InFireStop() { bFireHeld = false; }
@@ -246,6 +290,8 @@ void AVahagnCharacter::InBoostStop() { bBoosting = false; }
 
 void AVahagnCharacter::SetMenuFraming(bool bMenu)
 {
+	bMenuFraming = bMenu;
+	if (bMenu) { Boom->SetUsingAbsoluteRotation(false); Boom->bUsePawnControlRotation = true; bFrontView = false; bFreeLook = false; OrbitYaw = OrbitPitch = CamYawNow = CamPitchNow = 0.f; }
 	Boom->SocketOffset = bMenu ? FVector(0.f, -420.f, 40.f) : FVector(0, 85.f, 110.f);
 	Boom->TargetArmLength = bMenu ? 520.f : 560.f;
 	Boom->bEnableCameraLag = !bMenu;
@@ -298,6 +344,7 @@ void AVahagnCharacter::Tick(float Dt)
 	if (!bDead)
 	{
 		UpdateFlight(Dt);
+		if (!bMenuFraming) UpdateCameraRig(Dt);
 		UpdateAim(Dt);
 
 		// fire
@@ -374,8 +421,8 @@ void AVahagnCharacter::UpdateFlight(float Dt)
 void AVahagnCharacter::UpdateAim(float Dt)
 {
 	if (!Camera) return;
-	const FVector CamLoc = Camera->GetComponentLocation();
-	const FVector CamFwd = Camera->GetForwardVector();
+	FVector CamLoc, CamFwd;
+	GetAimView(CamLoc, CamFwd);
 	const float Range = 32000.f;
 
 	FCollisionQueryParams Q(SCENE_QUERY_STAT(TwAim), false, this);
@@ -539,7 +586,8 @@ FVector AVahagnCharacter::MuzzleLocation(bool bRight) const
 
 void AVahagnCharacter::SpawnFireball(const FVector& Muzzle, const FVector& Target, float Power, bool bCharged)
 {
-	const FVector CamFwd = Camera->GetForwardVector();
+	FVector CamLocA, CamFwd;
+	GetAimView(CamLocA, CamFwd);
 	FVector Dir = (Target - Muzzle).GetSafeNormal();
 	// never shoot sideways/backwards: the shot always follows the crosshair
 	if (FVector::DotProduct(Dir, CamFwd) < 0.35f) Dir = CamFwd;
@@ -588,6 +636,7 @@ void AVahagnCharacter::InNova()
 	int32 TargetBursts = 0;
 	TwFx::Sound2D(GetWorld(), TEXT("sfx_special_nova"), 1.f);
 	AddShake(1.f);
+	InSpin(); // the camera whirls once around the god as the sun bursts
 	for (TActorIterator<AVishap> It(GetWorld()); It; ++It)
 	{
 		AVishap* V = *It;

@@ -74,6 +74,9 @@ void AVahagnPlayerController::BuildInput()
 	IA_Charge = MakeAction(this, TEXT("IA_Charge"), EInputActionValueType::Boolean);
 	IA_Boost = MakeAction(this, TEXT("IA_Boost"), EInputActionValueType::Boolean);
 	IA_Nova = MakeAction(this, TEXT("IA_Nova"), EInputActionValueType::Boolean);
+	IA_FreeLook = MakeAction(this, TEXT("IA_FreeLook"), EInputActionValueType::Boolean);
+	IA_FrontView = MakeAction(this, TEXT("IA_FrontView"), EInputActionValueType::Boolean);
+	IA_Spin = MakeAction(this, TEXT("IA_Spin"), EInputActionValueType::Boolean);
 	IA_Pause = MakeAction(this, TEXT("IA_Pause"), EInputActionValueType::Boolean);
 	IA_Pause->bTriggerWhenPaused = true;
 
@@ -104,6 +107,13 @@ void AVahagnPlayerController::BuildInput()
 	Context->MapKey(IA_Boost, EKeys::Gamepad_LeftShoulder);
 	Context->MapKey(IA_Nova, EKeys::Q);
 	Context->MapKey(IA_Nova, EKeys::Gamepad_FaceButton_Top);
+	Context->MapKey(IA_FreeLook, EKeys::LeftAlt);
+	Context->MapKey(IA_FreeLook, EKeys::MiddleMouseButton);
+	Context->MapKey(IA_FreeLook, EKeys::Gamepad_RightThumbstick);
+	Context->MapKey(IA_FrontView, EKeys::F);
+	Context->MapKey(IA_FrontView, EKeys::Gamepad_DPad_Down);
+	Context->MapKey(IA_Spin, EKeys::R);
+	Context->MapKey(IA_Spin, EKeys::Gamepad_DPad_Up);
 	Context->MapKey(IA_Pause, EKeys::Escape);
 	Context->MapKey(IA_Pause, EKeys::P);
 	Context->MapKey(IA_Pause, EKeys::Gamepad_Special_Right);
@@ -127,6 +137,10 @@ void AVahagnPlayerController::SetupInputComponent()
 	EI->BindAction(IA_Boost, ETriggerEvent::Started, this, &AVahagnPlayerController::OnBoost);
 	EI->BindAction(IA_Boost, ETriggerEvent::Completed, this, &AVahagnPlayerController::OnBoostDone);
 	EI->BindAction(IA_Nova, ETriggerEvent::Started, this, &AVahagnPlayerController::OnNova);
+	EI->BindAction(IA_FreeLook, ETriggerEvent::Started, this, &AVahagnPlayerController::OnFreeLook);
+	EI->BindAction(IA_FreeLook, ETriggerEvent::Completed, this, &AVahagnPlayerController::OnFreeLookDone);
+	EI->BindAction(IA_FrontView, ETriggerEvent::Started, this, &AVahagnPlayerController::OnFrontView);
+	EI->BindAction(IA_Spin, ETriggerEvent::Started, this, &AVahagnPlayerController::OnSpin);
 	EI->BindAction(IA_Pause, ETriggerEvent::Started, this, &AVahagnPlayerController::OnPause);
 }
 
@@ -249,5 +263,9 @@ void AVahagnPlayerController::OnCharge(const FInputActionValue& V) { if (Screen 
 void AVahagnPlayerController::OnChargeDone(const FInputActionValue& V) { if (AVahagnCharacter* H = Hero()) H->InChargeRelease(); }
 void AVahagnPlayerController::OnBoost(const FInputActionValue& V) { if (AVahagnCharacter* H = Hero()) H->InBoostStart(); }
 void AVahagnPlayerController::OnBoostDone(const FInputActionValue& V) { if (AVahagnCharacter* H = Hero()) H->InBoostStop(); }
+void AVahagnPlayerController::OnFreeLook(const FInputActionValue& V) { if (Screen == EVahagnScreen::None) if (AVahagnCharacter* H = Hero()) H->InFreeLook(true); }
+void AVahagnPlayerController::OnFreeLookDone(const FInputActionValue& V) { if (AVahagnCharacter* H = Hero()) H->InFreeLook(false); }
+void AVahagnPlayerController::OnFrontView(const FInputActionValue& V) { if (Screen == EVahagnScreen::None) if (AVahagnCharacter* H = Hero()) H->InFrontView(); }
+void AVahagnPlayerController::OnSpin(const FInputActionValue& V) { if (Screen == EVahagnScreen::None) if (AVahagnCharacter* H = Hero()) H->InSpin(); }
 void AVahagnPlayerController::OnNova(const FInputActionValue& V) { if (Screen == EVahagnScreen::None) if (AVahagnCharacter* H = Hero()) H->InNova(); }
 void AVahagnPlayerController::OnPause(const FInputActionValue& V) { TogglePause(); }
