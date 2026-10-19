@@ -187,7 +187,7 @@ TSharedRef<SWidget> SVahagnHud::MakeControls()
 			+ SVerticalBox::Slot().AutoHeight()[ Row(LOCTEXT("k3", "Space / Ctrl"), LOCTEXT("v3", "Վեր / վար")) ]
 			+ SVerticalBox::Slot().AutoHeight()[ Row(LOCTEXT("k4", "Shift"), LOCTEXT("v4", "Արագացում")) ]
 			+ SVerticalBox::Slot().AutoHeight()[ Row(LOCTEXT("k5", "Ձախ կոճակ"), LOCTEXT("v5", "Կրակե գնդակներ")) ]
-			+ SVerticalBox::Slot().AutoHeight()[ Row(LOCTEXT("k6", "Աջ կոճակ (պահել)"), LOCTEXT("v6", "Լիցքավորված հարված՝ պայթյունով")) ]
+			+ SVerticalBox::Slot().AutoHeight()[ Row(LOCTEXT("k6", "Աջ կոճակ (պահել)"), LOCTEXT("v6", "Կայծակ ամպերից. խոցում է վիշապին և անցնում հաջորդներին")) ]
 			+ SVerticalBox::Slot().AutoHeight()[ Row(LOCTEXT("k7", "Q"), LOCTEXT("v7", "Արևի պոռթկում (երբ լիցքավորված է)")) ]
 			+ SVerticalBox::Slot().AutoHeight()[ Row(LOCTEXT("k8", "Esc"), LOCTEXT("v8", "Դադար")) ]
 			+ SVerticalBox::Slot().AutoHeight().Padding(0, 18, 0, 18)
@@ -503,7 +503,7 @@ void SVahagnHud::PaintGameplay(const FGeometry& Geo, FSlateWindowElementList& Ou
 	if (MS == EVahagnMatch::Intro || (MS == EVahagnMatch::Playing && GM->GetMatchTime() < 14.f))
 	{
 		Text(Out, L + 6, Geo, FVector2D(Size.X - 40 * S, Size.Y - 50 * S),
-			LOCTEXT("Hint", "Ձախ կոճակ՝ կրակ · Աջ կոճակ՝ լիցքավորված հարված · Shift՝ արագացում · Space/Ctrl՝ վեր/վար · Q՝ պոռթկում · Alt+մկնիկ՝ 360° տեսախցիկ · F՝ դիմացից · R՝ պտույտ · Esc՝ դադար"),
+			LOCTEXT("Hint", "Ձախ կոճակ՝ կրակ · Աջ կոճակ (պահել)՝ կայծակ · Shift՝ արագացում · Space/Ctrl՝ վեր/վար · Q՝ պոռթկում · Alt+մկնիկ՝ 360° տեսախցիկ · F՝ դիմացից · R՝ պտույտ · Esc՝ դադար"),
 			TwAssets::Font(15 * S, false, false), FLinearColor(1, 1, 1, 0.75f), 1.f);
 	}
 }

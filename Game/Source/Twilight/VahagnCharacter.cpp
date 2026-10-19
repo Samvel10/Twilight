@@ -6,6 +6,7 @@
 #include "TwPoseAnimInstance.h"
 #include "Fireball.h"
 #include "Vishap.h"
+#include "TwLightning.h"
 #include "VahagnGameMode.h"
 
 #include "Camera/CameraComponent.h"
@@ -341,6 +342,20 @@ void AVahagnCharacter::Tick(float Dt)
 		return;
 	}
 	if (bAutopilot && !bDead) UpdateAutopilot(Dt);
+	// -TwBoltTest: a bolt every 1.5 s right in front of the camera (visual check of the lightning)
+	static const bool bBoltTest = FParse::Param(FCommandLine::Get(), TEXT("TwBoltTest"));
+	if (bBoltTest)
+	{
+		AutoBolt -= Dt;
+		if (AutoBolt <= 0.f)
+		{
+			AutoBolt = 1.5f;
+			FVector CL, CF;
+			GetAimView(CL, CF);
+			const FVector Hit = CL + CF * 4000.f;
+			ATwLightning::Strike(GetWorld(), Hit + FVector(0, 0, 4500.f) + CF * 2000.f + FVector::CrossProduct(FVector::UpVector, CF) * 1500.f, Hit, 120.f);
+		}
+	}
 	if (!bDead)
 	{
 		UpdateFlight(Dt);
@@ -617,11 +632,73 @@ void AVahagnCharacter::FireCharged()
 	if (Charge < 0.3f) { FireOnce(); return; }
 	FireCooldown = 0.35f;
 	const FVector Muzzle = (MuzzleLocation(true) + MuzzleLocation(false)) * 0.5f + GetActorForwardVector() * 40.f;
-	SpawnFireball(Muzzle, AimPoint, Charge, true);
 	if (Poser) Poser->PlayOneShot(AnimCastA, 1.4f, 0.05f, 0.25f, 0.85f);
-	TwFx::Burst(GetWorld(), TwFx::EFx::MuzzleFlash, Muzzle, 1.2f + Charge);
-	TwFx::LightFlash(GetWorld(), Muzzle, FLinearColor(1.f, 0.5f, 0.15f), 40000.f, 3000.f, 0.35f);
-	TwFx::Sound(GetWorld(), TEXT("sfx_fireball_cast"), Muzzle, 1.f, 0.7f);
+	TwFx::Burst(GetWorld(), TwFx::EFx::Sparks, Muzzle, 1.f + Charge);
+	CallLightning(Charge);
+}
+
+void AVahagnCharacter::CallLightning(float Power)
+{
+	// Vahagn, god of thunder, strikes the vishap with lightning from the clouds (the myth's weapon)
+	AVishap* Target = AimTarget.Get();
+	FVector CamLoc, CamFwd;
+	GetAimView(CamLoc, CamFwd);
+	if (!Target)
+	{
+		// wider cone than the fireball assist: the god's bolt finds its prey
+		float Best = 13.f;
+		for (TActorIterator<AVishap> It(GetWorld()); It; ++It)
+		{
+			if (!It->IsAlive()) continue;
+			const FVector To = It->GetHeadLocation() - CamLoc;
+			const float D = To.Size();
+			if (D > 30000.f) continue;
+			const float Ang = FMath::RadiansToDegrees(FMath::Acos(FMath::Clamp(FVector::DotProduct(To / D, CamFwd), -1.f, 1.f)));
+			if (Ang < Best) { Best = Ang; Target = *It; }
+		}
+	}
+	const FVector Hit = Target ? Target->GetHeadLocation() : AimPoint;
+	// slanted from a cloud behind and beside the target so the whole bolt crosses the frame
+	const FVector Away = (Hit - CamLoc).GetSafeNormal2D();
+	const FVector Side = FVector::CrossProduct(FVector::UpVector, Away) * (FMath::RandBool() ? 1.f : -1.f);
+	const FVector Sky = Hit + FVector(0, 0, 4200.f + 1500.f * Power) + Away * 2200.f + Side * FMath::FRandRange(800.f, 2200.f);
+	ATwLightning::Strike(GetWorld(), Sky, Hit, 70.f + 70.f * Power);
+	TwFx::LightFlash(GetWorld(), Hit, FLinearColor(0.6f, 0.75f, 1.f), 200000.f, 9000.f, 0.3f);
+	TwFx::Burst(GetWorld(), TwFx::EFx::Sparks, Hit, 2.f + 2.f * Power);
+	TwFx::Sound(GetWorld(), TEXT("sfx_thunder"), Hit, 1.f, FMath::FRandRange(0.9f, 1.1f));
+	TwFx::Sound2D(GetWorld(), TEXT("sfx_thunder"), 0.45f, 1.f);
+	AddShake(0.35f + 0.4f * Power);
+	const float Dmg = 3.5f + 6.5f * Power;
+	if (Target)
+	{
+		Target->ApplyHit(Dmg, Hit, this, true);
+		// the bolt leaps on to up to two more vishaps nearby
+		TSet<AVishap*> Struck{ Target };
+		FVector From = Hit;
+		for (int32 Jump = 0; Jump < 2; ++Jump)
+		{
+			AVishap* Next = nullptr;
+			float BestD = 6000.f;
+			for (TActorIterator<AVishap> It(GetWorld()); It; ++It)
+			{
+				if (!It->IsAlive() || Struck.Contains(*It)) continue;
+				const float D = FVector::Dist(It->GetHeadLocation(), From);
+				if (D < BestD) { BestD = D; Next = *It; }
+			}
+			if (!Next) break;
+			const FVector P = Next->GetHeadLocation();
+			ATwLightning::Strike(GetWorld(), From, P, 30.f + 30.f * Power);
+			Next->ApplyHit(Dmg * 0.5f, P, this, true);
+			TwFx::Burst(GetWorld(), TwFx::EFx::Sparks, P, 1.5f);
+			Struck.Add(Next);
+			From = P;
+		}
+	}
+	else
+	{
+		for (TActorIterator<AVishap> It(GetWorld()); It; ++It)
+			if (It->IsAlive() && It->DistanceToPoint(Hit) < 900.f) It->ApplyHit(Dmg * 0.6f, Hit, this, true);
+	}
 }
 
 void AVahagnCharacter::InNova()
@@ -738,4 +815,7 @@ void AVahagnCharacter::UpdateAutopilot(float Dt)
 	bBoosting = Dist > 12000.f && BoostEnergy > 30.f;
 	bFireHeld = Target && Ang < 10.f && Dist < 20000.f;
 	if (Nova >= 100.f && Target && Dist < 4000.f) InNova();
+	// every few seconds the autopilot calls down a charged lightning bolt (exercises the myth weapon in tests)
+	AutoBolt -= Dt;
+	if (Target && Ang < 12.f && Dist < 20000.f && AutoBolt <= 0.f) { AutoBolt = 4.f; Charge = 0.8f; FireCharged(); Charge = 0.f; }
 }
