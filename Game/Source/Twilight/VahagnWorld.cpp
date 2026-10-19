@@ -1,4 +1,13 @@
 #include "VahagnWorld.h"
+#include "Engine/LevelStreamingDynamic.h"
+#include "Engine/TextureCube.h"
+#include "Engine/DirectionalLight.h"
+#include "Engine/SkyLight.h"
+#include "Engine/ExponentialHeightFog.h"
+#include "Engine/PostProcessVolume.h"
+#include "Engine/StaticMeshActor.h"
+#include "Components/SkyAtmosphereComponent.h"
+#include "Misc/PackageName.h"
 #include "Twilight.h"
 #include "TwAssets.h"
 
@@ -36,11 +45,63 @@ AVahagnWorld::AVahagnWorld()
 	Sea->SetupAttachment(RootComponent);
 }
 
+bool AVahagnWorld::UseHighlands()
+{
+	static const bool b = !FParse::Param(FCommandLine::Get(), TEXT("TwSea")) && FPackageName::DoesPackageExist(TEXT("/Game/Test/L_Highlands"));
+	return b;
+}
+
+void AVahagnWorld::StreamHighlands()
+{
+	bool bOk = false;
+	EnvLevel = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(), TEXT("/Game/Test/L_Highlands"), HighlandsOffset(), FRotator::ZeroRotator, bOk);
+	UE_LOG(LogTwilight, Display, TEXT("[TwEnv] stream L_Highlands ok=%d"), bOk ? 1 : 0);
+	if (EnvLevel) { EnvLevel->SetShouldBeVisible(true); EnvLevel->bShouldBlockOnLoad = true; }
+	GetWorld()->FlushLevelStreaming();
+	AdoptStreamedEnv();
+}
+
+void AVahagnWorld::AdoptStreamedEnv()
+{
+	if (bEnvAdopted || !EnvLevel) return;
+	ULevel* L = EnvLevel->GetLoadedLevel();
+	if (!L) return;
+	bEnvAdopted = true;
+	// the game's own sun/sky/fog/grading stay in charge; keep only terrain, lake, plants and the HDRI dome
+	int32 Removed = 0;
+	for (AActor* A : L->Actors)
+	{
+		if (!A) continue;
+		const bool bLight = A->IsA<ADirectionalLight>() || A->IsA<ASkyLight>() || A->IsA<AExponentialHeightFog>() || A->IsA<APostProcessVolume>() || A->IsA<ACameraActor>()
+			|| A->FindComponentByClass<USkyAtmosphereComponent>() != nullptr;
+		if (bLight) { A->Destroy(); ++Removed; continue; }
+		if (AStaticMeshActor* SM = Cast<AStaticMeshActor>(A))
+		{
+			UStaticMeshComponent* C = SM->GetStaticMeshComponent();
+			UMaterialInterface* M = C ? C->GetMaterial(0) : nullptr;
+			if (M && M->GetName().Contains(TEXT("HLSky"))) { A->Destroy(); ++Removed; } // our own HDRI dome (storm-tintable) replaces it
+		}
+	}
+	UE_LOG(LogTwilight, Display, TEXT("[TwEnv] adopted %d actors, removed %d lights/fog/cams, sky=%d"), L->Actors.Num(), Removed, SkyMat ? 1 : 0);
+	if (SkyLight) SkyLight->RecaptureSky();
+}
+
 void AVahagnWorld::BuildLevel()
 {
-	BuildSkyDome();
-	BuildSea();
-	BuildIslands();
+	if (UseHighlands())
+	{
+		BuildSkyDome();
+		StreamHighlands();
+		if (Fog) Fog->SetFogCutoffDistance(0.f);
+		Sea->SetVisibility(false);
+		Sea->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+	else
+	{
+		BuildSkyDome();
+		BuildSea();
+		BuildIslands();
+	}
 	// the crimson reed of the birth myth, standing out of the sea at the world centre
 	UMaterialInstanceDynamic* ReedMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_FireBody")), this);
 	if (ReedMat)
@@ -163,7 +224,7 @@ void AVahagnWorld::ApplyStorm(float K)
 	{
 		Fog->SetFogInscatteringColor(L(B.FogColor, FLinearColor(0.30f, 0.035f, 0.07f)));
 		Fog->SetDirectionalInscatteringColor(L(B.FogSunColor, FLinearColor(1.f, 0.18f, 0.06f)));
-		Fog->SetFogDensity(FMath::Lerp(B.FogDensity, 0.018f, E));
+		Fog->SetFogDensity(FMath::Lerp(B.FogDensity, UseHighlands() ? B.FogDensity * 6.f : 0.018f, E));
 	}
 	if (SkyLight) { SkyLight->SetIntensity(FMath::Lerp(B.SkyLightIntensity, 0.8f, E)); SkyLight->SetLightColor(L(B.SkyLightColor, FLinearColor(1.f, 0.5f, 0.55f))); }
 	if (Post)
@@ -336,6 +397,35 @@ void AVahagnWorld::BuildVishapakar(const FVector& Base, float Yaw, float Scale)
 
 FTwSkyPreset AVahagnWorld::GetSkyPreset() const
 {
+	if (UseHighlands())
+	{
+		// values of the highlands kit (env_params.json): sun 8 deg up at azimuth 255, matching its baked terrain shadow
+		FTwSkyPreset H;
+		H.SunRot = FRotator(-8.f, -15.f, 0.f);
+		H.SunColor = FLinearColor(1.f, 0.56f, 0.32f);
+		H.SunIntensity = 11.f;
+		H.MoonColor = FLinearColor(0.45f, 0.55f, 0.85f);
+		H.MoonIntensity = 0.f;
+		H.FogColor = FLinearColor(0.36f, 0.42f, 0.55f);
+		H.FogSunColor = FLinearColor(1.f, 0.5f, 0.25f);
+		H.FogDensity = 0.00019f;
+		H.FogFalloff = 0.0067f;
+		H.FogStart = 0.f;
+		H.FogMaxOpacity = 1.f;
+		H.Exposure = 0.f;
+		H.SkyLightIntensity = 0.65f;
+		H.SkyLightColor = FLinearColor(1.f, 1.f, 1.f);
+		H.LowerHemisphere = FLinearColor(0.03f, 0.035f, 0.04f);
+		H.SkyLuminance = FLinearColor(1.f, 1.f, 1.f);
+		H.GainShadows = FVector4(1.f, 1.f, 1.f, 1.f);
+		H.GainHighlights = FVector4(1.f, 1.f, 1.f, 1.f);
+		H.Saturation = FVector4(1.08f, 1.08f, 1.08f, 1.08f);
+		H.ShadowDistance = 20000.f;
+		H.AerialPerspectiveScale = 1.f;
+		H.EmberColor = FLinearColor(1.f, 0.42f, 0.12f);
+		H.EmberFloorZ = 60.f;
+		return H;
+	}
 	// natural sunset over open sea: warm low sun, blue-grey water, neutral-cool shadows (no purple stylisation)
 	FTwSkyPreset P;
 	P.EmberFloorZ = 60.f;
@@ -368,9 +458,16 @@ void AVahagnWorld::BuildSkyDome()
 	if (!M) return;
 	SkyMat = UMaterialInstanceDynamic::Create(M, this);
 	float Yaw = 0.f;
+	if (UseHighlands())
+	{
+		// kloppenheim_06: its sun (u 218 deg, 8 deg up) must sit where the directional light comes from
+		if (UTextureCube* Cube = LoadObject<UTextureCube>(nullptr, TEXT("/Game/Env/HDRI/kloppenheim_06_puresky_4k.kloppenheim_06_puresky_4k")))
+			if (SkyMat) SkyMat->SetTextureParameterValue(TEXT("SkyCube"), Cube);
+		Yaw = 0.352f;
+	}
 	FParse::Value(FCommandLine::Get(), TEXT("TwSkyYaw="), Yaw);
 	if (SkyMat) SkyMat->SetScalarParameterValue(TEXT("Yaw"), Yaw);
-	float Exp = 1.f;
+	float Exp = UseHighlands() ? 0.8f : 1.f;
 	FParse::Value(FCommandLine::Get(), TEXT("TwSkyExp="), Exp);
 	SkyExposure = Exp;
 	if (SkyMat) SkyMat->SetScalarParameterValue(TEXT("Exposure"), Exp);

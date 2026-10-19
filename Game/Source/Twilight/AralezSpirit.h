@@ -10,6 +10,7 @@ class UPointLightComponent;
 class UStaticMeshComponent;
 class UMaterialInstanceDynamic;
 class UInstancedStaticMeshComponent;
+class UAralezBodyComponent;
 
 /** A winged spirit-dog made of light. Player-controlled or a racing bot. */
 UCLASS()
@@ -35,6 +36,9 @@ public:
 	/** Open battlefield (Ara's plain) instead of the cave tunnel. Set before FinishSpawning. */
 	void SetField(bool b) { bField = b; }
 	bool IsField() const { return bField; }
+	/** Set every frame by the game mode while this Aralez tends a fallen warrior (Head = his head, Side = which side to kneel on). */
+	void SetTending(const FVector& Head, const FVector& Feet, float Now) { TendStamp = Now; TendHead = Head; TendFeet = Feet; }
+	bool HasRealBody() const { return RealBody != nullptr; }
 	/** Height above the plain (cm). */
 	float GetAltitude() const;
 	void SetControlEnabled(bool b) { bControl = b; if (!b) { MoveIn = FVector2D::ZeroVector; UpIn = 0.f; } }
@@ -85,6 +89,11 @@ private:
 
 	bool bBot = false;
 	bool bField = false;
+	bool bTending = false;
+	float TendStamp = -10.f;
+	FVector TendHead = FVector::ZeroVector, TendFeet = FVector::ZeroVector;
+	UPROPERTY() TObjectPtr<UAralezBodyComponent> RealBody;
+	void UpdateRealBody(float Dt);
 	TWeakObjectPtr<AActor> BotPatient;
 	float BotHover = 0.f;
 	bool bControl = true;

@@ -1,0 +1,49 @@
+{
+ "mode": "fog",
+ "lake_level_m": 1898.0,
+ "sun_el": 8.0,
+ "sun_yaw": -15.0,
+ "sun_lux": 11.0,
+ "sun_color": [
+  1.0,
+  0.56,
+  0.32
+ ],
+ "csm_distance": 20000.0,
+ "sky_yaw": 0.398,
+ "sky_exposure": 0.8,
+ "sky_intensity": 0.65,
+ "lower_hemi": [
+  0.03,
+  0.035,
+  0.04
+ ],
+ "fog_z": 0.0,
+ "fog_density": 0.00019,
+ "fog_falloff": 0.0067,
+ "fog_max_opacity": 1.0,
+ "fog_start": 0.0,
+ "fog_color": [
+  0.36,
+  0.42,
+  0.55
+ ],
+ "fog_sun_color": [
+  1.0,
+  0.5,
+  0.25
+ ],
+ "fog_sun_exponent": 6.0,
+ "fog_sun_start": 200000.0,
+ "fog2_density": 0.0004,
+ "fog2_falloff": 0.04,
+ "fog2_offset": -50000.0,
+ "ap_distance_scale": 1.0,
+ "mie_scale": 1.0,
+ "exposure": 0.0,
+ "bloom": 0.4,
+ "white_temp": 6500.0,
+ "saturation": 1.08,
+ "contrast": 1.08,
+ "hdri": "kloppenheim_06_puresky_4k"
+}

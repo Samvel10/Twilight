@@ -67,6 +67,8 @@ private:
 	FVector SampleTrail(float Distance, FVector* OutTangent) const;
 	// realistic dragon body (CC-BY skeletal mesh); the sphere segments stay as invisible hit volumes
 	void BuildDragon();
+	bool BuildSerpent();
+	void UpdateSerpent(float Dt);
 	void UpdateDragon(float Dt);
 	bool CalibrateDragon();
 
@@ -121,6 +123,12 @@ private:
 	UPROPERTY() TObjectPtr<USkeletalMeshComponent> Dragon;
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> DragonMat;
 	bool bDragon = false;
+	bool bSerpent = false;
+	UPROPERTY() TObjectPtr<class USerpentBodyComponent> Serpent;
+	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> SerpentMat;
+	TArray<FVector> SerpentPath;
+	float SerpentJaw = 0.f;
+	FVector SerpentFallVel = FVector::ZeroVector;
 	bool bDragonCalibrated = false;
 	bool bDragonAnimFrame = false;
 	FVector DragonHeadCS = FVector::ZeroVector; // head bone, component space (unscaled)

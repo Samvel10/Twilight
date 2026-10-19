@@ -20,3 +20,8 @@ Game/Saved/
 __pycache__/
 docs/capture/
 Build/
+Game/Content/Env/
+Game/Content/Terrain/
+Game/Content/Terrain_van/
+Game/Content/Test/
+Game/Content/Humans_big/

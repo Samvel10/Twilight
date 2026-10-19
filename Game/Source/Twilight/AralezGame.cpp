@@ -136,6 +136,20 @@ void AAralezGameMode::SpawnBattlefield()
 		const float A = g * PI * 0.5f + 0.4f;
 		SpawnGuard(FVector2D(FMath::Cos(A), FMath::Sin(A)) * 1500.f);
 	}
+	// Queen Shamiram watches from a rise east of the field, between two of her guards
+	{
+		const FVector2D Q(5200.f, -1800.f);
+		const FVector QP(Q.X, Q.Y, AAralezField::GroundZ(Q.X, Q.Y));
+		const FTransform T((FVector::ZeroVector - QP).GetSafeNormal2D().Rotation(), QP);
+		if (AShamiramSoldier* Queen = GetWorld()->SpawnActor<AShamiramSoldier>(AShamiramSoldier::StaticClass(), T, S))
+		{
+			Queen->SetQueen();
+			Queen->SetPost(QP);
+			UGameplayStatics::FinishSpawningActor(Queen, T);
+		}
+		SpawnGuard(Q + FVector2D(250.f, 300.f));
+		SpawnGuard(Q + FVector2D(250.f, -300.f));
+	}
 	Need = FMath::Min(8, Warriors.Num() - 1);
 }
 
@@ -187,6 +201,7 @@ void AAralezGameMode::TickHealing(float Dt)
 		if (D > AAralezGameMode::HealRadius || Sp->GetAltitude() > AAralezGameMode::HealAltitude) continue;
 		if (Sp->GetVel().Size() > 1100.f) continue; // a hurried pass heals nothing
 		if (Sp == PlayerSpirit) PlayerPatient = W;
+		Sp->SetTending(W->GetHead(), W->GetFeet(), GetWorld()->GetTimeSeconds());
 		// Ara needs the whole pack; a lone bot is slow
 		float Rate = (Sp->IsBot() ? 1.f / 4.5f : 1.f / 2.4f);
 		if (W->IsAra()) Rate *= 0.45f;

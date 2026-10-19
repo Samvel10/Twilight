@@ -241,13 +241,18 @@ void AAralezField::Tick(float Dt)
 AFallenWarrior::AFallenWarrior()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = Root;
+	Pivot = CreateDefaultSubobject<USceneComponent>(TEXT("Pivot"));
+	Pivot->SetupAttachment(Root);
 	Body = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Body"));
-	RootComponent = Body;
+	Body->SetupAttachment(Pivot);
 	Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Body->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
+	Body->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+	Body->bEnableUpdateRateOptimizations = true;
 	Glow = CreateDefaultSubobject<UPointLightComponent>(TEXT("Glow"));
-	Glow->SetupAttachment(Body);
-	Glow->SetRelativeLocation(FVector(0, 0, 80.f));
+	Glow->SetupAttachment(Root);
+	Glow->SetRelativeLocation(FVector(-90.f, 0, 90.f));
 	Glow->SetIntensityUnits(ELightUnits::Unitless);
 	Glow->SetIntensity(0.f);
 	Glow->SetAttenuationRadius(900.f);
@@ -258,36 +263,64 @@ AFallenWarrior::AFallenWarrior()
 void AFallenWarrior::BeginPlay()
 {
 	Super::BeginPlay();
-	USkeletalMesh* M = LoadObject<USkeletalMesh>(nullptr, WarriorMesh);
+	// Ara's own men: Armenian soldiers in madder red and conical helmets; the king with his gold circlet
+	CharName = bAra ? TEXT("Ara") : TEXT("Armsoldc");
+	USkeletalMesh* M = TwAssets::Human(CharName);
+	bRealHuman = M != nullptr;
+	if (!M) M = LoadObject<USkeletalMesh>(nullptr, WarriorMesh);
 	if (!M) M = TwAssets::Manny();
 	Body->SetSkeletalMesh(M);
-	Body->SetRelativeScale3D(FVector(bAra ? 0.95f : 0.86f));
-	AnimDeath = HeroAnim(FMath::RandBool() ? TEXT("MM_Death_Front_01") : TEXT("MM_Death_Back_01"));
-	if (bAra) AnimDeath = HeroAnim(TEXT("MM_Death_Back_01"));
-	AnimIdle = HeroAnim(TEXT("MM_Idle"));
-	for (int32 i = 0; i < Body->GetNumMaterials(); ++i)
+	Body->SetCastShadow(true);
+	if (bRealHuman)
 	{
-		UMaterialInstanceDynamic* D = Body->CreateDynamicMaterialInstance(i);
-		if (D)
+		// mesh faces +Y: turn it to the actor's +X, then lay him on his back (head toward -X, feet at the origin)
+		Body->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+		Body->SetRelativeScale3D(FVector(bAra ? 0.82f : 0.95f));
+		LieRoll = 90.f;
+		Pivot->SetRelativeLocation(FVector(0.f, 0.f, 14.f));
+		Pivot->SetRelativeRotation(FRotator(LieRoll, 0.f, 0.f));
+		for (int32 i = 0; i < 3; ++i) Body->SetCustomPrimitiveDataFloat(i, FMath::FRand());
+		AnimIdle = TwAssets::HumanAnim(CharName, TEXT("MM_Idle"));
+		AnimRise = TwAssets::HumanAnim(CharName, TEXT("MM_Land"));
+		if (AnimIdle)
 		{
-			D->SetScalarParameterValue(TEXT("EmissiveIntensity"), 0.f);
-			if (bAra && i == 5) D->SetScalarParameterValue(TEXT("CrestGlow"), 0.6f); // the king's crest still smoulders
-			Mats.Add(D);
+			Body->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+			Body->PlayAnimation(AnimIdle, false);
+			Body->SetPosition(FMath::FRandRange(0.f, 0.5f), false);
+			Body->SetPlayRate(0.f);
 		}
 	}
-	// lie dead: the last frame of a death clip
-	if (AnimDeath)
+	else
 	{
-		Body->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-		Body->PlayAnimation(AnimDeath, false);
-		Body->SetPosition(AnimDeath->GetPlayLength() - 0.02f, false);
-		Body->SetPlayRate(0.f);
+		Body->SetRelativeScale3D(FVector(bAra ? 0.95f : 0.86f));
+		AnimDeath = HeroAnim(bAra || FMath::RandBool() ? TEXT("MM_Death_Back_01") : TEXT("MM_Death_Front_01"));
+		AnimIdle = HeroAnim(TEXT("MM_Idle"));
+		if (AnimDeath)
+		{
+			Body->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+			Body->PlayAnimation(AnimDeath, false);
+			Body->SetPosition(AnimDeath->GetPlayLength() - 0.02f, false);
+			Body->SetPlayRate(0.f);
+		}
 	}
+	for (int32 i = 0; i < Body->GetNumMaterials(); ++i)
+		if (UMaterialInstanceDynamic* D = Body->CreateDynamicMaterialInstance(i))
+		{
+			D->SetScalarParameterValue(TEXT("EmissiveIntensity"), 0.f);
+			D->SetScalarParameterValue(TEXT("DustAmount"), 0.9f); // dust of the battlefield
+			if (bAra) D->SetVectorParameterValue(TEXT("RimColor"), FLinearColor(1.f, 0.75f, 0.4f));
+			Mats.Add(D);
+		}
 }
 
 FVector AFallenWarrior::GetChest() const
 {
 	return Body ? Body->GetBoneLocation(TEXT("spine_03")) : GetActorLocation();
+}
+
+FVector AFallenWarrior::GetHead() const
+{
+	return Body ? Body->GetBoneLocation(TEXT("head")) : GetActorLocation();
 }
 
 bool AFallenWarrior::Heal(float Amount)
@@ -296,11 +329,11 @@ bool AFallenWarrior::Heal(float Amount)
 	Progress = FMath::Min(1.f, Progress + Amount);
 	LastHeal = GetWorld()->GetTimeSeconds();
 	if (Progress < 1.f) return false;
-	// he rises: the death clip runs backwards, then he stands
 	bRevived = true;
 	RiseTime = GetWorld()->GetTimeSeconds();
-	if (AnimDeath)
+	if (!bRealHuman && AnimDeath)
 	{
+		// legacy body: the death clip runs backwards
 		Body->SetPlayRate(-1.2f);
 		Body->SetPosition(AnimDeath->GetPlayLength() - 0.02f, false);
 		Body->Play(false);
@@ -314,14 +347,38 @@ void AFallenWarrior::Tick(float Dt)
 {
 	Super::Tick(Dt);
 	const float Now = GetWorld()->GetTimeSeconds();
-	// golden glow while being healed, a brief pillar when he rises
 	const bool bHealing = !bRevived && Now - LastHeal < 0.2f;
 	float Want = bHealing ? 2500.f + 6000.f * Progress : 0.f;
 	if (bRevived && RiseTime > 0.f) Want = FMath::Max(0.f, 14000.f * (1.f - (Now - RiseTime) / 2.5f));
-	if (bAra && !bRevived && !bLocked) Want = FMath::Max(Want, 1200.f + 600.f * FMath::Sin(Now * 2.f)); // Ara waits
+	if (bAra && !bRevived && !bLocked) Want = FMath::Max(Want, 1200.f + 600.f * FMath::Sin(Now * 2.f));
 	Glow->SetIntensity(FMath::FInterpTo(Glow->Intensity, Want, Dt, 6.f));
-	for (UMaterialInstanceDynamic* D : Mats) if (D) D->SetScalarParameterValue(TEXT("HitFlash"), bHealing ? 0.15f * Progress : 0.f);
-	// once the rise finishes, idle
+	for (UMaterialInstanceDynamic* D : Mats) if (D)
+	{
+		D->SetScalarParameterValue(TEXT("HitFlash"), bHealing ? 0.15f * Progress : 0.f);
+		D->SetScalarParameterValue(TEXT("RimIntensity"), (bHealing ? 0.5f * Progress : 0.f) + (bAra ? 0.15f : 0.f));
+	}
+	if (bRealHuman)
+	{
+		// while being licked he stirs (a slight lift of the chest); once healed he rises from the ground
+		if (!bRevived)
+		{
+			const float Stir = bHealing ? 4.f * Progress * (0.5f + 0.5f * FMath::Sin(Now * 6.f)) : 0.f;
+			Pivot->SetRelativeRotation(FRotator(LieRoll - Stir, 0.f, 0.f));
+		}
+		else
+		{
+			const float T = FMath::Clamp((Now - RiseTime) / 1.6f, 0.f, 1.f);
+			const float E = T * T * (3.f - 2.f * T);
+			Pivot->SetRelativeRotation(FRotator(LieRoll * (1.f - E), 0.f, 0.f));
+			Pivot->SetRelativeLocation(FVector(0.f, 0.f, 14.f * (1.f - E)));
+			if (T >= 1.f && AnimIdle && Body->GetPlayRate() == 0.f)
+			{
+				Body->PlayAnimation(AnimIdle, true);
+				Body->SetPlayRate(1.f);
+			}
+		}
+		return;
+	}
 	if (bRevived && AnimDeath && AnimIdle && Body->GetAnimationMode() == EAnimationMode::AnimationSingleNode && !Body->IsPlaying() && Now - RiseTime > 0.3f)
 	{
 		Body->SetPlayRate(1.f);
@@ -334,34 +391,61 @@ void AFallenWarrior::Tick(float Dt)
 AShamiramSoldier::AShamiramSoldier()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	Body = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Body"));
-	RootComponent = Body;
+	Body->SetupAttachment(RootComponent);
 	Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Body->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
+	Body->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+	Body->bEnableUpdateRateOptimizations = true;
 }
 
 void AShamiramSoldier::BeginPlay()
 {
 	Super::BeginPlay();
-	USkeletalMesh* M = LoadObject<USkeletalMesh>(nullptr, WarriorMesh);
+	// Assyrian spearmen: bronze armour, lapis tunic, scutum; the queen in gold and crimson
+	const TCHAR* C = bQueen ? TEXT("Shamiram") : TEXT("Babsoldc");
+	USkeletalMesh* M = TwAssets::Human(C);
+	const bool bReal = M != nullptr;
+	if (!M) M = LoadObject<USkeletalMesh>(nullptr, WarriorMesh);
 	if (!M) M = TwAssets::Manny();
 	Body->SetSkeletalMesh(M);
-	Body->SetRelativeScale3D(FVector(0.86f));
-	// Assyrian dark bronze and black cloth: same body, darker gear
-	for (int32 i = 0; i < Body->GetNumMaterials(); ++i)
-		if (UMaterialInstanceDynamic* D = Body->CreateDynamicMaterialInstance(i))
-		{
-			D->SetScalarParameterValue(TEXT("EmissiveIntensity"), 0.f);
-			if (i == 0) D->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.62f, 0.5f, 0.42f));
-			else D->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.25f, 0.22f, 0.24f));
-			if (i == 5) D->SetScalarParameterValue(TEXT("CrestGlow"), 0.f);
-		}
-	AnimIdle = HeroAnim(TEXT("MM_Idle"));
-	AnimRun = HeroAnim(TEXT("MF_Unarmed_Jog_Fwd"));
-	AnimWalk = HeroAnim(TEXT("MF_Unarmed_Walk_Fwd"));
-	AnimStrike = HeroAnim(TEXT("MM_Attack_03"));
+	Body->SetRelativeRotation(FRotator(0.f, MeshYaw, 0.f));
+	Body->SetRelativeScale3D(FVector(bReal ? 1.f : 0.86f));
+	if (bReal)
+	{
+		for (int32 i = 0; i < 3; ++i) Body->SetCustomPrimitiveDataFloat(i, FMath::FRand());
+		AnimIdle = TwAssets::HumanAnim(C, TEXT("MM_Idle"));
+		AnimRun = TwAssets::HumanAnim(C, TEXT("MF_Unarmed_Jog_Fwd"));
+		AnimWalk = TwAssets::HumanAnim(C, TEXT("MF_Unarmed_Walk_Fwd"));
+		AnimStrike = TwAssets::HumanAnim(C, TEXT("MM_Attack_01"));
+		if (!bQueen)
+			if (UStaticMesh* SM = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Twilight/Humans/Props/Spear2/spear/StaticMeshes/spear.spear")))
+			{
+				Spear = NewObject<UStaticMeshComponent>(this);
+				Spear->SetStaticMesh(SM);
+				Spear->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				Spear->SetupAttachment(Body, TEXT("hand_r"));
+				Spear->SetRelativeTransform(FTransform(FRotator(21.03f, -88.92f, 85.09f), FVector(-93.86f, -4.67f, -7.52f), FVector(1.0188f)));
+				Spear->RegisterComponent();
+			}
+	}
+	else
+	{
+		for (int32 i = 0; i < Body->GetNumMaterials(); ++i)
+			if (UMaterialInstanceDynamic* D = Body->CreateDynamicMaterialInstance(i))
+			{
+				D->SetScalarParameterValue(TEXT("EmissiveIntensity"), 0.f);
+				D->SetVectorParameterValue(TEXT("Tint"), i == 0 ? FLinearColor(0.62f, 0.5f, 0.42f) : FLinearColor(0.25f, 0.22f, 0.24f));
+				if (i == 5) D->SetScalarParameterValue(TEXT("CrestGlow"), 0.f);
+			}
+		AnimIdle = HeroAnim(TEXT("MM_Idle"));
+		AnimRun = HeroAnim(TEXT("MF_Unarmed_Jog_Fwd"));
+		AnimWalk = HeroAnim(TEXT("MF_Unarmed_Walk_Fwd"));
+		AnimStrike = HeroAnim(TEXT("MM_Attack_03"));
+	}
 	Body->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-	PlayLoop(AnimIdle, 1.f);
+	PlayLoop(AnimIdle, FMath::FRandRange(0.85f, 1.1f));
+	Body->SetPosition(FMath::FRand() * 2.f, false);
 	if (Post.IsNearlyZero()) Post = GetActorLocation();
 	WanderGoal = Post;
 }
@@ -376,17 +460,21 @@ void AShamiramSoldier::PlayLoop(UAnimSequence* A, float Rate)
 
 void AShamiramSoldier::Repel(const FVector& From)
 {
+	if (bQueen) return;
 	Stagger = 2.5f;
 	const FVector Away = (GetActorLocation() - From).GetSafeNormal2D();
 	FVector P = GetActorLocation() + Away * 500.f;
 	P.Z = AAralezField::GroundZ(P.X, P.Y);
 	SetActorLocation(P);
-	PlayLoop(AnimIdle, 0.5f);
+	CurrentAnim = nullptr;
+	if (UAnimSequence* Hit = TwAssets::HumanAnim(TEXT("Babsoldc"), TEXT("MM_HitReact_Front_Hvy_01"))) Body->PlayAnimation(Hit, false);
+	else PlayLoop(AnimIdle, 0.5f);
 }
 
 void AShamiramSoldier::Tick(float Dt)
 {
 	Super::Tick(Dt);
+	if (bQueen) return;
 	StrikeCd = FMath::Max(0.f, StrikeCd - Dt);
 	if (Stagger > 0.f) { Stagger -= Dt; return; }
 	const FVector Me = GetActorLocation();
@@ -434,7 +522,7 @@ void AShamiramSoldier::Tick(float Dt)
 		const FVector Dir = To / D;
 		FVector P = Me + Dir * FMath::Min(D, Spd * Dt);
 		P.Z = AAralezField::GroundZ(P.X, P.Y);
-		SetActorLocationAndRotation(P, FMath::RInterpTo(GetActorRotation(), FRotator(0.f, Dir.Rotation().Yaw - 90.f, 0.f), Dt, 6.f));
+		SetActorLocationAndRotation(P, FMath::RInterpTo(GetActorRotation(), FRotator(0.f, Dir.Rotation().Yaw, 0.f), Dt, 6.f));
 		PlayLoop(Prey ? AnimRun : AnimWalk, 1.f);
 	}
 	else PlayLoop(AnimIdle, 1.f);

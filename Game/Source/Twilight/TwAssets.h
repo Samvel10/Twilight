@@ -46,6 +46,9 @@ namespace TwAssets
 	UParticleSystem* Cascade(const TCHAR* Name);
 	UAnimSequence* Anim(const TCHAR* Path);
 	USkeletalMesh* Manny();
+	/** Realistic CC-BY humans (Hayk, Ara, Bel, Babsold, Armsold, Babsoldc, Armsoldc, Shamiram) and their retargeted clips. */
+	USkeletalMesh* Human(const TCHAR* Char);
+	UAnimSequence* HumanAnim(const TCHAR* Char, const TCHAR* Clip);
 
 	/** Armenian-capable fonts (Noto) loaded straight from the TTF files in Content/Fonts. */
 	FSlateFontInfo Font(float Size, bool bSerif = false, bool bBold = true);

@@ -1,0 +1,33 @@
+{
+ "pine_cull": [
+  380000,
+  420000
+ ],
+ "juniper_cull": [
+  120000,
+  150000
+ ],
+ "rock_cull": [
+  200000,
+  250000
+ ],
+ "shore_cull": [
+  30000,
+  40000
+ ],
+ "grass_cull": [
+  4000,
+  4200
+ ],
+ "grass_shadow": false,
+ "rock_scale": {
+  "boulder_01": 1.7600000000000002,
+  "namaqualand_boulder_02": 1.7600000000000002,
+  "namaqualand_boulder_05": 2.2,
+  "rock_07": 7.700000000000001,
+  "rock_09": 17.6,
+  "stone_01": 13.200000000000001
+ },
+ "grass_xy": 1.7,
+ "grass_wind_mi": false
+}

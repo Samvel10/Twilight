@@ -103,3 +103,14 @@ namespace TwAssets
 		return FSlateFontInfo(Fonts[Idx], Size);
 	}
 }
+
+USkeletalMesh* TwAssets::Human(const TCHAR* C)
+{
+	const FString L = FString(C).ToLower();
+	return Load<USkeletalMesh>(*FString::Printf(TEXT("/Game/Twilight/Humans/%s/Mesh/%s/SkeletalMeshes/%s.%s"), C, *L, *L, *L));
+}
+
+UAnimSequence* TwAssets::HumanAnim(const TCHAR* C, const TCHAR* Clip)
+{
+	return Anim(*FString::Printf(TEXT("/Game/Twilight/Humans/%s/Anims/%s.%s"), C, Clip, Clip));
+}

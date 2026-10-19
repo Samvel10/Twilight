@@ -1,4 +1,7 @@
 #include "Vishap.h"
+#include "SerpentBodyComponent.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "Twilight.h"
 #include "TwAssets.h"
 #include "TwFx.h"
@@ -244,8 +247,73 @@ namespace
 	const FName DragonTailBone(TEXT("DEF-tail_010_0161"));
 }
 
+bool AVishap::BuildSerpent()
+{
+	// the Armenian vishap is a serpent of lakes and clouds: a real giant-viper scan, straightened and rigged (CC0/CC-BY)
+	static const TCHAR* SerpentMeshPath = TEXT("/Game/Twilight/Vishap/Mesh/SK_VishapSerpent/SkeletalMeshes/SK_VishapSerpent.SK_VishapSerpent");
+	static const TCHAR* SerpentHornsPath = TEXT("/Game/Twilight/Vishap/Mesh/Horns/SM_VishapHorns/StaticMeshes/SM_VishapHorns.SM_VishapHorns");
+	if (FParse::Param(FCommandLine::Get(), TEXT("TwWingedDragon"))) return false;
+	USkeletalMesh* Mesh = LoadObject<USkeletalMesh>(nullptr, SerpentMeshPath);
+	if (!Mesh) return false;
+	Serpent = NewObject<USerpentBodyComponent>(this);
+	Serpent->SetupAttachment(RootComponent);
+	Serpent->SetAbsolute(true, true, true);
+	Serpent->SetSkinnedAssetAndUpdate(Mesh);
+	Serpent->HeadAttachment = LoadObject<UStaticMesh>(nullptr, SerpentHornsPath);
+	Serpent->HeadScale = bBoss ? 1.5f : 1.35f;
+	const float WantLen = bBoss ? 9000.f : (Tier ? 3200.f : 2600.f);
+	Serpent->SetWorldScale3D(FVector(WantLen / 1000.f));
+	Serpent->RegisterComponent();
+	const TCHAR* MI = bBoss ? TEXT("/Game/Twilight/Vishap/Materials/MI_Vishap_Storm.MI_Vishap_Storm")
+		: (Tier ? TEXT("/Game/Twilight/Vishap/Materials/MI_Vishap_Bronze.MI_Vishap_Bronze") : TEXT("/Game/Twilight/Vishap/Materials/MI_Vishap_Default.MI_Vishap_Default"));
+	SerpentMat = Serpent->CreateDynamicMaterialInstance(0, LoadObject<UMaterialInterface>(nullptr, MI));
+	for (UStaticMeshComponent* Sg : Segments) if (Sg) Sg->SetVisibility(false, true);
+	if (Skull) Skull->SetVisibility(false, true);
+	if (NumSeg > 1)
+	{
+		const float Step = WantLen / (NumSeg - 1);
+		for (int32 i = 0; i < NumSeg && i < Segments.Num(); ++i)
+		{
+			const float A = float(i) / (NumSeg - 1);
+			SegDist[i] = i * Step;
+			SegRadius[i] = WantLen * 0.019f * (i == 0 ? 1.6f : FMath::Lerp(1.f, 0.25f, FMath::Square(A)));
+			Segments[i]->SetWorldScale3D(FVector(SegRadius[i] / 50.f));
+		}
+	}
+	bSerpent = true;
+	return true;
+}
+
+void AVishap::UpdateSerpent(float Dt)
+{
+	if (!Serpent) return;
+	SerpentPath.Reset(Trail.Num() + 1);
+	SerpentPath.Add(HeadPos);
+	SerpentPath.Append(Trail);
+	SerpentJaw = FMath::FInterpTo(SerpentJaw, FMath::Lerp(-0.8f, 1.f, JawOpen), Dt, 8.f);
+	Serpent->JawOpen = SerpentJaw;
+	Serpent->ApplyPath(SerpentPath, FVector::UpVector, LifeTime);
+	if (SerpentMat)
+	{
+		const bool bFiring = State == EVishapState::Breath || State == EVishapState::BreathWindup;
+		SerpentMat->SetScalarParameterValue(TEXT("MouthGlow"), bFiring ? 20.f : 3.f + 1.f * FMath::Sin(LifeTime * 3.f));
+		SerpentMat->SetScalarParameterValue(TEXT("HitFlash"), HitFlash);
+	}
+	// a body the camera flies through would fill the screen: hide it for that instant
+	if (APlayerController* CPC = GetWorld()->GetFirstPlayerController())
+		if (CPC->PlayerCameraManager)
+		{
+			const FVector C = CPC->PlayerCameraManager->GetCameraLocation();
+			bool bNear = false;
+			for (int32 i = 0; i < SegDist.Num() && i < Segments.Num(); i += 2)
+				if (FVector::DistSquared(Segments[i]->GetComponentLocation(), C) < FMath::Square(SegRadius[i] * 1.6f + 120.f)) { bNear = true; break; }
+			if (Serpent->IsVisible() == bNear) Serpent->SetVisibility(!bNear, true);
+		}
+}
+
 void AVishap::BuildDragon()
 {
+	if (BuildSerpent()) return;
 	USkeletalMesh* Mesh = LoadObject<USkeletalMesh>(nullptr, DragonMeshPath);
 	UAnimSequence* Fly = LoadObject<UAnimSequence>(nullptr, DragonFlyPath);
 	if (!Mesh || !Fly) return;
@@ -327,6 +395,7 @@ bool AVishap::CalibrateDragon()
 
 void AVishap::UpdateDragon(float Dt)
 {
+	if (bSerpent) { UpdateSerpent(Dt); return; }
 	if (!bDragon || !Dragon) return;
 	// the reference pose stands upright; the Fly clip lays the body out: take the frame from the animated pose
 	if (!bDragonAnimFrame && LifeTime > 0.2f)
@@ -380,6 +449,7 @@ AVahagnCharacter* AVishap::Player() const
 
 FVector AVishap::MouthLocation() const
 {
+	if (bSerpent && Serpent) return Serpent->GetSocketTransform(TEXT("Head")).TransformPosition(FVector(45.f, 0.f, -3.f));
 	if (bDragon && Dragon) return Dragon->GetBoneLocation(DragonJawBone) + DragonFwd * 60.f * DragonScale;
 	if (Segments.Num() == 0) return HeadPos;
 	const FTransform T = Segments[0]->GetComponentTransform();
@@ -771,7 +841,7 @@ void AVishap::UpdateBody(float Dt)
 		P += Side * Wave;
 		const FRotator Rot = FRotationMatrix::MakeFromXZ(Tan, FVector::UpVector).Rotator();
 		Segments[i]->SetWorldLocationAndRotation(P, Rot);
-		if (bHideNear && !bDragon)
+		if (bHideNear && !bDragon && !bSerpent)
 		{
 			const bool bNear = FVector::DistSquared(P, CamLoc) < FMath::Square(SegRadius[i] * 1.8f + (bBoss ? 600.f : 250.f));
 			if (Segments[i]->IsVisible() == bNear) Segments[i]->SetVisibility(!bNear, true);
@@ -815,6 +885,26 @@ void AVishap::UpdateBody(float Dt)
 void AVishap::UpdateDying(float Dt)
 {
 	DyingTime += Dt;
+	if (bSerpent && Serpent && Serpent->IsVisible())
+	{
+		// struck down: the serpent coils and falls into the lake, smoking
+		if (SerpentFallVel.IsNearlyZero())
+		{
+			SerpentFallVel = HeadVel * 0.3f + FVector(0, 0, 300.f);
+			TwFx::AttachFlame(Serpent, TEXT("Head"), FVector::ZeroVector, bBoss ? 2.f : 1.f);
+		}
+		SerpentFallVel.Z -= 2200.f * Dt;
+		HeadPos += SerpentFallVel * Dt;
+		if (FVector::Dist(HeadPos, Trail[0]) > TrailStep) Trail.Insert(HeadPos, 0);
+		JawOpen = 1.f;
+		HitFlash = 0.6f + 0.4f * FMath::Sin(DyingTime * 20.f);
+		UpdateSerpent(Dt);
+		if (HeadPos.Z < -300.f || DyingTime > StateDur - 0.15f)
+		{
+			TwFx::Burst(GetWorld(), TwFx::EFx::Splash, FVector(HeadPos.X, HeadPos.Y, 10.f), bBoss ? 6.f : 3.f);
+			Serpent->SetVisibility(false, true);
+		}
+	}
 	if (bDragon && Dragon && Dragon->IsVisible())
 	{
 		if (DragonFallVel.IsNearlyZero()) DragonFallVel = HeadVel * 0.4f + FVector(0, 0, 400.f);

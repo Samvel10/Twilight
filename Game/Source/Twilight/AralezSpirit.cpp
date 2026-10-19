@@ -7,6 +7,9 @@
 #include "AralezWorld.h"
 #include "AralezActors.h"
 #include "AralezField.h"
+#include "AralezBodyComponent.h"
+#include "AralezWingComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "TwFlash.h"
 
 #include "Camera/CameraComponent.h"
@@ -71,6 +74,25 @@ void AAralezSpirit::BeginPlay()
 
 void AAralezSpirit::BuildBody()
 {
+	// on Ara's field the Aralez is the real winged dog (CC-BY Shiba-Inu rig + original feather wings)
+	if (bField)
+	{
+		UAralezBodyComponent* B = NewObject<UAralezBodyComponent>(this, TEXT("AralezBody"));
+		B->NumShells = bBot ? 0 : 2;
+		B->GlowLight = bBot ? 6.f : 12.f;
+		B->SetupAttachment(BodyRoot);
+		B->SetRelativeLocation(FVector(0.f, 0.f, -60.f));
+		B->RegisterComponent();
+		B->Build();
+		if (B->GetDog() && B->GetDog()->GetSkeletalMeshAsset())
+		{
+			RealBody = B;
+			RealBody->SetMode(EAralezMode::Glide, 0.f);
+			Trail->SetVisibility(false);
+			return;
+		}
+		B->DestroyComponent();
+	}
 	Mat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Additive")), this);
 	if (Mat)
 	{
@@ -278,13 +300,28 @@ void AAralezSpirit::MoveField(float Dt)
 		Wish = Wish.GetClampedToMaxSize(1.f);
 	}
 	if (Stun > 0.f) Wish *= 0.15f;
+	if (bTending && RealBody && (bBot || Wish.Size() < 0.3f))
+	{
+		// kneel beside the fallen warrior's head and lick his wounds (only while the player isn't steering away)
+		const FVector Along = (TendHead - TendFeet).GetSafeNormal2D();
+		const FVector Side = FVector::CrossProduct(FVector::UpVector, Along) * (BotLane >= 0.f ? 1.f : -1.f);
+		FVector Spot = TendHead + Side * 72.f;
+		Spot.Z = AAralezField::GroundZ(Spot.X, Spot.Y) + 60.f;
+		const FVector P = FMath::VInterpTo(GetActorLocation(), Spot, Dt, 3.f);
+		Vel = (P - GetActorLocation()) / FMath::Max(Dt, 1e-3f);
+		SetActorLocation(P);
+		const FVector Face = (TendHead - P).GetSafeNormal2D();
+		SetActorRotation(FMath::RInterpTo(GetActorRotation(), Face.Rotation(), Dt, 5.f));
+		return;
+	}
 	const float BotScale = bBot ? (0.62f + 0.06f * Skill) : 1.f;
 	const float MaxSpd = Speed * BotScale * (DashTime > 0.f ? 2.2f : 1.f);
 	Vel = FMath::VInterpTo(Vel, Wish * MaxSpd, Dt, Wish.IsNearlyZero() ? 1.5f : 3.f);
 	FVector P = GetActorLocation() + Vel * Dt;
 	// never below the grass, never above the low clouds, never off the plain
 	const float G = AAralezField::GroundZ(P.X, P.Y);
-	if (P.Z < G + 110.f) { P.Z = G + 110.f; Vel.Z = FMath::Max(0.f, Vel.Z); }
+	const float Floor = RealBody ? 60.f : 110.f; // the dog can stand on the grass
+	if (P.Z < G + Floor) { P.Z = G + Floor; Vel.Z = FMath::Max(0.f, Vel.Z); }
 	if (P.Z > G + 9000.f) { P.Z = G + 9000.f; Vel.Z = FMath::Min(0.f, Vel.Z); }
 	const float R = FVector2D(P.X, P.Y).Size();
 	if (R > AAralezField::FieldRadius)
@@ -409,8 +446,31 @@ void AAralezSpirit::Move(float Dt)
 	if (!Vel.IsNearlyZero(50.f)) SetActorRotation(FMath::RInterpTo(GetActorRotation(), Vel.Rotation(), Dt, 6.f));
 }
 
+void AAralezSpirit::UpdateRealBody(float Dt)
+{
+	const float Alt = GetAltitude();
+	const float Spd = Vel.Size();
+	EAralezMode Want = EAralezMode::Glide;
+	if (bTending) Want = EAralezMode::Lick;
+	else if (Alt < 140.f && Spd < 350.f) Want = (RealBody->GetMode() == EAralezMode::Land) ? EAralezMode::Land : EAralezMode::Idle;
+	else if (Vel.Z > 120.f || DashTime > 0.f || (Spd < 500.f && Alt > 200.f)) Want = EAralezMode::Flap; // climbing or hovering takes wingbeats
+	// touching down: one landing clip with the wing air-brake, then it stands
+	if ((Want == EAralezMode::Idle || Want == EAralezMode::Lick) && RealBody->GetMode() != EAralezMode::Idle && RealBody->GetMode() != EAralezMode::Lick && RealBody->GetMode() != EAralezMode::Land)
+		Want = EAralezMode::Land;
+	if (Want != RealBody->GetMode() && !(RealBody->GetMode() == EAralezMode::Land && Want == EAralezMode::Lick && Alt > 100.f)) RealBody->SetMode(Want, 0.3f);
+	if (UAralezWingComponent* W = RealBody->GetWings()) W->SetFlapRate(1.f + 0.5f * FMath::Clamp(Spd / Speed, 0.f, 1.f) + (DashTime > 0.f ? 0.6f : 0.f));
+	// bank into turns while flying, level on the ground
+	const bool bGround = Alt < 150.f;
+	FRotator R = GetActorRotation();
+	R.Pitch = bGround ? 0.f : FMath::Clamp(R.Pitch, -22.f, 18.f);
+	R.Roll = 0.f;
+	SetActorRotation(R);
+	BodyRoot->SetRelativeLocation(FVector::ZeroVector);
+}
+
 void AAralezSpirit::Animate(float Dt)
 {
+	if (RealBody) { UpdateRealBody(Dt); return; }
 	Flap += Dt * (DashTime > 0.f ? 16.f : 7.f);
 	const float W = FMath::Sin(Flap) * 38.f;
 	if (WingL && WingL->GetAttachParent()) WingL->GetAttachParent()->SetRelativeRotation(FRotator(0, 0, -W));
@@ -470,6 +530,7 @@ void AAralezSpirit::Tick(float Dt)
 			if (LPC->PlayerCameraManager) bNearLens = FVector::DistSquared(GetActorLocation(), LPC->PlayerCameraManager->GetCameraLocation()) < FMath::Square(450.f);
 		if (BodyRoot->IsVisible() == bNearLens) BodyRoot->SetVisibility(!bNearLens, true);
 	}
+	bTending = GetWorld()->GetTimeSeconds() - TendStamp < 0.2f;
 	DashCd = FMath::Max(0.f, DashCd - Dt);
 	HowlCd = FMath::Max(0.f, HowlCd - Dt);
 	DashTime = FMath::Max(0.f, DashTime - Dt);

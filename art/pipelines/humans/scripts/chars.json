@@ -1,0 +1,9 @@
+{
+ "hayk":    {"src":"666f485199db43488b14035f2a3840bf", "drop":"Shield,Sword,Helmet", "title":"Rigged for UE4 - Spartan - free"},
+ "ara":     {"src":"f727e3ecfe5642fdb85a2def36d57539", "drop":"Sword,Shield", "title":"Celt - rigged for UE4/5",
+             "props":[["a01505c752944647956037757a1a93f7","Crown","--fitw 1.1 --top -0.045 --dz -0.012"]]},
+ "bel":     {"src":"a488272c15cc4aa5898c28e5141e939d", "drop":"Scutum,Scabbard,Sword2", "title":"Rigged for UE4 - Roman - free"},
+ "babsold": {"src":"a488272c15cc4aa5898c28e5141e939d", "drop":"Scabbard,Sword2", "title":"Rigged for UE4 - Roman - free"},
+ "armsold": {"src":"8b241785d74347f89f4d0f201c88600a", "drop":"Scabbard", "title":"Rigged for UE4 - Saxon - free",
+             "props":[["624fe4b3df49424eac3f55c6a051b7b5","Helmet_Norman","--fitw 1.15 --top 0.03"]]}
+}

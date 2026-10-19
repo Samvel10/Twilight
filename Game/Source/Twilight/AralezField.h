@@ -56,13 +56,21 @@ public:
 	bool IsAra() const { return bAra; }
 	float GetProgress() const { return Progress; }
 	FVector GetChest() const;
+	FVector GetHead() const;
+	FVector GetFeet() const { return GetActorLocation(); }
 	void SetLocked(bool b) { bLocked = b; }
 	bool IsLocked() const { return bLocked; }
 
 private:
+	UPROPERTY(VisibleAnywhere) TObjectPtr<USceneComponent> Root;
+	UPROPERTY(VisibleAnywhere) TObjectPtr<USceneComponent> Pivot;
 	UPROPERTY(VisibleAnywhere) TObjectPtr<USkeletalMeshComponent> Body;
 	UPROPERTY(VisibleAnywhere) TObjectPtr<UPointLightComponent> Glow;
 	UPROPERTY() TObjectPtr<UAnimSequence> AnimDeath;
+	UPROPERTY() TObjectPtr<UAnimSequence> AnimRise;
+	const TCHAR* CharName = TEXT("Armsoldc");
+	bool bRealHuman = false;
+	float LieRoll = 90.f;
 	UPROPERTY() TObjectPtr<UAnimSequence> AnimIdle;
 	UPROPERTY() TArray<TObjectPtr<UMaterialInstanceDynamic>> Mats;
 	bool bAra = false;
@@ -83,18 +91,23 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float Dt) override;
 	void SetPost(const FVector& P) { Post = P; }
+	/** Queen Shamiram herself: stands and watches, never fights. */
+	void SetQueen() { bQueen = true; }
 	void Repel(const FVector& From);
 
 private:
 	void PlayLoop(UAnimSequence* A, float Rate);
 
 	UPROPERTY(VisibleAnywhere) TObjectPtr<USkeletalMeshComponent> Body;
+	UPROPERTY() TObjectPtr<UStaticMeshComponent> Spear;
 	UPROPERTY() TObjectPtr<UAnimSequence> AnimIdle;
 	UPROPERTY() TObjectPtr<UAnimSequence> AnimRun;
 	UPROPERTY() TObjectPtr<UAnimSequence> AnimWalk;
 	UPROPERTY() TObjectPtr<UAnimSequence> AnimStrike;
 	UPROPERTY() TObjectPtr<UAnimSequence> CurrentAnim;
 	FVector Post = FVector::ZeroVector;
+	bool bQueen = false;
+	float MeshYaw = -90.f;
 	float StrikeCd = 0.f;
 	float Stagger = 0.f;
 	float Wander = 0.f;

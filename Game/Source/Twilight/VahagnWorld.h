@@ -16,6 +16,10 @@ public:
 	virtual void Tick(float Dt) override;
 	/** 0 = calm sunset, 1 = crimson storm with lightning (the Great Vishap's world). Blends over a few seconds. */
 	void SetStorm(bool bOn) { StormTarget = bOn ? 1.f : 0.f; }
+	/** The real Geghama highlands + Lake Sevan (streamed sublevel built from DEM data) instead of the procedural sea. */
+	static bool UseHighlands();
+	/** Offset applied to the highlands level so a spot on Lake Sevan, ~900 m off the west shore, is the arena centre. */
+	static FVector HighlandsOffset() { return FVector(-1100000.f, 200000.f, 0.f); }
 
 protected:
 	virtual void BuildLevel() override;
@@ -29,6 +33,10 @@ private:
 	void BuildMasis(UMaterialInterface* Mat);
 
 	void ApplyStorm(float K);
+	void StreamHighlands();
+	void AdoptStreamedEnv();
+	UPROPERTY() TObjectPtr<class ULevelStreamingDynamic> EnvLevel;
+	bool bEnvAdopted = false;
 	void StrikeLightning();
 	void UpdateBolt(float Dt);
 
