@@ -790,34 +790,47 @@ def _load(path):
 
 
 def build_dragon():
-    """Skin for the CC-BY 'European Dragon' (Regina Cachoa): its own albedo/normal/roughness, re-tinted to
-    dark obsidian, glowing lava in the crevices (dark albedo), cold fresnel rim, hit flash. Two-sided wings."""
+    """CC-BY 'European Dragon' (Regina Cachoa) - REALISTIC skin: own albedo (lifted to a plausible
+    reptile albedo), wet sheen on scale tops, TwoSidedFoliage transmission through the wing
+    membranes (low sun behind the wing = glowing red membrane), no fake rim / lava by default."""
     D = "/Game/Twilight/Vishap/Dragon/european_dragon_texture_"
     albedo, rough, normal = _load(D + "0"), _load(D + "1"), _load(D + "2")
+    wingtex = _load("/Game/Twilight/Vishap/Dragon/T_DragonWingMask")
     if albedo is None or normal is None:
         warn("dragon textures missing - M_Dragon skipped")
         return None
     mat = get_or_create_material("M_Dragon")
-    setup_material(mat, two_sided=True, usages=("MATUSAGE_SKELETAL_MESH",))
+    setup_material(mat, shading="MSM_TWO_SIDED_FOLIAGE", two_sided=True, usages=("MATUSAGE_SKELETAL_MESH",))
     g = G(mat)
     t = g.time()
     uv = g.texcoord()
-    a = g.tex_param("BaseTex", albedo, uv)
+    a = g.tex_param("BaseTex", albedo, uv)                                   # sRGB albedo
     lum = g.dot(a, g.c3(0.3, 0.59, 0.11))
-    tint = g.vec("Tint", (0.42, 0.36, 0.40))
-    g.out("MP_BASE_COLOR", g.mul(a, tint))
-    g.out("MP_NORMAL", g.tex_param("NormalTex", normal, uv))
-    if rough is not None:
-        r = g.tex_param("RoughTex", rough, uv, "G")
-        g.out("MP_ROUGHNESS", g.sat(g.mul(r, g.scalar("RoughnessScale", 0.75, "Surface"))))
-    else:
-        g.out("MP_ROUGHNESS", g.scalar("Roughness", 0.55, "Surface"))
-    g.out("MP_METALLIC", g.scalar("Metallic", 0.12, "Surface"))
-    crev = g.sat(g.mul(g.sat(g.sub(g.scalar("VeinThreshold", 0.16, "Veins"), lum)), g.scalar("VeinGain", 9.0, "Veins")))
+    w = g.tex_param("WingMask", wingtex, uv, "R") if wingtex is not None else g.c1(0.0)
+    # base colour: desaturate 30 %, tint body / membrane separately, lift x2.4 (texture is ~sRGB 0.09 avg = near black)
+    desat = g.lerp(a, lum, g.scalar("Desaturate", 0.3, "Surface"))
+    tint = g.lerp(g.vec("Tint", (1.0, 0.95, 0.92)), g.vec("WingTint", (0.55, 0.36, 0.30)), w)
+    g.out("MP_BASE_COLOR", g.mul(g.mul(desat, tint), g.scalar("Brightness", 2.4, "Surface")))
+    # normal x1.2
+    n = g.tex_param("NormalTex", normal, uv)
+    g.out("MP_NORMAL", g.lerp(g.c3(0.0, 0.0, 1.0), n, g.scalar("NormalStrength", 1.2, "Surface")))
+    # roughness: MR.G * 0.75 (~0.70), 'wet' 0.32 on flat scale tops (normal.z^6), membrane 0.55
+    r0 = g.mul(g.tex_param("RoughTex", rough, uv, "G"), g.scalar("RoughnessScale", 0.75, "Surface")) if rough is not None \
+        else g.scalar("Roughness", 0.7, "Surface")
+    tops = g.sat(g.mul(g.power(g.sat(g.mask(n, b=True)), g.scalar("WetTightness", 6.0, "Surface")), g.scalar("Wetness", 1.0, "Surface")))
+    r1 = g.lerp(r0, g.scalar("WetRough", 0.32, "Surface"), tops)
+    g.out("MP_ROUGHNESS", g.sat(g.lerp(r1, g.scalar("MembraneRough", 0.55, "Surface"), w)))
+    g.out("MP_SPECULAR", g.scalar("Specular", 0.5, "Surface"))
+    g.out("MP_METALLIC", g.scalar("Metallic", 0.0, "Surface"))
+    # wing membrane transmission (TwoSidedFoliage 'Subsurface Color'); dark struts/veins transmit less
+    thin = g.sat(g.power(g.sat(g.mul(lum, 4.0)), 1.5))
+    sss = g.mul(g.mul(g.mul(g.vec("MembraneColor", (1.0, 0.22, 0.06)), g.scalar("Transmission", 0.8, "Wings")), w), thin)
+    g.out("MP_SUBSURFACE_COLOR", sss)
+    # gameplay emissive kept (HitFlash / Burn); veins + rim kept as params but OFF by default
+    crev = g.sat(g.mul(g.sat(g.sub(g.scalar("VeinThreshold", 0.0045, "Veins"), lum)), g.scalar("VeinGain", 260.0, "Veins")))
     pulse = g.add(g.mul(g.sine(g.add(g.mul(t, g.scalar("PulseSpeed", 0.6, "Veins")), g.mul(g.mask(uv, r=True), 3.0))), 0.3), 1.0)
-    vein_e = g.mul(g.mul(g.vec("VeinColor", (1.0, 0.25, 0.04)), crev), g.mul(g.scalar("VeinIntensity", 2.5, "Veins"), pulse))
-    rim = g.mul(g.mul(g.vec("RimColor", (0.35, 0.45, 1.0)), g.fresnel(g.scalar("RimExponent", 4.0, "Rim"))),
-                g.scalar("RimIntensity", 0.5, "Rim"))
+    vein_e = g.mul(g.mul(g.vec("VeinColor", (1.0, 0.25, 0.04)), crev), g.mul(g.scalar("VeinIntensity", 0.0, "Veins"), pulse))
+    rim = g.mul(g.mul(g.vec("RimColor", (1.0, 0.55, 0.3)), g.fresnel(g.scalar("RimExponent", 5.0, "Rim"))), g.scalar("RimIntensity", 0.0, "Rim"))
     flash = g.mul(g.vec("FlashColor", (1.0, 0.25, 0.05)), g.scalar("HitFlash", 0.0, "Veins"))
     burn = g.mul(g.vec("BurnColor", (1.0, 0.35, 0.05)), g.scalar("Burn", 0.0, "Veins"))
     g.out("MP_EMISSIVE_COLOR", g.add(g.add(vein_e, rim), g.add(g.mul(flash, g.add(crev, 0.15)), g.mul(burn, g.add(crev, 0.04)))))
@@ -833,8 +846,8 @@ def build_dragon_teeth():
     setup_material(mat, two_sided=True, usages=("MATUSAGE_SKELETAL_MESH",))
     g = G(mat)
     a = g.tex_param("BaseTex", tex, g.texcoord())
-    g.out("MP_BASE_COLOR", g.mul(a, g.vec("Tint", (0.55, 0.45, 0.38))))
-    g.out("MP_ROUGHNESS", g.scalar("Roughness", 0.45, "Surface"))
+    g.out("MP_BASE_COLOR", g.mul(a, g.vec("Tint", (0.80, 0.74, 0.66))))
+    g.out("MP_ROUGHNESS", g.scalar("Roughness", 0.4, "Surface"))
     finish_material(mat)
     return mat
 

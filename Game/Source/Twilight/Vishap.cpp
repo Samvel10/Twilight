@@ -261,19 +261,20 @@ void AVishap::BuildDragon()
 	DragonMat = UMaterialInstanceDynamic::Create(TwAssets::Material(TEXT("M_Dragon")), this);
 	if (DragonMat)
 	{
-		const FLinearColor Tint = bBoss ? FLinearColor(0.8f, 0.36f, 0.3f) : (Tier ? FLinearColor(0.75f, 0.42f, 0.38f) : FLinearColor(0.62f, 0.55f, 0.6f));
+		// realistic reptile skin (lifted albedo, wet scale tops, translucent wings); the boss is a rusty red
+		const FLinearColor Tint = bBoss ? FLinearColor(0.95f, 0.8f, 0.74f) : (Tier ? FLinearColor(1.f, 0.88f, 0.82f) : FLinearColor(1.f, 0.95f, 0.92f));
 		DragonMat->SetVectorParameterValue(TEXT("Tint"), Tint);
 		// lava only in the deepest ~10% of the painted crevices (linear albedo luminance < ~0.009)
 		DragonMat->SetScalarParameterValue(TEXT("VeinThreshold"), 0.0045f);
 		DragonMat->SetScalarParameterValue(TEXT("VeinGain"), 260.f);
-		DragonMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBoss ? 4.f : (Tier ? 3.2f : 2.5f));
+		DragonMat->SetScalarParameterValue(TEXT("VeinIntensity"), bBoss ? 0.4f : 0.f);
 		Dragon->SetMaterial(0, DragonMat);
 	}
 	if (UMaterialInterface* Teeth = TwAssets::Material(TEXT("M_DragonTeeth"))) { Dragon->SetMaterial(1, Teeth); Dragon->SetMaterial(2, Teeth); }
 	if (EyeMat) Dragon->SetMaterial(3, EyeMat);
 	Dragon->SetAnimationMode(EAnimationMode::AnimationSingleNode);
 	Dragon->PlayAnimation(Fly, true);
-	Dragon->SetPlayRate(FMath::FRandRange(0.9f, 1.1f) * (bBoss ? 0.7f : 1.f));
+	Dragon->SetPlayRate(FMath::FRandRange(0.72f, 0.82f) * (bBoss ? 0.75f : 1.f));
 	Dragon->SetPosition(FMath::FRandRange(0.f, Fly->GetPlayLength()), false);
 	bDragon = true;
 	CalibrateDragon();
@@ -304,7 +305,7 @@ bool AVishap::CalibrateDragon()
 	if (Up.SizeSquared() < 0.05f) Up = FVector::ForwardVector - Fwd * FVector::DotProduct(FVector::ForwardVector, Fwd);
 	DragonMeshFrame = FRotationMatrix::MakeFromXZ(Fwd, Up.GetSafeNormal()).ToQuat();
 	const float RefLen = FMath::Max(50.f, FVector::Dist(Head, Tail));
-	const float WantLen = bBoss ? 5200.f : (Tier ? 2100.f : 1800.f); // head-to-tail
+	const float WantLen = bBoss ? 3800.f : (Tier ? 1500.f : 1350.f); // head-to-tail (~22 m wingspan, boss ~60 m)
 	DragonScale = WantLen / RefLen;
 	Dragon->SetWorldScale3D(FVector(DragonScale));
 	UE_LOG(LogTwilight, Display, TEXT("[TwDragon] head=%s tail=%s reflen=%.0f scale=%.2f bones=%d"), *Head.ToCompactString(), *Tail.ToCompactString(), RefLen, DragonScale, Ref.GetNum());
@@ -356,12 +357,12 @@ void AVishap::UpdateDragon(float Dt)
 	const FQuat Rot = World * DragonMeshFrame.Inverse();
 	Dragon->SetWorldLocationAndRotation(HeadPos - Rot.RotateVector(DragonHeadCS * DragonScale), Rot);
 	// wings beat faster when climbing / dashing
-	Dragon->SetPlayRate((bBoss ? 0.7f : 1.f) * FMath::Clamp(0.8f + V.Size() / 6000.f + FMath::Max(0.f, V.Z) / 4000.f, 0.8f, 1.6f));
+	Dragon->SetPlayRate((bBoss ? 0.55f : 0.78f) * FMath::Clamp(0.8f + V.Size() / 6000.f + FMath::Max(0.f, V.Z) / 4000.f, 0.8f, 1.5f));
 	if (DragonMat)
 	{
 		DragonMat->SetScalarParameterValue(TEXT("HitFlash"), HitFlash * 1.5f); // (the material keeps it to the cracks)
 		const bool bFiring = State == EVishapState::Breath || State == EVishapState::BreathWindup;
-		DragonMat->SetScalarParameterValue(TEXT("VeinIntensity"), (bBoss ? 1.6f : (Tier ? 2.4f : 1.8f)) * (bFiring ? 1.8f : 1.f));
+		DragonMat->SetScalarParameterValue(TEXT("VeinIntensity"), (bBoss ? 0.4f : 0.f) + (bFiring ? 1.2f : 0.f)); // the throat glows only when it breathes fire
 	}
 	// never fill the lens with a wing
 	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())

@@ -50,7 +50,7 @@ def import_env():
     # --- dragon (skeletal mesh + Fly/Idle anims). One combined skeletal mesh, no Nanite.
     glb = os.path.join(ROOT, "art", "models", "vishap", "european_dragon.glb")
     dest = "/Game/Twilight/Vishap/Dragon"
-    if os.path.exists(glb):
+    if os.path.exists(glb) and (os.environ.get("TW_DRAGON") or not EAL.does_asset_exist(dest + "/european_dragon")):
         mgr = unreal.InterchangeManager.get_interchange_manager_scripted()
         src = unreal.InterchangeManager.create_source_data(glb)
         prm = unreal.ImportAssetParameters(); prm.is_automated = True
@@ -72,6 +72,11 @@ def import_env():
     for f in sorted(glob.glob(os.path.join(ROOT, "art", "textures", "*", "*.jpg")) + glob.glob(os.path.join(ROOT, "art", "textures", "*", "*.png"))):
         t = unreal.AssetImportTask(); t.filename = f; t.destination_path = "/Game/Twilight/Env/Textures"
         t.automated = True; t.replace_existing = True; t.save = True; tasks.append(t)
+    # wing-membrane mask of the dragon (baked from its skin weights by Tools/wingmask_bake.py), next to the dragon
+    wm = os.path.join(ROOT, "art", "models", "vishap", "T_DragonWingMask.png")
+    if os.path.exists(wm):
+        t = unreal.AssetImportTask(); t.filename = wm; t.destination_path = "/Game/Twilight/Vishap/Dragon"
+        t.automated = True; t.replace_existing = True; t.save = True; tasks.append(t)
     TOOLS.import_asset_tasks(tasks)
     for t in tasks:
         for path in t.get_editor_property("imported_object_paths"):
@@ -79,7 +84,10 @@ def import_env():
             if not a: continue
             n = a.get_name().lower()
             if isinstance(a, unreal.Texture2D):
-                if "nor" in n or n.endswith("_n_1k"):
+                if "wingmask" in n:
+                    a.set_editor_property("srgb", False)
+                    a.set_editor_property("compression_settings", unreal.TextureCompressionSettings.TC_GRAYSCALE)
+                elif "nor" in n or n.endswith("_n_1k"):
                     a.set_editor_property("compression_settings", unreal.TextureCompressionSettings.TC_NORMALMAP)
                     a.set_editor_property("srgb", False)
                     a.set_editor_property("flip_green_channel", "nor_gl" in n)  # T_OceanWaves_N is already DirectX
