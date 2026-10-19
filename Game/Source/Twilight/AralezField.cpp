@@ -443,9 +443,9 @@ void AFallenWarrior::Tick(float Dt)
 	Super::Tick(Dt);
 	const float Now = GetWorld()->GetTimeSeconds();
 	const bool bHealing = !bRevived && Now - LastHeal < 0.2f;
-	float Want = bHealing ? 2500.f + 6000.f * Progress : 0.f;
-	if (bRevived && RiseTime > 0.f) Want = FMath::Max(0.f, 14000.f * (1.f - (Now - RiseTime) / 2.5f));
-	if (bAra && !bRevived && !bLocked) Want = FMath::Max(Want, 1200.f + 600.f * FMath::Sin(Now * 2.f));
+	float Want = bHealing ? 500.f + 1300.f * Progress : 0.f;
+	if (bRevived && RiseTime > 0.f) Want = FMath::Max(0.f, 4000.f * (1.f - (Now - RiseTime) / 2.5f));
+	if (bAra && !bRevived && !bLocked) Want = FMath::Max(Want, 500.f + 250.f * FMath::Sin(Now * 2.f));
 	Glow->SetIntensity(FMath::FInterpTo(Glow->Intensity, Want, Dt, 6.f));
 	for (UMaterialInstanceDynamic* D : Mats) if (D)
 	{

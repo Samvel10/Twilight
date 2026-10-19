@@ -539,7 +539,13 @@ void AAralezSpirit::Tick(float Dt)
 	{
 		if (bField) { if (bBot) ThinkBotField(Dt); MoveField(Dt); }
 		else { if (bBot) ThinkBot(Dt); Move(Dt); }
-		if (bBot && Controller && !Vel.IsNearlyZero(50.f)) Controller->SetControlRotation(FMath::RInterpTo(Controller->GetControlRotation(), Vel.Rotation(), Dt, 2.5f));
+		if (bBot && Controller && !Vel.IsNearlyZero(50.f))
+		{
+			// autopilot camera: follow the flight but keep the horizon in view
+			FRotator Want = Vel.Rotation();
+			Want.Pitch = FMath::Clamp(Want.Pitch, -35.f, -4.f);
+			Controller->SetControlRotation(FMath::RInterpTo(Controller->GetControlRotation(), Want, Dt, 2.5f));
+		}
 	}
 	else
 	{
