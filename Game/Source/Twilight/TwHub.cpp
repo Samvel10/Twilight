@@ -203,8 +203,8 @@ void STwHubWidget::Construct(const FArguments& Args)
 				+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)
 				[
 					SNew(SHorizontalBox)
-					+ SHorizontalBox::Slot().AutoWidth().Padding(14, 0)[ Card(LOCTEXT("C1", "ԳԼՈՒԽ I"), LOCTEXT("V", "ՎԱՀԱԳՆ"), LOCTEXT("VG", "Թռիչքային էքշն · 8 րոպե"), LOCTEXT("VT", "Ծիրանի ծովի եղեգից ծնված կրակե պատանին թռչում է ծովի ու լեռների վրայով և կռվում վիշապների դեմ։ Երեք ալիք և Մեծ վիշապը։"), TEXT("/Game/Twilight/Maps/L_Vahagn"), true) ]
-					+ SHorizontalBox::Slot().AutoWidth().Padding(14, 0)[ Card(LOCTEXT("C2", "ԳԼՈՒԽ II"), LOCTEXT("H", "ՀԱՅԿ"), LOCTEXT("HG", "Մենամարտ · 1–2 խաղացող"), LOCTEXT("HT", "Հայոց ձորի ճակատամարտ. Հայկը Բելի դեմ։ Քամի, վահաններ և ուղղորդվող եռաթև նետ՝ ռոբոտի կամ ընկերոջ դեմ։"), TEXT("/Game/Twilight/Maps/L_Hayk"), true) ]
+					+ SHorizontalBox::Slot().AutoWidth().Padding(14, 0)[ Card(LOCTEXT("C1", "ԳԼՈՒԽ I"), LOCTEXT("V", "ՎԱՀԱԳՆ"), LOCTEXT("VG", "Թռիչքային էքշն · 8 րոպե"), LOCTEXT("VT", "Կրակե պատանին իջնում է Հայկական լեռնաշխարհ՝ Սևանա լիճ և Գեղամա լեռներ։ Օձանման վիշապները բարձրանում են ջրից, իսկ Վահագնը նրանց խոցում է կրակով ու կայծակով։ Հաղթանակից հետո երկնքում բացվում է Հարդագողի ճանապարհը։"), TEXT("/Game/Twilight/Maps/L_Vahagn"), true) ]
+					+ SHorizontalBox::Slot().AutoWidth().Padding(14, 0)[ Card(LOCTEXT("C2", "ԳԼՈՒԽ II"), LOCTEXT("H", "ՀԱՅԿ"), LOCTEXT("HG", "Մենամարտ · 1–2 խաղացող"), LOCTEXT("HT", "Վանա լճի ափին Բելը կանգնած է բլրի վրա՝ իր նետաձիգների հետևում։ Ճեղքի՛ր նրանց շարքը, և վճռական պահին եռաթև նետը կխոցի բռնակալին։ Հաղթանակը՝ Նավասարդ, հայոց տոմարի սկիզբ։"), TEXT("/Game/Twilight/Maps/L_Hayk"), true) ]
 					+ SHorizontalBox::Slot().AutoWidth().Padding(14, 0)[ Card(LOCTEXT("C3", "ԳԼՈՒԽ III"), LOCTEXT("A", "ԱՐԱԼԵԶ"), LOCTEXT("AG", "Արայի դաշտը"), LOCTEXT("AT", "Մայրամուտին Արալեզներն իջնում են երկնքից մարտադաշտ։ Կենդանացրո՛ւ ընկած քաջերին և Արա Գեղեցիկին, մինչև Շամիրամը կխաբի ժողովրդին։"), TEXT("/Game/Twilight/Maps/L_Aralez"), true) ]
 				]
 				+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center).Padding(0, 30, 0, 0)
