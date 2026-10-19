@@ -8,7 +8,8 @@
 #include "AralezGame.generated.h"
 
 class AAralezSpirit;
-class AAralezWorld;
+class AAralezField;
+class AFallenWarrior;
 class SAralezHud;
 class UInputAction;
 class UInputMappingContext;
@@ -17,7 +18,8 @@ struct FInputActionValue;
 UENUM()
 enum class EAralezState : uint8 { Menu, Intro, Race, End };
 
-/** «Արալեզ»: race down to the abyss collecting Ara's soul-lights; most lights wins, finishing order gives a bonus. */
+/** «Արալեզ. Արայի դաշտը»: the Aralez fly down from the clouds onto Ara's battlefield, lick the fallen back to life
+ *  while Shamiram's spearmen guard them, and at last raise Ara himself before the sun sets. */
 UCLASS()
 class TWILIGHT_API AAralezGameMode : public AGameModeBase
 {
@@ -37,37 +39,50 @@ public:
 	float GetIntroLeft() const { return IntroLeft; }
 	const TArray<AAralezSpirit*>& GetRacers() const { return Racers; }
 	AAralezSpirit* GetPlayerSpirit() const { return PlayerSpirit; }
-	int32 ScoreOf(const AAralezSpirit* S) const;
-	int32 RankOf(const AAralezSpirit* S) const;
-	bool DidPlayerWin() const { return RankOf(PlayerSpirit) == 1; }
+	bool DidPlayerWin() const { return bWon; }
 	bool GetAnnouncement(FText& Title, FText& Sub, float& Age) const;
-	int32 GetZone() const { return Zone; }
+	int32 GetRevived() const { return Revived; }
+	int32 GetNeed() const { return Need; }
+	int32 GetFallenTotal() const { return Warriors.Num() - 1; }
+	int32 GetPlayerRevived() const { return PlayerRevived; }
+	bool IsAraOpen() const { return bAraOpen; }
+	AFallenWarrior* GetAra() const { return Ara; }
+	/** Warrior the player is tending right now (null if none) and the nearest one still lying. */
+	AFallenWarrior* GetPlayerPatient() const { return PlayerPatient; }
+	AFallenWarrior* NearestFallen(const FVector& P) const;
+	float GetRealPlayTime() const { return RaceTime; }
 
-	static constexpr float RaceLength = 165.f;
+	static constexpr float RaceLength = 210.f;
+	static constexpr float HealRadius = 480.f;
+	static constexpr float HealAltitude = 520.f;
 
 private:
-	void SpawnLightsAndWraiths();
+	void SpawnBattlefield();
 	void EndRace();
-	void FinishCinematic();
-	bool bFinishing = false;
+	void TickHealing(float Dt);
 	UPROPERTY() TObjectPtr<class ACameraActor> EndCam;
 	float EndCamAge = 0.f;
 	void StartEndCamera();
 	void TickEndCamera(float Dt);
 	void Announce(const FText& T, const FText& S);
 
-	UPROPERTY() TObjectPtr<AAralezWorld> World;
+	UPROPERTY() TObjectPtr<AAralezField> Field;
 	UPROPERTY() TArray<TObjectPtr<AAralezSpirit>> RacerRefs;
+	UPROPERTY() TArray<TObjectPtr<AFallenWarrior>> Warriors;
+	UPROPERTY() TObjectPtr<AFallenWarrior> Ara;
+	UPROPERTY() TObjectPtr<AFallenWarrior> PlayerPatient;
 	TArray<AAralezSpirit*> Racers;
 	AAralezSpirit* PlayerSpirit = nullptr;
 	EAralezState State = EAralezState::Menu;
 	float TimeLeft = RaceLength;
 	float IntroLeft = 3.f;
 	float RaceTime = 0.f;
-	int32 Finished = 0;
-	int32 Zone = 0;
-	TMap<const AAralezSpirit*, int32> FinishBonus;
-	TMap<const AAralezSpirit*, int32> FrozenScore;
+	int32 Revived = 0;
+	int32 PlayerRevived = 0;
+	int32 Need = 7;
+	bool bAraOpen = false;
+	bool bWon = false;
+	bool bDuskWarned = false;
 	FText AnnTitle, AnnSub;
 	float AnnTime = -100.f;
 	FTwTestHarness Test;
@@ -98,6 +113,10 @@ private:
 	void OnDash(const FInputActionValue& V);
 	void OnHowl(const FInputActionValue& V);
 	void OnPause(const FInputActionValue& V);
+	void OnFreeLook(const FInputActionValue& V);
+	void OnFreeLookDone(const FInputActionValue& V);
+	void OnFrontView(const FInputActionValue& V);
+	void OnSpin(const FInputActionValue& V);
 
 	UPROPERTY() TObjectPtr<UInputMappingContext> Context;
 	UPROPERTY() TObjectPtr<UInputAction> IA_Move;
@@ -106,6 +125,9 @@ private:
 	UPROPERTY() TObjectPtr<UInputAction> IA_Dash;
 	UPROPERTY() TObjectPtr<UInputAction> IA_Howl;
 	UPROPERTY() TObjectPtr<UInputAction> IA_Pause;
+	UPROPERTY() TObjectPtr<UInputAction> IA_FreeLook;
+	UPROPERTY() TObjectPtr<UInputAction> IA_Front;
+	UPROPERTY() TObjectPtr<UInputAction> IA_Spin;
 	TSharedPtr<SAralezHud> Hud;
 	EAralezScreen Screen = EAralezScreen::Menu;
 };

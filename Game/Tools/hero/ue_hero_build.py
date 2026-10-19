@@ -10,7 +10,8 @@ DEST=os.environ.get('HERO_DEST','/Game/Twilight/Hero')
 MANNY='/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple'
 A='/Game/Characters/Mannequins/Anims/'
 ANIMS=[A+'Unarmed/MM_Idle', A+'Unarmed/Jump/MM_Fall_Loop', A+'Unarmed/Attack/MM_Attack_01', A+'Unarmed/Attack/MM_Attack_02',
-       A+'Unarmed/Attack/MM_ChargedAttack', A+'Rifle/HitReact/MM_HitReact_Front_Lgt_01', A+'Death/MM_Death_Front_01']
+       A+'Unarmed/Attack/MM_ChargedAttack', A+'Rifle/HitReact/MM_HitReact_Front_Lgt_01', A+'Death/MM_Death_Front_01',
+       A+'Unarmed/Jog/MF_Unarmed_Jog_Fwd', A+'Unarmed/Walk/MF_Unarmed_Walk_Fwd', A+'Unarmed/Attack/MM_Attack_03', A+'Death/MM_Death_Back_01']
 def log(m): unreal.log_warning('HERO '+str(m))
 AT=unreal.AssetToolsHelpers.get_asset_tools(); EAL=unreal.EditorAssetLibrary
 reg=unreal.AssetRegistryHelpers.get_asset_registry()

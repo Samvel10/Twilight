@@ -27,7 +27,16 @@ public:
 	void InUp(float V) { UpIn = V; }
 	void InDash();
 	void InHowl();
+	// camera: hold for free 360° orbit, toggle a front view, or a quick full turn around the Aralez
+	void InFreeLook(bool b) { bFreeLook = b; }
+	void InFrontView() { bFrontView = !bFrontView; }
+	void InSpin() { if (SpinLeft <= 0.f) SpinLeft = 1.f; }
 	void SetBotDriven(bool b) { bBot = b; }
+	/** Open battlefield (Ara's plain) instead of the cave tunnel. Set before FinishSpawning. */
+	void SetField(bool b) { bField = b; }
+	bool IsField() const { return bField; }
+	/** Height above the plain (cm). */
+	float GetAltitude() const;
 	void SetControlEnabled(bool b) { bControl = b; if (!b) { MoveIn = FVector2D::ZeroVector; UpIn = 0.f; } }
 
 	// race state
@@ -56,7 +65,12 @@ private:
 	void BuildBody();
 	void ThinkBot(float Dt);
 	void Move(float Dt);
+	void MoveField(float Dt);
+	void ThinkBotField(float Dt);
 	void Animate(float Dt);
+	void UpdateCameraRig(float Dt);
+	bool bFreeLook = false, bFrontView = false;
+	float OrbitYaw = 0.f, OrbitPitch = 0.f, SpinLeft = 0.f, CamYawNow = 0.f, CamPitchNow = 0.f;
 
 	UPROPERTY(VisibleAnywhere) TObjectPtr<USceneComponent> Root;
 	UPROPERTY(VisibleAnywhere) TObjectPtr<USceneComponent> BodyRoot;
@@ -70,6 +84,9 @@ private:
 	UPROPERTY() TObjectPtr<UMaterialInstanceDynamic> Mat;
 
 	bool bBot = false;
+	bool bField = false;
+	TWeakObjectPtr<AActor> BotPatient;
+	float BotHover = 0.f;
 	bool bControl = true;
 	int32 Skill = 1;
 	FLinearColor Color = FLinearColor(0.6f, 0.9f, 1.f);

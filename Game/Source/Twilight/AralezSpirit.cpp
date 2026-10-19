@@ -6,6 +6,7 @@
 #include "TwFx.h"
 #include "AralezWorld.h"
 #include "AralezActors.h"
+#include "AralezField.h"
 #include "TwFlash.h"
 
 #include "Camera/CameraComponent.h"
@@ -63,7 +64,9 @@ void AAralezSpirit::BeginPlay()
 	Glow->SetIntensity(bBot ? 6000.f : 20000.f);
 	Glow->SetAttenuationRadius(bBot ? 900.f : 2400.f);
 	if (bBot) Camera->Deactivate();
-	PathT = AAralezWorld::NearestT(GetActorLocation(), 0.f);
+	Boom->bDoCollisionTest = bField; // the plain has collision: keep the lens above the grass
+	if (!bField) PathT = AAralezWorld::NearestT(GetActorLocation(), 0.f);
+	else { Boom->TargetArmLength = 700.f; Boom->CameraLagSpeed = 6.f; Glow->SetAttenuationRadius(bBot ? 1200.f : 1800.f); Glow->SetIntensity(bBot ? 5000.f : 9000.f); }
 }
 
 void AAralezSpirit::BuildBody()
@@ -139,9 +142,38 @@ void AAralezSpirit::BuildBody()
 	PrevTrail = GetActorLocation();
 }
 
+void AAralezSpirit::UpdateCameraRig(float Dt)
+{
+	if (!Boom || !Controller) return;
+	if (!bFreeLook)
+	{
+		OrbitYaw = FMath::FInterpTo(FRotator::NormalizeAxis(OrbitYaw), 0.f, Dt, 3.f);
+		OrbitPitch = FMath::FInterpTo(OrbitPitch, 0.f, Dt, 3.f);
+	}
+	float SpinYaw = 0.f;
+	if (SpinLeft > 0.f)
+	{
+		SpinLeft = FMath::Max(0.f, SpinLeft - Dt / 1.1f);
+		const float T = 1.f - SpinLeft;
+		SpinYaw = 360.f * T * T * (3.f - 2.f * T);
+	}
+	CamYawNow = FMath::FInterpTo(CamYawNow, OrbitYaw + (bFrontView ? 180.f : 0.f), Dt, bFreeLook ? 18.f : 6.f);
+	CamPitchNow = FMath::FInterpTo(CamPitchNow, OrbitPitch + (bFrontView ? -6.f : 0.f), Dt, bFreeLook ? 18.f : 6.f);
+	const FRotator Ctl = Controller->GetControlRotation();
+	Boom->SetUsingAbsoluteRotation(true);
+	Boom->bUsePawnControlRotation = false;
+	Boom->SetWorldRotation(FRotator(FMath::Clamp(FRotator::NormalizeAxis(Ctl.Pitch) + CamPitchNow, -85.f, 85.f), Ctl.Yaw + CamYawNow + SpinYaw, 0.f));
+}
+
 void AAralezSpirit::InLook(const FVector2D& V)
 {
 	if (!bControl) return;
+	if (bFreeLook)
+	{
+		OrbitYaw += V.X * 2.2f;
+		OrbitPitch = FMath::Clamp(OrbitPitch + V.Y * 2.2f, -70.f, 70.f);
+		return;
+	}
 	AddControllerYawInput(V.X);
 	AddControllerPitchInput(V.Y);
 }
@@ -170,6 +202,99 @@ void AAralezSpirit::InHowl()
 		if (FVector::Dist(It->GetActorLocation(), P) < 2600.f) It->Repel(P);
 	for (TActorIterator<ASoulLight> It(GetWorld()); It; ++It)
 		if (FVector::Dist(It->GetActorLocation(), P) < 2600.f) It->PullTo(this);
+	// on Ara's plain the howl drives Shamiram's spearmen back
+	for (TActorIterator<AShamiramSoldier> It(GetWorld()); It; ++It)
+		if (FVector::Dist(It->GetActorLocation(), P) < 2200.f) It->Repel(P);
+}
+
+float AAralezSpirit::GetAltitude() const
+{
+	const FVector P = GetActorLocation();
+	return P.Z - AAralezField::GroundZ(P.X, P.Y);
+}
+
+void AAralezSpirit::ThinkBotField(float Dt)
+{
+	BotThink -= Dt;
+	AActor* Pat = BotPatient.Get();
+	const AFallenWarrior* W = Cast<AFallenWarrior>(Pat);
+	if (BotThink <= 0.f || !W || W->IsRevived() || W->IsLocked())
+	{
+		BotThink = 1.f;
+		// nearest fallen warrior nobody else (no other spirit) is already tending
+		float Best = TNumericLimits<float>::Max();
+		AFallenWarrior* Pick = nullptr;
+		for (TActorIterator<AFallenWarrior> It(GetWorld()); It; ++It)
+		{
+			if (It->IsRevived() || It->IsLocked()) continue;
+			bool bTaken = false;
+			for (TActorIterator<AAralezSpirit> S(GetWorld()); S; ++S)
+				if (*S != this && FVector::Dist2D(S->GetActorLocation(), It->GetActorLocation()) < 900.f) bTaken = true;
+			float D = FVector::Dist2D(It->GetActorLocation(), GetActorLocation());
+			if (bTaken) D += 20000.f;
+			if (It->IsAra()) D += 6000.f; // the king last: he needs the whole pack
+			if (D < Best) { Best = D; Pick = *It; }
+		}
+		if (Pick != Pat) BotHover = 0.f;
+		BotPatient = Pick;
+		W = Pick;
+	}
+	FVector Goal = GetActorLocation();
+	if (W)
+	{
+		const FVector T = W->GetActorLocation();
+		const float D = FVector::Dist2D(T, GetActorLocation());
+		// cruise high (out of spear reach), drop only for the last stretch
+		const float H = D > 2500.f ? 1800.f : 260.f;
+		Goal = T + FVector(0, 0, H) + FVector(FMath::Cos(BotLane * 3.f), FMath::Sin(BotLane * 3.f), 0.f) * 160.f;
+	}
+	// spearmen close: climb away, howl when cornered
+	for (TActorIterator<AShamiramSoldier> It(GetWorld()); It; ++It)
+	{
+		const float D = FVector::Dist2D(It->GetActorLocation(), GetActorLocation());
+		if (D < 900.f)
+		{
+			if (HowlCd <= 0.f && FMath::FRand() < 0.02f * (Skill + 1)) InHowl();
+			Goal += FVector(0, 0, 900.f);
+		}
+	}
+	BotGoal = Goal;
+}
+
+void AAralezSpirit::MoveField(float Dt)
+{
+	FVector Wish = FVector::ZeroVector;
+	if (bBot)
+	{
+		const FVector To = BotGoal - GetActorLocation();
+		Wish = To.GetSafeNormal() * FMath::Clamp(To.Size() / 600.f, 0.f, 1.f);
+	}
+	else if (Controller)
+	{
+		const FRotator C = Controller->GetControlRotation();
+		const FVector F = C.Vector();
+		const FVector R = FRotationMatrix(FRotator(0, C.Yaw, 0)).GetUnitAxis(EAxis::Y);
+		Wish = F * MoveIn.Y + R * MoveIn.X + FVector::UpVector * UpIn;
+		Wish = Wish.GetClampedToMaxSize(1.f);
+	}
+	if (Stun > 0.f) Wish *= 0.15f;
+	const float BotScale = bBot ? (0.62f + 0.06f * Skill) : 1.f;
+	const float MaxSpd = Speed * BotScale * (DashTime > 0.f ? 2.2f : 1.f);
+	Vel = FMath::VInterpTo(Vel, Wish * MaxSpd, Dt, Wish.IsNearlyZero() ? 1.5f : 3.f);
+	FVector P = GetActorLocation() + Vel * Dt;
+	// never below the grass, never above the low clouds, never off the plain
+	const float G = AAralezField::GroundZ(P.X, P.Y);
+	if (P.Z < G + 110.f) { P.Z = G + 110.f; Vel.Z = FMath::Max(0.f, Vel.Z); }
+	if (P.Z > G + 9000.f) { P.Z = G + 9000.f; Vel.Z = FMath::Min(0.f, Vel.Z); }
+	const float R = FVector2D(P.X, P.Y).Size();
+	if (R > AAralezField::FieldRadius)
+	{
+		const FVector In = FVector(-P.X, -P.Y, 0.f).GetSafeNormal();
+		P += In * (R - AAralezField::FieldRadius);
+		Vel += In * FMath::Max(0.f, -FVector::DotProduct(Vel, In));
+	}
+	SetActorLocation(P);
+	if (!Vel.IsNearlyZero(50.f)) SetActorRotation(FMath::RInterpTo(GetActorRotation(), Vel.Rotation(), Dt, 6.f));
 }
 
 int32 AAralezSpirit::StealLights(int32 N)
@@ -351,8 +476,8 @@ void AAralezSpirit::Tick(float Dt)
 	Stun = FMath::Max(0.f, Stun - Dt);
 	if (bControl && !bFinished)
 	{
-		if (bBot) ThinkBot(Dt);
-		Move(Dt);
+		if (bField) { if (bBot) ThinkBotField(Dt); MoveField(Dt); }
+		else { if (bBot) ThinkBot(Dt); Move(Dt); }
 		if (bBot && Controller && !Vel.IsNearlyZero(50.f)) Controller->SetControlRotation(FMath::RInterpTo(Controller->GetControlRotation(), Vel.Rotation(), Dt, 2.5f));
 	}
 	else
@@ -361,7 +486,9 @@ void AAralezSpirit::Tick(float Dt)
 		SetActorLocation(GetActorLocation() + Vel * Dt);
 	}
 	Animate(Dt);
-	if (!bBot)
+	if (!bBot && bField) UpdateCameraRig(Dt);
+	if (!bBot && bField) Camera->SetFieldOfView(FMath::FInterpTo(Camera->FieldOfView, DashTime > 0.f ? 100.f : 85.f, Dt, 5.f));
+	else if (!bBot)
 	{
 		Camera->SetFieldOfView(FMath::FInterpTo(Camera->FieldOfView, DashTime > 0.f ? 104.f : 90.f, Dt, 5.f));
 		// keep the lens inside the cave: pull the boom in when the camera nears the rock
