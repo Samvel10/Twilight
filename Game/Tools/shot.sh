@@ -10,7 +10,7 @@ LOG=$OUT/$NAME.log
 PID=$!
 for i in $(seq 1 180); do grep -q "\[TwTest\]\|LogLoad: Took" "$LOG" 2>/dev/null && break; sleep 1; done
 sleep "$WAIT"
-WID=$(xdotool search --onlyvisible --name 'SF_VULKAN' | tail -1)
+WID=$(xdotool search --onlyvisible --pid $PID 2>/dev/null | tail -1); [ -z "$WID" ] && WID=$(xdotool search --onlyvisible --name 'SF_VULKAN' | tail -1)
 eval "$(xdotool getwindowgeometry --shell "$WID")"
 ffmpeg -hide_banner -loglevel error -y -f x11grab -video_size ${WIDTH}x${HEIGHT} -i :0.0+${X},${Y} -frames:v 1 "$OUT/$NAME.jpg"
 kill $PID 2>/dev/null; wait $PID 2>/dev/null

@@ -5,6 +5,9 @@
 #include "VahagnCharacter.h"
 #include "VahagnPlayerController.h"
 #include "VahagnWorld.h"
+#include "HardagoghPath.h"
+#include "Camera/CameraActor.h"
+#include "Camera/CameraComponent.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
@@ -240,7 +243,28 @@ void AVahagnGameMode::EndMatch(bool bVictory)
 		FFileHelper::SaveStringToFile(FString::FromInt(BestScore), *BestScorePath());
 	}
 	if (AVahagnCharacter* H = Hero()) H->SetControlEnabled(false);
-	if (AVahagnPlayerController* PC = Cast<AVahagnPlayerController>(UGameplayStatics::GetPlayerController(this, 0))) PC->OnMatchEnded(bVictory);
+	AVahagnPlayerController* EndPC = Cast<AVahagnPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+	if (bVictory && EndPC && Hero())
+	{
+		// the myth's last image: the straw Vahagn carried spills across the sky as the Milky Way
+		AVahagnCharacter* H = Hero();
+		const FVector Fwd = FRotator(0.f, EndPC->GetControlRotation().Yaw, 0.f).Vector();
+		FActorSpawnParameters Sp;
+		Sp.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		if (AHardagoghPath* Path = GetWorld()->SpawnActor<AHardagoghPath>(H->GetActorLocation(), FRotator::ZeroRotator, Sp)) Path->Build(H->GetActorLocation(), Fwd);
+		const FVector CamLoc = H->GetActorLocation() - Fwd * 900.f + FVector(0, 0, 120.f);
+		if (ACameraActor* Cam = GetWorld()->SpawnActor<ACameraActor>(CamLoc, FRotator(20.f, Fwd.Rotation().Yaw, 0.f), Sp))
+		{
+			Cam->GetCameraComponent()->SetFieldOfView(80.f);
+			Cam->GetCameraComponent()->bConstrainAspectRatio = false;
+			EndPC->SetViewTargetWithBlend(Cam, 2.5f, VTBlend_EaseInOut, 2.f);
+		}
+		Announce(NSLOCTEXT("Vahagn", "MilkyWay", "Հարդագողի ճանապարհը"), NSLOCTEXT("Vahagn", "MilkyWaySub", "Վահագնի տարած հարդը թափվեց երկնքում և դարձավ Ծիր Կաթին"));
+		FTimerHandle T;
+		TWeakObjectPtr<AVahagnPlayerController> WPC(EndPC);
+		GetWorldTimerManager().SetTimer(T, FTimerDelegate::CreateLambda([WPC]() { if (WPC.IsValid()) WPC->OnMatchEnded(true); }), AHardagoghPath::RevealTime + 1.5f, false);
+	}
+	else if (EndPC) EndPC->OnMatchEnded(bVictory);
 	UE_LOG(LogTwilight, Display, TEXT("[TwTest] Match ended: %s score=%d kills=%d time=%.1f"), bVictory ? TEXT("VICTORY") : TEXT("DEFEAT"), Score, Kills, MatchTime);
 }
 
@@ -265,6 +289,8 @@ void AVahagnGameMode::Tick(float Dt)
 	case EVahagnMatch::Playing:
 	{
 		MatchTime += Dt;
+		static const bool bWinNow = FParse::Param(FCommandLine::Get(), TEXT("TwWinNow")); // debug: jump straight to the victory ending
+		if (bWinNow && MatchTime > 6.f) { EndMatch(true); return; }
 		TimeLeft = FMath::Max(0.f, TimeLeft - Dt);
 		WaveTime += Dt;
 		AVahagnCharacter* H = Hero();

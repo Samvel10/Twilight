@@ -15,7 +15,7 @@ PID=$!
 # wait for the window, then record until the game exits
 WID=""
 for i in $(seq 1 300); do
-  WID=$(xdotool search --onlyvisible --name 'SF_VULKAN' 2>/dev/null | tail -1)
+  WID=$(xdotool search --onlyvisible --pid $PID 2>/dev/null | tail -1)
   [ -n "$WID" ] && break
   kill -0 $PID 2>/dev/null || break
   sleep 1

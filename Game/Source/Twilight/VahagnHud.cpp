@@ -219,7 +219,8 @@ TSharedRef<SWidget> SVahagnHud::MakePause()
 TSharedRef<SWidget> SVahagnHud::MakeEnd()
 {
 	TWeakObjectPtr<AVahagnPlayerController> O = Owner;
-	return SNew(SBorder).BorderImage(White()).BorderBackgroundColor(FLinearColor(0.f, 0.f, 0.f, 0.55f)).HAlign(HAlign_Center).VAlign(VAlign_Center)
+	// after a victory the Milky Way fills the sky: keep the panel low and light so it stays visible
+	return SNew(SBorder).BorderImage(White()).BorderBackgroundColor_Lambda([O]() { return FLinearColor(0.f, 0.f, 0.f, O.IsValid() && O->WasVictory() ? 0.22f : 0.55f); }).HAlign(HAlign_Center).VAlign(VAlign_Bottom).Padding(FMargin(0, 0, 0, 50))
 	[
 		SNew(SVerticalBox)
 		+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)
@@ -236,7 +237,7 @@ TSharedRef<SWidget> SVahagnHud::MakeEnd()
 			.Text_Lambda([O]()
 			{
 				return O.IsValid() && O->WasVictory()
-					? LOCTEXT("WinSub", "Մեծ վիշապը խոցված է։ Ծիրանի ծովը խաղաղվեց։")
+					? LOCTEXT("WinSub", "Մեծ վիշապը խոցված է։ Երկնքում փայլում է Հարդագողի ճանապարհը։")
 					: LOCTEXT("LoseSub", "Վահագնի կրակը մարեց… բայց առասպելը շարունակվում է։");
 			})
 			.Font(TwAssets::Font(24.f, false, false)).ColorAndOpacity(Cream)
