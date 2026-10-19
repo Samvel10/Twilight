@@ -163,6 +163,13 @@ void AVahagnWorld::ApplyStorm(float K)
 	{
 		Post->Settings.ColorGainHighlights = FMath::Lerp(B.GainHighlights, FVector4(1.14f, 0.9f, 0.85f, 1.f), E);
 	}
+	if (SkyMat)
+	{
+		// the HDRI dome carries the visible sky: it must turn crimson with the storm
+		SkyMat->SetVectorParameterValue(TEXT("ZenithTint"), L(FLinearColor(0.75f, 0.62f, 1.f), FLinearColor(0.75f, 0.22f, 0.3f)));
+		SkyMat->SetVectorParameterValue(TEXT("HorizonTint"), L(FLinearColor(1.f, 0.62f, 0.78f), FLinearColor(1.3f, 0.32f, 0.22f)));
+		SkyMat->SetScalarParameterValue(TEXT("Exposure"), FMath::Lerp(SkyExposure, SkyExposure * 0.75f, E));
+	}
 	if (SeaMat)
 	{
 		SeaMat->SetVectorParameterValue(TEXT("DeepColor"), L(SeaDeep, FLinearColor(0.07f, 0.008f, 0.02f)));
@@ -328,6 +335,7 @@ void AVahagnWorld::BuildSkyDome()
 	if (SkyMat) SkyMat->SetScalarParameterValue(TEXT("Yaw"), Yaw);
 	float Exp = 1.f;
 	FParse::Value(FCommandLine::Get(), TEXT("TwSkyExp="), Exp);
+	SkyExposure = Exp;
 	if (SkyMat) SkyMat->SetScalarParameterValue(TEXT("Exposure"), Exp);
 	UStaticMeshComponent* Dome = NewObject<UStaticMeshComponent>(this);
 	Dome->SetStaticMesh(TwAssets::Sphere());

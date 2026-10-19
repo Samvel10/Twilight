@@ -36,6 +36,7 @@ private:
 	UPROPERTY() TObjectPtr<class UMaterialInstanceDynamic> SeaMat;
 	UPROPERTY() TObjectPtr<class UMaterialInstanceDynamic> SkyMat;
 	UPROPERTY() TObjectPtr<class ACameraActor> DebugCam;
+	float SkyExposure = 1.f;
 	UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> BoltSegs;
 	UPROPERTY() TObjectPtr<class UMaterialInstanceDynamic> BoltMat;
 	float Storm = 0.f;

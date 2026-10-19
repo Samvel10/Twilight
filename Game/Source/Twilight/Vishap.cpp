@@ -361,7 +361,7 @@ void AVishap::UpdateDragon(float Dt)
 	{
 		DragonMat->SetScalarParameterValue(TEXT("HitFlash"), HitFlash * 1.5f); // (the material keeps it to the cracks)
 		const bool bFiring = State == EVishapState::Breath || State == EVishapState::BreathWindup;
-		DragonMat->SetScalarParameterValue(TEXT("VeinIntensity"), (bBoss ? 3.f : (Tier ? 2.4f : 1.8f)) * (bFiring ? 1.8f : 1.f));
+		DragonMat->SetScalarParameterValue(TEXT("VeinIntensity"), (bBoss ? 1.6f : (Tier ? 2.4f : 1.8f)) * (bFiring ? 1.8f : 1.f));
 	}
 	// never fill the lens with a wing
 	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
