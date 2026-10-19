@@ -8,6 +8,7 @@ G=$(cd "$(dirname "$0")/.." && pwd)
 OUT=$G/../docs/capture/$(date +%m%d_%H%M%S); mkdir -p "$OUT"
 RESX=${RESX:-1600}; RESY=${RESY:-900}
 LOG="$OUT/game.log"
+"$(dirname "$0")/cool_wait.sh" >&2
 "$UE/Engine/Binaries/Linux/UnrealEditor" "$G/Twilight.uproject" ${MAP:-/Game/Twilight/Maps/L_Vahagn} -game -windowed \
   -ResX=$RESX -ResY=$RESY -WinX=0 -WinY=0 -NoSplash -nosound -unattended -log=TwTest.log \
   -TwAutoPlay=$SECS "$@" > "$LOG" 2>&1 &

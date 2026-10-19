@@ -5,6 +5,7 @@ G=$(cd "$(dirname "$0")/.." && pwd)
 MAP=$1; SECS=$2; shift 2
 OUT=$G/../docs/capture/pkg_${MAP}_$(date +%H%M%S); mkdir -p "$OUT"
 SUM=$HOME/.config/Epic/Twilight/Saved/TwTestSummary.txt; rm -f "$SUM"
+"$(dirname "$0")/cool_wait.sh" >&2
 "$G/../Build/Linux/Twilight.sh" -TwMap=$MAP -windowed -ResX=1600 -ResY=900 -WinX=0 -WinY=0 -nosound -TwAutoPlay=$SECS "$@" > "$OUT/game.log" 2>&1 &
 W=""; for i in $(seq 1 90); do P=$(pidof Twilight-Linux-Shipping); [ -n "$P" ] && W=$(xdotool search --onlyvisible --pid $P 2>/dev/null | tail -1); [ -n "$W" ] && break; sleep 1; done
 sleep 2; eval "$(xdotool getwindowgeometry --shell "$W")"
