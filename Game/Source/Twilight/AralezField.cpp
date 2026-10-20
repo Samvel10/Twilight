@@ -328,7 +328,8 @@ void AAralezField::Tick(float Dt)
 	{
 		SmokeTimer = 0.9f;
 		const FVector P = SmokeSpots[FMath::RandRange(0, SmokeSpots.Num() - 1)];
-		TwFx::Burst(GetWorld(), TwFx::EFx::Smoke, P + FVector(0, 0, 300.f + FMath::FRandRange(0.f, 900.f)), 4.f);
+		// (StarterContent smoke puffs read as floating black balls over the plain: the fires keep only flame and glow)
+		(void)P;
 	}
 }
 

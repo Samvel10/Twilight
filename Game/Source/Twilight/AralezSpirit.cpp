@@ -69,7 +69,7 @@ void AAralezSpirit::BeginPlay()
 	if (bBot) Camera->Deactivate();
 	Boom->bDoCollisionTest = bField; // the plain has collision: keep the lens above the grass
 	if (!bField) PathT = AAralezWorld::NearestT(GetActorLocation(), 0.f);
-	else { Boom->TargetArmLength = 700.f; Boom->CameraLagSpeed = 6.f; Glow->SetAttenuationRadius(bBot ? 1200.f : 1800.f); Glow->SetIntensity(bBot ? 5000.f : 9000.f); }
+	else { Boom->TargetArmLength = 700.f; Boom->CameraLagSpeed = 6.f; Glow->SetAttenuationRadius(bBot ? 1200.f : 1800.f); Glow->SetIntensity(RealBody ? 0.f : (bBot ? 5000.f : 9000.f)); if (RealBody) Glow->SetVisibility(false); }
 }
 
 void AAralezSpirit::BuildBody()
@@ -79,7 +79,7 @@ void AAralezSpirit::BuildBody()
 	{
 		UAralezBodyComponent* B = NewObject<UAralezBodyComponent>(this, TEXT("AralezBody"));
 		B->NumShells = bBot ? 0 : 2;
-		B->GlowLight = bBot ? 6.f : 12.f;
+		B->GlowLight = bBot ? 0.f : 3.f; // a faint warmth only: a strong light painted a yellow disc on the grass
 		B->SetupAttachment(BodyRoot);
 		B->SetRelativeLocation(FVector(0.f, 0.f, -60.f));
 		B->RegisterComponent();
