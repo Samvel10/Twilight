@@ -267,6 +267,7 @@ bool AVishap::BuildSerpent()
 	const TCHAR* MI = bBoss ? TEXT("/Game/Twilight/Vishap/Materials/MI_Vishap_Storm.MI_Vishap_Storm")
 		: (Tier ? TEXT("/Game/Twilight/Vishap/Materials/MI_Vishap_Bronze.MI_Vishap_Bronze") : TEXT("/Game/Twilight/Vishap/Materials/MI_Vishap_Default.MI_Vishap_Default"));
 	SerpentMat = Serpent->CreateDynamicMaterialInstance(0, LoadObject<UMaterialInterface>(nullptr, MI));
+	if (SerpentMat) SerpentMat->SetVectorParameterValue(TEXT("FlashColor"), FLinearColor(1.f, 0.32f, 0.08f));
 	for (UStaticMeshComponent* Sg : Segments) if (Sg) Sg->SetVisibility(false, true);
 	if (Skull) Skull->SetVisibility(false, true);
 	if (NumSeg > 1)
@@ -297,7 +298,8 @@ void AVishap::UpdateSerpent(float Dt)
 	{
 		const bool bFiring = State == EVishapState::Breath || State == EVishapState::BreathWindup;
 		SerpentMat->SetScalarParameterValue(TEXT("MouthGlow"), bFiring ? 20.f : 3.f + 1.f * FMath::Sin(LifeTime * 3.f));
-		SerpentMat->SetScalarParameterValue(TEXT("HitFlash"), HitFlash);
+		// the scan material adds FlashColor * HitFlash as emission: keep it a brief red-hot glint, not a white wash
+		SerpentMat->SetScalarParameterValue(TEXT("HitFlash"), FMath::Min(HitFlash, 1.f) * 0.22f);
 	}
 	// a body the camera flies through would fill the screen: hide it for that instant
 	if (APlayerController* CPC = GetWorld()->GetFirstPlayerController())

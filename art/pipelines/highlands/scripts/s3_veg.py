@@ -217,6 +217,9 @@ def add_hism(act, sm, mats, rows, cull, shadow, scale_mul=1.0, rand_tilt=0.0, xy
         if m is not None:
             comp.set_material(i, m)
     comp.set_editor_property('cast_shadow', shadow)
+    # no physics bodies for scattered plants/rocks: hundreds of thousands of instance bodies stalled Chaos for ~30 s in cooked builds
+    comp.set_collision_enabled(unreal.CollisionEnabled.NO_COLLISION)
+    comp.set_collision_profile_name('NoCollision')
     comp.set_cull_distances(cull[0], cull[1])
     comp.set_mobility(unreal.ComponentMobility.STATIC)
     xs = []

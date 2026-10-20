@@ -397,6 +397,9 @@ void AVahagnCharacter::Tick(float Dt)
 	}
 	if (bAutopilot && !bDead) UpdateAutopilot(Dt);
 	// -TwBoltTest: a bolt every 1.5 s right in front of the camera (visual check of the lightning)
+	// -TwNovaTest: a sun burst every 12 s (perf check of the nova)
+	static const bool bNovaTest = FParse::Param(FCommandLine::Get(), TEXT("TwNovaTest"));
+	if (bNovaTest && bControl) { NovaTestT += Dt; if (NovaTestT > 12.f) { NovaTestT = 0.f; Nova = 100.f; InNova(); } }
 	static const bool bBoltTest = FParse::Param(FCommandLine::Get(), TEXT("TwBoltTest"));
 	if (bBoltTest)
 	{

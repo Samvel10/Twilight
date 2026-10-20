@@ -126,6 +126,7 @@ private:
 	void FireCharged();
 	void CallLightning(float Power);
 	float AutoBolt = 2.f;
+	float NovaTestT = 0.f;
 	void SpawnFireball(const FVector& Muzzle, const FVector& Target, float Power, bool bCharged);
 	FVector MuzzleLocation(bool bRight) const;
 	void Die();

@@ -40,6 +40,21 @@ namespace TwFx
 			}
 			return;
 		}
+		// fiery blasts: additive blooms + sparks. The StarterContent P_Explosion stalled cooked Vulkan builds
+		// (pipeline compiles on first use, ~30 s on Iris Xe) and its sub-UV tail left dark puffs in a bright sky.
+		if (Type == EFx::FireballImpact || Type == EFx::BigExplosion || Type == EFx::VishapDeath || Type == EFx::Nova)
+		{
+			FActorSpawnParameters FP;
+			FP.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			const bool bBig = Type != EFx::FireballImpact;
+			if (ATwFlash* Core = World->SpawnActor<ATwFlash>(Loc, FRotator::ZeroRotator, FP))
+				Core->Init(FLinearColor(1.f, 0.62f, 0.25f), 2.4f * Scale, bBig ? 0.55f : 0.35f);
+			if (ATwFlash* Halo = World->SpawnActor<ATwFlash>(Loc, FRotator::ZeroRotator, FP))
+				Halo->Init(Type == EFx::Nova ? FLinearColor(1.f, 0.5f, 0.15f) : FLinearColor(1.f, 0.32f, 0.07f), 4.2f * Scale, bBig ? 0.9f : 0.5f);
+			if (UParticleSystem* SparksPs = TwAssets::Cascade(TEXT("P_Sparks")))
+				UGameplayStatics::SpawnEmitterAtLocation(World, SparksPs, Loc, Rot, FVector(0.6f * Scale), true, EPSCPoolMethod::AutoRelease);
+			return;
+		}
 		const TCHAR* NsName = nullptr;
 		const TCHAR* Cascade = nullptr;
 		switch (Type)
